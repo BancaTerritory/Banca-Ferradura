@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-import uuid # For generating a unique (but still simulated) PIX code
+import uuid # Fimport uuid or generating a unique (but still simulated) PIX code
 import datetime # For timestamping transactions
 
 # This would normally come from auth_routes or a shared user model/db access layer
@@ -39,8 +39,7 @@ def add_credits_page():
 
             user_phone = session["user_phone"]
             
-            generated_pix_code = f"00020126330014BR.GOV.BCB.PIX0111{user_phone.replace("(", "").replace(")", "").replace("-", "")}5204000053039865802BR5913BancaFerradura6009SAO PAULO62070503***6304{str(uuid.uuid4())[:4].upper()}"
-            session["pix_code_to_display"] = generated_pix_code
+            generated_pix_code = generated_pix_code = f"00020126330014BR.GOV.BCB.PIX0111{cleaned_phone_for_pix}5204{amount_value:.2f}53039865802BR5913NOMEBENEFICIARIO6009SAOPAULO62070503{random_pix_part}6304ABCD"
 
             transaction_id = str(uuid.uuid4())
             new_recharge_transaction = {
