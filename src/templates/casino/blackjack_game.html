@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}Blackjack - Banca Ferradura{% endblock %}
+
+{% block extra_css %}
+<style>
+  .blackjack-game-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #006400; /* Verde escuro de mesa de cassino */
+    border-radius: var(--raio-borda-padrao);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    color: #fff;
+    border: 5px solid #8B4513; /* Borda de madeira escura */
+    font-family: 'Arial', sans-serif;
+  }
+
+  .blackjack-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+  }
+
+  .blackjack-header h2 {
+    margin: 0;
+    color: #FFD700; /* Dourado */
+    text-shadow: 1px 1px 2px #000;
+    font-size: 2.2em;
+  }
+
+  .balance-info {
+    font-size: 1.2em;
+    background-color: rgba(0,0,0,0.3);
+    padding: 8px 12px;
+    border-radius: var(--raio-borda-pequena);
+  }
+
+  .blackjack-table {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .hand-area {
+    background-color: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: var(--raio-borda-padrao);
+    min-height: 120px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .hand-area h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #FFD700;
+    font-size: 1.3em;
+  }
+
+  .cards-display {
+    display: flex;
+    gap: 10px;
+    min-height: 80px; /* Para acomodar as cartas */
+    align-items: center;
+  }
+
+  .card {
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+    width: 60px;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    font-size: 1.8em;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  }
+  .card.hidden-card {
+    background-color: #B22222; /* Dorso da carta */
+    color: #B22222;
+  }
+  .card .suit {
+    font-size: 0.6em;
+  }
+  .card .rank.red {
+    color: red;
+  }
+
+  .player-score, .dealer-score {
+    font-size: 1.1em;
+    margin-top: 5px;
+    color: #eee;
+  }
+
+  .blackjack-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(0,0,0,0.15);
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .bet-area-blackjack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bet-input-blackjack {
+    width: 100px;
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    color: #333;
+    border: 2px solid #FFD700;
+    border-radius: var(--raio-borda-padrao);
+    font-size: 1em;
+  }
+
+  .btn-blackjack {
+    padding: 10px 25px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: var(--raio-borda-arredondada);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .btn-blackjack.deal {
+    background-color: #28a745; /* Verde para Deal/Apostar */
+  }
+  .btn-blackjack.hit {
+    background-color: #007bff; /* Azul para Hit */
+  }
+  .btn-blackjack.stand {
+    background-color: #dc3545; /* Vermelho para Stand */
+  }
+  .btn-blackjack:hover {
+    opacity: 0.9;
+  }
+  .btn-blackjack:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .game-message-blackjack {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: var(--raio-borda-padrao);
+    text-align: center;
+    font-size: 1.3em;
+    min-height: 50px;
+    color: #FFD700;
+    font-weight: bold;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container blackjack-game-container">
+    <div class="blackjack-header">
+        <h2>{{ game_name|default("Blackjack") }} (Protótipo)</h2>
+        {% if session.get("user_phone") %}
+            <span class="balance-info">Saldo: R$ <span id="user-balance-blackjack">{{ session.get("user_credits", "0.00") }}</span></span>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if session.get("user_phone") %}
+        <div class="blackjack-table">
+            <div class="hand-area dealer-hand-area">
+                <h3>Mão do Dealer <span class="dealer-score" id="dealer-score-blackjack"></span></h3>
+                <div class="cards-display" id="dealer-cards-blackjack">
+                    <!-- Cartas do Dealer aqui -->
+                </div>
+            </div>
+
+            <div class="hand-area player-hand-area">
+                <h3>Sua Mão <span class="player-score" id="player-score-blackjack"></span></h3>
+                <div class="cards-display" id="player-cards-blackjack">
+                    <!-- Suas cartas aqui -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-message-blackjack" id="game-message-blackjack">
+            Faça sua aposta para começar!
+        </div>
+
+        <div class="blackjack-controls">
+            <div class="bet-area-blackjack">
+                <label for="bet-amount-blackjack">Sua Aposta: R$</label>
+                <input type="number" id="bet-amount-blackjack" value="5.00" min="1.00" step="1.00" class="bet-input-blackjack">
+            </div>
+            <button class="btn-blackjack deal" id="deal-button-blackjack">APOSTAR / DAR CARTAS</button>
+            <button class="btn-blackjack hit" id="hit-button-blackjack" disabled>COMPRAR (HIT)</button>
+            <button class="btn-blackjack stand" id="stand-button-blackjack" disabled>PARAR (STAND)</button>
+        </div>
+        <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+
+    {% else %}
+        <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const dealButton = document.getElementById("deal-button-blackjack");
+    const hitButton = document.getElementById("hit-button-blackjack");
+    const standButton = document.getElementById("stand-button-blackjack");
+    const betAmountInput = document.getElementById("bet-amount-blackjack");
+    const userBalanceDisplay = document.getElementById("user-balance-blackjack");
+    const gameMessageDisplay = document.getElementById("game-message-blackjack");
+    const playerCardsDisplay = document.getElementById("player-cards-blackjack");
+    const dealerCardsDisplay = document.getElementById("dealer-cards-blackjack");
+    const playerScoreDisplay = document.getElementById("player-score-blackjack");
+    const dealerScoreDisplay = document.getElementById("dealer-score-blackjack");
+
+    function createCardElement(card) { // card = {rank: 'A', suit: '♠'} or {rank: '?', suit: '?'} for hidden
+        const cardDiv = document.createElement("div");
+        cardDiv.classList.add("card");
+        if (card.rank === '?') {
+            cardDiv.classList.add("hidden-card");
+            cardDiv.innerHTML = `<span></span><span></span>`; // Empty for hidden card
+        } else {
+            const rankSpan = document.createElement("span");
+            rankSpan.classList.add("rank");
+            rankSpan.textContent = card.rank;
+            const suitSpan = document.createElement("span");
+            suitSpan.classList.add("suit");
+            suitSpan.textContent = card.suit;
+
+            if (card.suit === '♥' || card.suit === '♦') {
+                rankSpan.classList.add('red');
+                suitSpan.style.color = 'red';
+            }
+            cardDiv.appendChild(rankSpan);
+            cardDiv.appendChild(suitSpan);
+        }
+        return cardDiv;
+    }
+
+    function renderHand(hand, displayElement, scoreElement, hideFirstDealerCard = false) {
+        displayElement.innerHTML = '';
+        let score = 0;
+        let aces = 0;
+        hand.forEach((card, index) => {
+            if (hideFirstDealerCard && index === 0) {
+                displayElement.appendChild(createCardElement({rank: '?', suit: '?'}));
+            } else {
+                displayElement.appendChild(createCardElement(card));
+                if (card.rank !== '?') { // Calculate score only for visible cards
+                    if (['K', 'Q', 'J'].includes(card.rank)) {
+                        score += 10;
+                    } else if (card.rank === 'A') {
+                        aces += 1;
+                        score += 11; // Assume Ace is 11 initially
+                    } else {
+                        score += parseInt(card.rank);
+                    }
+                }
+            }
+        });
+        // Adjust for Aces
+        while (score > 21 && aces > 0) {
+            score -= 10;
+            aces -= 1;
+        }
+        if (scoreElement && score > 0) scoreElement.textContent = `(Pontos: ${score})`;
+        else if (scoreElement) scoreElement.textContent = '';
+        return score;
+    }
+
+    function updateGameState(data) {
+        userBalanceDisplay.textContent = data.new_balance;
+        gameMessageDisplay.textContent = data.message;
+        
+        renderHand(data.player_hand, playerCardsDisplay, playerScoreDisplay);
+        renderHand(data.dealer_hand, dealerCardsDisplay, dealerScoreDisplay, data.game_over ? false : true);
+
+        if (data.game_over) {
+            dealButton.disabled = false;
+            hitButton.disabled = true;
+            standButton.disabled = true;
+            betAmountInput.disabled = false;
+            dealButton.textContent = "NOVA APOSTA";
+        } else {
+            dealButton.disabled = true;
+            hitButton.disabled = false;
+            standButton.disabled = false;
+            betAmountInput.disabled = true;
+            dealButton.textContent = "APOSTAR / DAR CARTAS";
+        }
+    }
+
+    function sendAction(action, extra_data = {}) {
+        const betAmount = parseFloat(betAmountInput.value);
+        fetch(`{{ url_for('casino.blackjack_action') }}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ action: action, bet_amount: betAmount, ...extra_data })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Erro: " + data.error);
+                gameMessageDisplay.textContent = data.error;
+                 // Reset buttons if error during active game
+                if (!dealButton.disabled) { // if deal button is active, means game was not started
+                    // no need to reset hit/stand
+                } else if (data.game_over === undefined || data.game_over === true ) { // if game ended due to error or naturally
+                    dealButton.disabled = false;
+                    hitButton.disabled = true;
+                    standButton.disabled = true;
+                    betAmountInput.disabled = false;
+                    dealButton.textContent = "NOVA APOSTA";
+                }
+            } else {
+                updateGameState(data);
+            }
+        })
+        .catch(error => {
+            console.error("Erro de Conexão:", error);
+            alert("Ocorreu um erro de conexão ao processar sua jogada.");
+            gameMessageDisplay.textContent = "Erro de conexão.";
+        });
+    }
+
+    if (dealButton) {
+        dealButton.addEventListener("click", () => sendAction("deal"));
+    }
+    if (hitButton) {
+        hitButton.addEventListener("click", () => sendAction("hit"));
+    }
+    if (standButton) {
+        standButton.addEventListener("click", () => sendAction("stand"));
+    }
+
+    // Initial placeholder cards (optional, can be cleared by first game state)
+    // renderHand([{rank:'?', suit:'?'}, {rank:'?', suit:'?'}], playerCardsDisplay, playerScoreDisplay);
+    // renderHand([{rank:'?', suit:'?'}, {rank:'?', suit:'?'}], dealerCardsDisplay, dealerScoreDisplay, true);
+});
+</script>
+{% endblock %}
+

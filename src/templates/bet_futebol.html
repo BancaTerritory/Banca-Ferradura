@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Apostas em Futebol - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card game-container"> {# Usando game-container para o card principal da página de jogo #}
+        <div class="header-balance">
+            <h2>Apostas Esportivas - Futebol (Protótipo)</h2>
+            {% if session.get("user_phone") %}
+                <span class="balance-info">Saldo: R$ {{ session.get("user_credits", "0.00") }}</span>
+            {% endif %}
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if session.get("user_phone") %}
+            <h3 style="margin-top: 20px;">Partidas Disponíveis (Simuladas):</h3>
+            {% if partidas %}
+                <form method="POST" action="{{ url_for("games.fazer_aposta_futebol") }}" class="bet-form" style="margin-top:15px;">
+                    <div class="table-responsive" style="overflow-x:auto;">
+                        <table class="table" style="width:100%; border-collapse: collapse; margin-bottom:20px; background-color: #3e444c; border-radius: var(--raio-borda-padrao);">
+                            <thead>
+                                <tr style="background-color: #495057;">
+                                    <th style="padding: 10px; text-align:left;">Partida</th>
+                                    <th style="padding: 10px;">Casa (Odd)</th>
+                                    <th style="padding: 10px;">Empate (Odd)</th>
+                                    <th style="padding: 10px;">Fora (Odd)</th>
+                                    <th style="padding: 10px;">Apostar Nesta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for partida in partidas %}
+                                <tr style="border-bottom: 1px solid #495057;">
+                                    <td style="padding: 10px;">{{ partida.casa }} vs {{ partida.fora }}</td>
+                                    <td style="padding: 10px; text-align:center;">
+                                        <label style="cursor:pointer; display:block; padding: 5px;">
+                                            <input type="radio" name="aposta_partida_{{ partida.id }}" value="casa" required>
+                                            {{ "%.2f"|format(partida.odds.casa) }}
+                                        </label>
+                                    </td>
+                                    <td style="padding: 10px; text-align:center;">
+                                        <label style="cursor:pointer; display:block; padding: 5px;">
+                                            <input type="radio" name="aposta_partida_{{ partida.id }}" value="empate">
+                                            {{ "%.2f"|format(partida.odds.empate) }}
+                                        </label>
+                                    </td>
+                                    <td style="padding: 10px; text-align:center;">
+                                        <label style="cursor:pointer; display:block; padding: 5px;">
+                                            <input type="radio" name="aposta_partida_{{ partida.id }}" value="fora">
+                                            {{ "%.2f"|format(partida.odds.fora) }}
+                                        </label>
+                                    </td>
+                                    <td style="padding: 10px; text-align:center;">
+                                        <input type="radio" name="partida_selecionada" value="{{ partida.id }}" required title="Selecione esta partida para apostar" style="transform: scale(1.2);">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="valor_aposta_futebol">Valor da Aposta (R$):</label>
+                        <input type="number" id="valor_aposta_futebol" name="valor_aposta_futebol" min="0.01" step="0.01" required placeholder="Ex: 10.00">
+                    </div>
+                    <button type="submit" class="btn btn-verde submit-bet-button">Fazer Aposta</button>
+                </form>
+            {% else %}
+                <p>Nenhuma partida disponível no momento.</p>
+            {% endif %}
+
+            {% if session.get("ultimo_resultado_futebol") %}
+                <div class="results-box" style="margin-top: 20px;">
+                    <h4>Resultado da Última Aposta de Futebol (Simulado)</h4>
+                    <p><strong>Sua aposta:</strong> Partida: {{ session.get("ultimo_jogo_futebol").partida }}, Escolha: {{ session.get("ultimo_jogo_futebol").escolha }}, Odd: {{ session.get("ultimo_jogo_futebol").odd }}, Apostou: R$ {{ session.get("ultimo_jogo_futebol").valor_apostado }}</p>
+                    <p><strong>Resultado da Partida:</strong> {{ session.get("ultimo_resultado_futebol").resultado_partida }}</p>
+                    <p><strong>Prêmio:</strong> R$ {{ session.get("ultimo_resultado_futebol").premio }}</p>
+                    <p class="result-message">{{ session.get("ultimo_resultado_futebol").mensagem }}</p>
+                </div>
+            {% endif %}
+
+            <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("main.index") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar para o Dashboard</a></p>
+        {% else %}
+            <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+

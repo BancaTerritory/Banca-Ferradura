@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">BANCA FERRADURA</div>
+    <div class="auth-logo-subtitle">A SUA SORTE NO DESTINO CERTO</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+        <div class="form-group">
+            <span class="input-icon"><i data-lucide="user"></i></span>
+            <input type="text" name="name" class="input-with-icon" placeholder="Nome Completo" required>
+        </div>
+        <div class="form-group phone-group">
+            <span class="input-icon"><i data-lucide="smartphone"></i></span>
+            <input type="tel" name="ddd" class="input-ddd" placeholder="DDD" required pattern="[0-9]{2}" title="Digite um DDD válido com 2 dígitos">
+            <input type="tel" name="phone_number" class="input-phone-number" placeholder="Número (Ex: 987654321)" required pattern="[0-9]{8,9}" title="Digite um número válido com 8 ou 9 dígitos">
+        </div>
+        {# A senha é gerada automaticamente no backend e "enviada" por SMS (simulado) #}
+        {# Não pedimos senha no cadastro inicial #}
+        <button type="submit" class="btn btn-neutro">Cadastrar e Receber Código</button>
+    </form>
+
+    <div class="auth-divider">OU</div>
+
+    <a href="{{ url_for('auth.login_page') }}" class="btn btn-cadastro">Já tenho conta &rarr;</a>
+</div>
+<style>
+.phone-group {
+    display: flex;
+    align-items: center; /* Alinha verticalmente o ícone e os inputs */
+}
+.input-ddd {
+    width: 60px; /* Largura menor para o DDD */
+    margin-right: 10px; /* Espaço entre DDD e número */
+    text-align: center;
+    padding-left: 10px !important; /* Ajuste para não sobrepor o ícone se o ícone fosse por input */
+}
+.input-phone-number {
+    flex-grow: 1; /* Ocupa o espaço restante */
+    padding-left: 10px !important; /* Ajuste para não sobrepor o ícone se o ícone fosse por input */
+}
+/* Ajuste para o ícone ficar à esquerda do grupo DDD + Número */
+.phone-group .input-icon {
+    margin-right: 10px; /* Espaço entre o ícone e o campo DDD */
+    /* Removido o posicionamento absoluto para fluir com os inputs */
+}
+.input-ddd,
+.input-phone-number {
+    padding-left: 5px !important; /* Reduzir padding para campos menores */
+}
+.form-group input[type="tel"].input-ddd,
+.form-group input[type="tel"].input-phone-number {
+    padding-left: 10px; /* Reset para o padding normal sem ícone individual */
+}
+
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Recarregar Saldo - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container" style="max-width: 500px; margin-top: 20px;">
+        <div class="auth-logo">BANCA FERRADURA</div>
+        <div class="auth-logo-subtitle">RECARGA VIA PIX</div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('payments.add_credits_page') }}" class="auth-form">
+            <div class="form-group">
+                <label for="amount" class="form-label">Valor da Recarga (R$):</label>
+                <input type="number" name="amount" id="amount" class="input-full-width" placeholder="Ex: 50.00" required min="1" step="0.01">
+            </div>
+            <button type="submit" class="btn btn-verde btn-block">Gerar PIX Copia e Cola</button>
+        </form>
+
+        {% if pix_code %}
+        <div class="pix-code-container card" style="margin-top: 20px; padding: 15px;">
+            <h4>PIX Copia e Cola Gerado:</h4>
+            <p style="font-size: 0.9em; color: #888;">Esta é uma simulação. Em um ambiente real, este seria um código PIX válido.</p>
+            <textarea id="pix_code_text" class="input-full-width" rows="4" readonly style="margin-bottom: 10px; font-family: monospace; background-color: #f0f0f0;">{{ pix_code }}</textarea>
+            <button class="btn btn-neutro btn-sm" onclick="copyPixCode()">Copiar Código</button>
+            <p style="margin-top:15px;">Após o pagamento, o saldo será atualizado em sua conta.</p>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('main.index') }}" class="auth-link">&larr; Voltar para o Dashboard</a>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+
+    function copyPixCode() {
+        const textarea = document.getElementById("pix_code_text");
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+        try {
+            navigator.clipboard.writeText(textarea.value).then(function() {
+                alert("Código PIX copiado para a área de transferência!");
+            }, function(err) {
+                document.execCommand("copy");
+                alert("Código PIX copiado para a área de transferência (fallback)!");
+            });
+        } catch (err) {
+            document.execCommand("copy");
+            alert("Código PIX copiado para a área de transferência (catch fallback)!");
+        }
+    }
+</script>
+{% endblock %}
+

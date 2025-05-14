@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Créditos - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container" style="max-width: 600px;"> {# Reutilizando auth-container para um card centralizado #}
+        <h2 style="text-align: center; color: var(--cor-texto-principal); margin-bottom: 20px;">Adicionar Créditos</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if session.get("user_phone") %}
+            <p style="text-align: center; margin-bottom: 15px; font-size: 1.1em;">Seu saldo atual é: <strong style="color: var(--cor-destaque-verde);">R$ {{ session.get("user_credits", "0.00") }}</strong></p>
+            
+            <form method="POST" action="{{ url_for("payments.add_credits") }}" class="auth-form">
+                <div class="form-group">
+                    <label for="amount">Valor a adicionar (R$):</label>
+                    <input type="number" id="amount" name="amount" min="1" step="0.01" required placeholder="Ex: 50.00">
+                </div>
+                <button type="submit" class="btn btn-verde" style="width:100%;">Gerar PIX Copia e Cola (Simulado)</button>
+            </form>
+
+            {% if session.get("pix_code") %}
+                <div class="card" style="margin-top: 20px; background-color: #3e444c; color: var(--cor-texto-principal);">
+                    <h4 style="color: var(--cor-destaque-verde); margin-top:0;">PIX Copia e Cola (Simulado)</h4>
+                    <p>Por favor, "pague" o valor de <strong style="color: var(--cor-destaque-verde);">R$ {{ session.get("pix_amount") }}</strong> usando o código abaixo:</p>
+                    <pre style="background-color: #282c34; color: var(--cor-texto-principal); padding: 10px; border-radius: var(--raio-borda-padrao); word-wrap: break-word; white-space: pre-wrap;">{{ session.get("pix_code") }}</pre>
+                    <form method="POST" action="{{ url_for("payments.confirm_pix") }}" style="margin-top:15px;">
+                        <button type="submit" class="btn btn-neutro" style="width:100%;">Confirmar Pagamento (Simulado)</button>
+                    </form>
+                </div>
+            {% endif %}
+            <p style="text-align:center; margin-top:20px;"><a href="{{ url_for("main.index") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar para o Dashboard</a></p>
+        {% else %}
+            <p style="text-align:center;">Você precisa estar logado para adicionar créditos. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Roleta - Banca Ferradura{% endblock %}
+
+{% block extra_css %}
+<style>
+  .roulette-game-container {
+    max-width: 700px; /* Ajustar conforme necessário */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--cor-fundo-card); /* Ou uma cor temática para a roleta */
+    border-radius: var(--raio-borda-padrao);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    color: var(--cor-texto-principal);
+  }
+
+  .roulette-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--cor-borda-elementos);
+  }
+
+  .roulette-header h2 {
+    margin: 0;
+  }
+
+  .balance-info {
+    font-size: 1.1em;
+  }
+
+  .roulette-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .roulette-wheel-area {
+    width: 300px; /* Tamanho da roleta */
+    height: 300px;
+    border-radius: 50%;
+    background-color: #2c3e50; /* Cor base da roleta */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    /* Adicionar imagem da roleta ou desenhar com CSS/SVG */
+    background-image: url("{{ url_for('static', filename='img/casino_assets/roulette_wheel.png') }}"); /* Placeholder */
+    background-size: cover;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5) inset;
+  }
+  
+  .roulette-ball {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    /* A posição será atualizada por JS */
+    transition: transform 4s cubic-bezier(0.2, 0.8, 0.7, 1); /* Animação da bola */
+  }
+  
+  .roulette-pointer {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 20px solid red; /* Cor do ponteiro */
+    position: absolute;
+    top: -15px; /* Ajustar para ficar acima da roda */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .betting-table-area {
+    width: 100%;
+    max-width: 600px;
+    /* Estilizar a mesa de apostas aqui */
+    background-color: #006000; /* Verde clássico de mesa de roleta */
+    padding: 15px;
+    border-radius: var(--raio-borda-padrao);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .betting-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .bet-option {
+    padding: 10px;
+    background-color: var(--cor-botao-secundario);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda-elementos);
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .bet-option:hover, .bet-option.selected {
+    background-color: var(--cor-destaque-verde);
+    color: white;
+  }
+  .bet-option.red { background-color: #c0392b; color: white; }
+  .bet-option.red:hover, .bet-option.red.selected { background-color: #e74c3c; }
+  .bet-option.black { background-color: #2c3e50; color: white; }
+  .bet-option.black:hover, .bet-option.black.selected { background-color: #34495e; }
+  .bet-option.number { font-weight: bold; }
+
+  .controls-area-roulette {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .bet-input-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bet-input-roulette {
+    width: 100px;
+    padding: 8px;
+    text-align: center;
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda-elementos);
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .btn-spin-roulette {
+    padding: 12px 40px;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: var(--cor-destaque-verde);
+    border-color: var(--cor-destaque-verde);
+  }
+  .btn-spin-roulette:disabled {
+    background-color: #555;
+    border-color: #555;
+    cursor: not-allowed;
+  }
+  
+  .result-display-roulette {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: var(--raio-borda-padrao);
+    text-align: center;
+    font-size: 1.2em;
+    min-height: 50px;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container roulette-game-container">
+    <div class="roulette-header">
+        <h2>{{ game_name|default("Roleta") }} (Protótipo)</h2>
+        {% if session.get("user_phone") %}
+            <span class="balance-info">Saldo: R$ <span id="user-balance-roulette">{{ session.get("user_credits", "0.00") }}</span></span>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if session.get("user_phone") %}
+        <div class="roulette-layout">
+            <div class="roulette-wheel-area" id="roulette-wheel">
+                 <div class="roulette-pointer"></div>
+                 <div class="roulette-ball" id="roulette-ball"></div>
+                 <!-- Números da roleta podem ser adicionados dinamicamente ou como parte da imagem de fundo -->
+            </div>
+
+            <div class="betting-table-area">
+                <p style="text-align:center; margin-bottom:10px; font-size:0.9em;">Selecione seu tipo de aposta:</p>
+                <div class="betting-options">
+                    <!-- Opções de aposta simplificadas -->
+                    <div class="bet-option red" data-bet-type="color" data-bet-value="red">Vermelho</div>
+                    <div class="bet-option black" data-bet-type="color" data-bet-value="black">Preto</div>
+                    <div class="bet-option" data-bet-type="parity" data-bet-value="even">Par</div>
+                    <div class="bet-option" data-bet-type="parity" data-bet-value="odd">Ímpar</div>
+                    <div class="bet-option" data-bet-type="range" data-bet-value="1-18">1-18</div>
+                    <div class="bet-option" data-bet-type="range" data-bet-value="19-36">19-36</div>
+                    <!-- Adicionar apostas em números específicos seria mais complexo para um protótipo inicial -->
+                </div>
+            </div>
+
+            <div class="controls-area-roulette">
+                <div class="bet-input-area">
+                    <label for="bet-amount-roulette">Valor da Aposta: R$</label>
+                    <input type="number" id="bet-amount-roulette" value="1.00" min="0.50" step="0.50" class="bet-input-roulette">
+                </div>
+                <button class="btn btn-verde btn-spin-roulette" id="spin-button-roulette">GIRAR ROLETA</button>
+            </div>
+
+            <div class="result-display-roulette" id="result-display-roulette">
+                Faça sua aposta e gire a roleta!
+            </div>
+        </div>
+        <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+    {% else %}
+        <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const spinButton = document.getElementById("spin-button-roulette");
+    const betAmountInput = document.getElementById("bet-amount-roulette");
+    const userBalanceDisplay = document.getElementById("user-balance-roulette");
+    const resultDisplay = document.getElementById("result-display-roulette");
+    const betOptions = document.querySelectorAll(".bet-option");
+    const rouletteWheel = document.getElementById("roulette-wheel");
+    const rouletteBall = document.getElementById("roulette-ball");
+
+    let selectedBetType = null;
+    let selectedBetValue = null;
+
+    // Mapeamento de números para cores e posições na roleta (simplificado)
+    const wheelNumbers = [
+        0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 
+        5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+    ]; // Roleta Europeia Padrão
+    const numberColors = {
+        0: 'green', 1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black', 7: 'red', 8: 'black', 9: 'red',
+        10: 'black', 11: 'black', 12: 'red', 13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red',
+        19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black', 25: 'red', 26: 'black', 27: 'red',
+        28: 'black', 29: 'black', 30: 'red', 31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red'
+    };
+
+    betOptions.forEach(option => {
+        option.addEventListener("click", function() {
+            betOptions.forEach(opt => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            selectedBetType = this.dataset.betType;
+            selectedBetValue = this.dataset.betValue;
+            resultDisplay.textContent = `Aposta selecionada: ${this.textContent}`;
+        });
+    });
+
+    if (spinButton) {
+        spinButton.addEventListener("click", () => {
+            if (!selectedBetType || !selectedBetValue) {
+                alert("Por favor, selecione um tipo de aposta.");
+                return;
+            }
+            const betAmount = parseFloat(betAmountInput.value);
+            if (isNaN(betAmount) || betAmount <= 0) {
+                alert("Por favor, insira um valor de aposta válido.");
+                return;
+            }
+            let currentBalance = parseFloat(userBalanceDisplay.textContent);
+            if (betAmount > currentBalance) {
+                alert("Saldo insuficiente!");
+                return;
+            }
+
+            spinButton.disabled = true;
+            spinButton.textContent = "GIRANDO...";
+            resultDisplay.textContent = "Roleta girando...";
+
+            // Animação da bola (simples)
+            const randomSpins = Math.floor(Math.random() * 5) + 3; // 3 a 7 voltas
+            const finalAngle = Math.floor(Math.random() * 360); // Ângulo final aleatório
+            const totalRotation = randomSpins * 360 + finalAngle;
+            
+            if(rouletteBall) {
+                rouletteBall.style.transform = `rotate(${totalRotation}deg) translateX(130px) rotate(-${totalRotation}deg)`; // Ajustar translateX para o raio
+            }
+
+            fetch("{{ url_for('casino.roulette_spin') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    bet_amount: betAmount,
+                    bet_type: selectedBetType,
+                    bet_value: selectedBetValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                setTimeout(() => { // Atraso para coincidir com a "parada" da bola
+                    if (data.error) {
+                        alert("Erro: " + data.error);
+                        resultDisplay.textContent = data.error;
+                    } else {
+                        userBalanceDisplay.textContent = data.new_balance;
+                        let resultText = `Número sorteado: ${data.winning_number} (${numberColors[data.winning_number]}). `;
+                        if (parseFloat(data.winnings) > 0) {
+                            resultText += `Parabéns, você ganhou R$ ${data.winnings}!`;
+                        } else {
+                            resultText += `Não foi desta vez.`;
+                        }
+                        resultDisplay.textContent = resultText;
+                        alert(resultText); 
+                    }
+                    spinButton.disabled = false;
+                    spinButton.textContent = "GIRAR ROLETA";
+                }, 4100); // Tempo da animação da bola + pequeno buffer
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                alert("Ocorreu um erro ao processar sua aposta.");
+                resultDisplay.textContent = "Erro ao conectar com o servidor.";
+                spinButton.disabled = false;
+                spinButton.textContent = "GIRAR ROLETA";
+            });
+        });
+    }
+
+    // Criar a imagem da roleta se não existir (placeholder)
+    const wheelImgPath = "{{ url_for('static', filename='img/casino_assets/roulette_wheel.png') }}";
+    fetch(wheelImgPath)
+        .then(res => {
+            if (!res.ok) {
+                console.warn("Imagem da roleta (roulette_wheel.png) não encontrada. Crie uma em static/img/casino_assets/");
+                if(rouletteWheel) rouletteWheel.style.backgroundColor = '#333'; // Fallback
+            }
+        });
+
+});
+</script>
+{% endblock %}
+

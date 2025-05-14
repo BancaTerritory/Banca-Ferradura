@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block title %}Aviator - Banca Ferradura{% endblock %}
+
+{% block extra_css %}
+<style>
+  .aviator-game-container {
+    max-width: 800px; /* Ajustar conforme necessário */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1a1d22; /* Fundo escuro para o tema Aviator */
+    border-radius: var(--raio-borda-padrao);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    color: var(--cor-texto-principal);
+  }
+
+  .aviator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+  }
+
+  .aviator-header h2 {
+    margin: 0;
+    color: #e0e0e0;
+  }
+
+  .balance-info {
+    font-size: 1.1em;
+    color: #e0e0e0;
+  }
+
+  .aviator-main-area {
+    height: 350px; /* Altura da área de voo */
+    background-color: #0f1216; /* Fundo da área de voo */
+    border-radius: var(--raio-borda-padrao);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #2a2d32;
+  }
+
+  .airplane {
+    width: 80px; /* Tamanho do avião */
+    height: auto;
+    position: absolute;
+    bottom: 20px; /* Posição inicial */
+    left: 50px;
+    transition: transform 0.1s linear, opacity 0.2s linear;
+    /* Usar uma imagem de avião */
+    content: url("{{ url_for(\'static\', filename=\'img/casino_assets/aviator_plane.png\') }}");
+  }
+
+  .multiplier-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4em; /* Tamanho grande para o multiplicador */
+    font-weight: bold;
+    color: #ffc107; /* Amarelo/dourado para destaque */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  .multiplier-display.active {
+    opacity: 1;
+  }
+  .multiplier-display.crashed {
+    color: #dc3545; /* Vermelho para "Caiu!" */
+    font-size: 3em;
+  }
+
+  .aviator-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .bet-input-group-aviator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #2a2f34;
+    padding: 10px 15px;
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .bet-input-group-aviator label {
+    color: #ccc;
+  }
+
+  .bet-input-aviator {
+    width: 100px;
+    padding: 8px;
+    text-align: center;
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda-elementos);
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .btn-aviator {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: var(--raio-borda-arredondada);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+  .btn-aviator:active {
+    transform: scale(0.98);
+  }
+
+  .btn-place-bet {
+    background-color: var(--cor-destaque-verde);
+    color: white;
+    border: none;
+  }
+  .btn-place-bet:hover {
+    background-color: #218838;
+  }
+  .btn-place-bet:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+  }
+
+  .btn-cash-out {
+    background-color: #ffc107; /* Amarelo para cash out */
+    color: #212529;
+    border: none;
+  }
+  .btn-cash-out:hover {
+    background-color: #e0a800;
+  }
+  .btn-cash-out:disabled {
+    background-color: #777;
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .game-status-aviator {
+    margin-top: 15px;
+    font-size: 1.1em;
+    text-align: center;
+    min-height: 30px;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container aviator-game-container">
+    <div class="aviator-header">
+        <h2>{{ game_name|default("Aviator") }} (Protótipo)</h2>
+        {% if session.get("user_phone") %}
+            <span class="balance-info">Saldo: R$ <span id="user-balance-aviator">{{ session.get("user_credits", "0.00") }}</span></span>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if session.get("user_phone") %}
+        <div class="aviator-main-area" id="aviator-main-area">
+            <img src="{{ url_for(\'static\', filename=\'img/casino_assets/aviator_plane.png\') }}" alt="Avião" class="airplane" id="airplane">
+            <div class="multiplier-display" id="multiplier-display">1.00x</div>
+        </div>
+
+        <div class="aviator-controls">
+            <div class="bet-input-group-aviator">
+                <label for="bet-amount-aviator">Aposta: R$</label>
+                <input type="number" id="bet-amount-aviator" value="1.00" min="0.10" step="0.10" class="bet-input-aviator">
+            </div>
+            
+            <button class="btn-aviator btn-place-bet" id="place-bet-button">APOSTAR</button>
+            <button class="btn-aviator btn-cash-out" id="cash-out-button" disabled>SAIR @ <span id="cashout-multiplier">1.00</span>x</button>
+            
+            <div class="game-status-aviator" id="game-status-aviator">
+                Aguardando próxima rodada...
+            </div>
+        </div>
+        <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+    {% else %}
+        <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const placeBetButton = document.getElementById("place-bet-button");
+    const cashOutButton = document.getElementById("cash-out-button");
+    const betAmountInput = document.getElementById("bet-amount-aviator");
+    const userBalanceDisplay = document.getElementById("user-balance-aviator");
+    const multiplierDisplay = document.getElementById("multiplier-display");
+    const cashoutMultiplierDisplay = document.getElementById("cashout-multiplier");
+    const gameStatusDisplay = document.getElementById("game-status-aviator");
+    const airplane = document.getElementById("airplane");
+
+    let currentMultiplier = 1.00;
+    let gameActive = false;
+    let betPlaced = false;
+    let currentBetAmount = 0;
+    let gameLoopInterval = null;
+
+    // Simulação da lógica do jogo Aviator
+    function resetGame() {
+        gameActive = false;
+        betPlaced = false;
+        currentMultiplier = 1.00;
+        multiplierDisplay.textContent = "1.00x";
+        multiplierDisplay.classList.remove("active", "crashed");
+        airplane.style.transform = "translate(0px, 0px) rotate(0deg)"; 
+        airplane.style.opacity = 1;
+        placeBetButton.disabled = false;
+        betAmountInput.disabled = false;
+        cashOutButton.disabled = true;
+        gameStatusDisplay.textContent = "Aguardando próxima rodada...";
+        if (gameLoopInterval) clearInterval(gameLoopInterval);
+    }
+
+    function startGame() {
+        if (!betPlaced) {
+            alert("Faça sua aposta primeiro!");
+            return;
+        }
+        gameActive = true;
+        currentMultiplier = 1.00;
+        multiplierDisplay.classList.add("active");
+        multiplierDisplay.classList.remove("crashed");
+        gameStatusDisplay.textContent = "Em voo!";
+        cashOutButton.disabled = false;
+        placeBetButton.disabled = true;
+        betAmountInput.disabled = true;
+
+        let yPos = 0;
+        let xPos = 0;
+        let angle = -10; // Ângulo inicial de subida
+
+        gameLoopInterval = setInterval(() => {
+            if (!gameActive) return;
+
+            // Incremento do multiplicador (exponencial simulado)
+            currentMultiplier += (Math.random() * 0.05 + 0.01) * Math.sqrt(currentMultiplier);
+            multiplierDisplay.textContent = currentMultiplier.toFixed(2) + "x";
+            cashoutMultiplierDisplay.textContent = currentMultiplier.toFixed(2);
+
+            // Movimento do avião
+            yPos -= currentMultiplier * 0.3; // Sobe mais rápido com multiplicador maior
+            xPos += currentMultiplier * 0.2;
+            if (angle > -30) angle -= 0.1;
+            airplane.style.transform = `translate(${xPos}px, ${yPos}px) rotate(${angle}deg)`;
+
+            // Simulação de "crash"
+            // A chance de crash aumenta com o multiplicador
+            if (Math.random() < currentMultiplier / 500) { // Ajustar este valor para controlar a "dificuldade"
+                gameActive = false;
+                multiplierDisplay.textContent = "Caiu!";
+                multiplierDisplay.classList.add("crashed");
+                airplane.style.opacity = 0; // Avião some
+                gameStatusDisplay.textContent = `Caiu em ${currentMultiplier.toFixed(2)}x.`;
+                cashOutButton.disabled = true;
+                
+                // Se a aposta estava ativa e não houve cashout, o jogador perde
+                if(betPlaced){
+                    // A lógica de perda já foi considerada ao debitar a aposta
+                    // Apenas informa o usuário
+                    alert(`O avião caiu em ${currentMultiplier.toFixed(2)}x! Você perdeu R$ ${currentBetAmount.toFixed(2)}.`);
+                }
+                setTimeout(resetGame, 3000); // Reinicia após um tempo
+            }
+            
+            // Limite de altura/distância para o avião sair da tela (ganho máximo simulado)
+            if (yPos < -300 || xPos > 700) { 
+                gameActive = false;
+                gameStatusDisplay.textContent = `Avião voou para longe em ${currentMultiplier.toFixed(2)}x!`;
+                // Se a aposta estava ativa e não houve cashout, considera como um cashout automático no último multiplicador
+                if(betPlaced){
+                    handleCashOut(true); // true para indicar que foi um "voo para longe"
+                }
+                setTimeout(resetGame, 3000);
+            }
+
+        }, 100); // Atualiza a cada 100ms
+    }
+
+    placeBetButton.addEventListener("click", () => {
+        if (gameActive) return; // Não pode apostar se o jogo já começou
+
+        currentBetAmount = parseFloat(betAmountInput.value);
+        let currentBalance = parseFloat(userBalanceDisplay.textContent);
+
+        if (isNaN(currentBetAmount) || currentBetAmount <= 0) {
+            alert("Valor de aposta inválido.");
+            return;
+        }
+        if (currentBetAmount > currentBalance) {
+            alert("Saldo insuficiente.");
+            return;
+        }
+
+        // Chamada AJAX para registrar a aposta no backend e debitar o saldo
+        fetch("{{ url_for(\'casino.aviator_bet\') }}", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ bet_amount: currentBetAmount })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Erro ao apostar: " + data.error);
+                return;
+            }
+            userBalanceDisplay.textContent = data.new_balance;
+            betPlaced = true;
+            placeBetButton.disabled = true;
+            betAmountInput.disabled = true;
+            gameStatusDisplay.textContent = `Aposta de R$ ${currentBetAmount.toFixed(2)} feita. Aguardando início do voo...`;
+            // Inicia o jogo automaticamente após um pequeno delay ou com um botão de "Iniciar Voo"
+            setTimeout(startGame, 1500); 
+        })
+        .catch(error => {
+            console.error("Erro ao apostar:", error);
+            alert("Erro de comunicação ao fazer a aposta.");
+        });
+    });
+
+    function handleCashOut(flewAway = false) {
+        if (!gameActive || !betPlaced) return;
+        
+        const cashOutAtMultiplier = currentMultiplier;
+        gameActive = false; // Para o jogo imediatamente ao fazer cash out
+        betPlaced = false; // Aposta resolvida
+        cashOutButton.disabled = true;
+
+        // Chamada AJAX para o backend registrar o cash out e creditar os ganhos
+        fetch("{{ url_for(\'casino.aviator_cashout\') }}", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ bet_amount: currentBetAmount, multiplier: cashOutAtMultiplier })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Erro no cash out: " + data.error);
+                // Reverter o estado do jogo pode ser complexo aqui, idealmente o backend lida com isso
+                // Por ora, vamos apenas resetar o jogo no frontend
+                resetGame();
+                return;
+            }
+            userBalanceDisplay.textContent = data.new_balance;
+            const winnings = parseFloat(data.winnings);
+            if (flewAway) {
+                 gameStatusDisplay.textContent = `Avião voou para longe! Ganhos: R$ ${winnings.toFixed(2)} @ ${cashOutAtMultiplier.toFixed(2)}x`;
+                 alert(`O avião voou para longe! Você ganhou R$ ${winnings.toFixed(2)} com sua aposta de R$ ${currentBetAmount.toFixed(2)} @ ${cashOutAtMultiplier.toFixed(2)}x.`);
+            } else {
+                gameStatusDisplay.textContent = `Cash out @ ${cashOutAtMultiplier.toFixed(2)}x! Ganhos: R$ ${winnings.toFixed(2)}`;
+                alert(`Cash out realizado! Você ganhou R$ ${winnings.toFixed(2)} com sua aposta de R$ ${currentBetAmount.toFixed(2)} @ ${cashOutAtMultiplier.toFixed(2)}x.`);
+            }
+            setTimeout(resetGame, 3000);
+        })
+        .catch(error => {
+            console.error("Erro no cash out:", error);
+            alert("Erro de comunicação ao fazer cash out.");
+            // Tentar resetar o jogo mesmo em caso de erro de comunicação
+            resetGame();
+        });
+    }
+
+    cashOutButton.addEventListener("click", () => handleCashOut(false));
+
+    // Imagem do avião (placeholder)
+    const planeImgPath = "{{ url_for(\'static\', filename=\'img/casino_assets/aviator_plane.png\') }}";
+    fetch(planeImgPath)
+        .then(res => {
+            if (!res.ok) {
+                console.warn("Imagem do avião (aviator_plane.png) não encontrada. Crie uma em static/img/casino_assets/");
+                if(airplane) airplane.style.backgroundColor = \'red\'; // Fallback visual
+            }
+        });
+
+    resetGame(); // Estado inicial
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">BANCA FERRADURA</div>
+    <div class="auth-logo-subtitle">A SUA SORTE NO DESTINO CERTO</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login_page') }}" class="auth-form">
+        <div class="form-group phone-group">
+            <span class="input-icon"><i data-lucide="smartphone"></i></span>
+            <input type="tel" name="ddd" class="input-ddd" placeholder="DDD" required pattern="[0-9]{2}" title="Digite um DDD válido com 2 dígitos">
+            <input type="tel" name="phone_number" class="input-phone-number" placeholder="Número (Ex: 987654321)" required pattern="[0-9]{8,9}" title="Digite um número válido com 8 ou 9 dígitos">
+        </div>
+        <div class="form-group">
+            <span class="input-icon"><i data-lucide="lock"></i></span>
+            <input type="password" name="password" class="input-with-icon" placeholder="Senha (4 dígitos)" required minlength="4" maxlength="4" pattern="[0-9]{4}" title="Senha de 4 dígitos numéricos">
+        </div>
+        <a href="#" class="auth-link">Esqueceu sua senha?</a> {# Placeholder #}
+        <button type="submit" class="btn btn-neutro">Entrar</button>
+    </form>
+
+    <div class="auth-divider">OU</div>
+
+    <a href="{{ url_for('auth.register') }}" class="btn btn-cadastro">Cadastre-se &rarr;</a>
+</div>
+<style>
+/* Estilos do grupo de telefone já definidos em register.html, mas replicados aqui para garantir que funcionem isoladamente se necessário */
+.phone-group {
+    display: flex;
+    align-items: center;
+}
+.input-ddd {
+    width: 60px;
+    margin-right: 10px;
+    text-align: center;
+    padding-left: 10px !important; 
+}
+.input-phone-number {
+    flex-grow: 1;
+    padding-left: 10px !important; 
+}
+.phone-group .input-icon {
+    margin-right: 10px;
+}
+.input-ddd,
+.input-phone-number {
+    padding-left: 5px !important; 
+}
+.form-group input[type="tel"].input-ddd,
+.form-group input[type="tel"].input-phone-number {
+    padding-left: 10px;
+}
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Fortune Ox - Banca Ferradura{% endblock %}
+
+{% block extra_css %}
+<style>
+  .fortune-ox-game-container {
+    max-width: 600px; /* Ajustar para melhor visualização do 3-4-3 */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #4a0e0e; /* Vermelho escuro temático */
+    border-radius: var(--raio-borda-padrao);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    color: #f0e0c0; /* Cor de texto clara para contraste */
+    border: 3px solid #c89b3c; /* Borda dourada */
+  }
+
+  .fortune-ox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #c89b3c;
+  }
+
+  .fortune-ox-header h2 {
+    margin: 0;
+    color: #ffd700; /* Dourado */
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .balance-info {
+    font-size: 1.1em;
+    color: #fff;
+  }
+
+  .slot-machine-ox {
+    display: grid;
+    /* Grade 3-4-3: 3 colunas, a do meio com 4 linhas, as laterais com 3 */
+    /* Para simplificar a representação visual no protótipo, faremos 3 colunas e o JS lidará com a lógica 3-4-3 */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background-color: #2a0808; /* Fundo interno mais escuro */
+    border-radius: var(--raio-borda-padrao);
+    margin-bottom: 20px;
+    border: 2px solid #c89b3c;
+    min-height: 280px; /* Altura para os símbolos */
+  }
+
+  .reel-ox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around; /* Para 3 símbolos, ou ajustar para 4 no JS */
+    background-color: #5c1a1a;
+    border-radius: 5px;
+    min-height: 250px; /* Altura de cada rolo */
+  }
+
+  .symbol-ox {
+    font-size: 2.8em; /* Tamanho dos símbolos */
+    padding: 5px;
+    text-align: center;
+    width: 100%;
+    height: calc(100% / 3); /* Para 3 símbolos visíveis, ajustar se for 4 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Adicionar imagens para símbolos depois */
+  }
+  
+  /* Símbolos de exemplo - substituir por imagens/ícones melhores */
+  .symbol-ox.ox { color: #ffd700; } /* Touro (Wild) */
+  .symbol-ox.gold_ingot { color: #f1c40f; } /* Lingote de Ouro */
+  .symbol-ox.coins { color: #e67e22; } /* Moedas */
+  .symbol-ox.red_envelope { color: #e74c3c; } /* Envelope Vermelho */
+  .symbol-ox.oranges { color: #f39c12; } /* Laranjas */
+  .symbol-ox.fireworks { color: #c0392b; } /* Fogos de Artifício */
+  .symbol-ox.placeholder { color: #7f8c8d; } /* Placeholder */
+
+  .controls-area-ox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .bet-input-area-ox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .bet-input-ox {
+    width: 100px;
+    padding: 8px;
+    text-align: center;
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid #c89b3c;
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .btn-spin-ox {
+    padding: 12px 40px;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #c89b3c; /* Dourado */
+    color: #4a0e0e; /* Vermelho escuro */
+    border: none;
+    border-radius: var(--raio-borda-arredondada);
+    text-shadow: 1px 1px 1px #fff5e0;
+  }
+  .btn-spin-ox:disabled {
+    background-color: #555;
+    color: #aaa;
+    cursor: not-allowed;
+    text-shadow: none;
+  }
+  
+  .result-display-ox {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: var(--raio-borda-padrao);
+    text-align: center;
+    font-size: 1.2em;
+    min-height: 50px;
+    color: #ffd700;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container fortune-ox-game-container">
+    <div class="fortune-ox-header">
+        <h2>{{ game_name|default("Fortune Ox") }} (Protótipo)</h2>
+        {% if session.get("user_phone") %}
+            <span class="balance-info">Saldo: R$ <span id="user-balance-ox">{{ session.get("user_credits", "0.00") }}</span></span>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if session.get("user_phone") %}
+        <div class="slot-machine-ox" id="slot-machine-ox">
+            <div class="reel-ox" id="reel-ox-0">
+                <span class="symbol-ox placeholder">?</span>
+                <span class="symbol-ox placeholder">?</span>
+                <span class="symbol-ox placeholder">?</span>
+            </div>
+            <div class="reel-ox" id="reel-ox-1">
+                <!-- O rolo do meio pode ter 4 símbolos visíveis, mas para o protótipo inicial, 3 são suficientes para a demonstração -->
+                <span class="symbol-ox placeholder">?</span>
+                <span class="symbol-ox placeholder">?</span>
+                <span class="symbol-ox placeholder">?</span>
+                <!-- <span class="symbol-ox placeholder">?</span> -->
+            </div>
+            <div class="reel-ox" id="reel-ox-2">
+                <span class="symbol-ox placeholder">?</span>
+                <span class="symbol-ox placeholder">?</span>
+                <span class="symbol-ox placeholder">?</span>
+            </div>
+        </div>
+
+        <div class="controls-area-ox">
+            <div class="bet-input-area-ox">
+                <label for="bet-amount-ox">Valor da Aposta: R$</label>
+                <input type="number" id="bet-amount-ox" value="1.00" min="0.20" step="0.20" class="bet-input-ox">
+            </div>
+            <button class="btn btn-verde btn-spin-ox" id="spin-button-ox">GIRAR</button>
+        </div>
+
+        <div class="result-display-ox" id="result-display-ox">
+            Boa sorte!
+        </div>
+        <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+    {% else %}
+        <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const spinButton = document.getElementById("spin-button-ox");
+    const betAmountInput = document.getElementById("bet-amount-ox");
+    const userBalanceDisplay = document.getElementById("user-balance-ox");
+    const resultDisplay = document.getElementById("result-display-ox");
+    const reels = [ // Apenas 3 rolos para simplificar a demo visual
+        document.getElementById("reel-ox-0"),
+        document.getElementById("reel-ox-1"),
+        document.getElementById("reel-ox-2")
+    ];
+
+    // Símbolos do Fortune Ox (simplificado para protótipo)
+    // 🐂 (Touro - Wild), 💰 (Lingotes), 🪙 (Moedas), 🧧 (Envelope), 🍊 (Laranjas), 🎆 (Fogos)
+    const oxSymbols = [
+        { char: "🐂", name: "ox", cssClass: "ox" }, 
+        { char: "💰", name: "gold_ingot", cssClass: "gold_ingot" }, 
+        { char: "🪙", name: "coins", cssClass: "coins" }, 
+        { char: "🧧", name: "red_envelope", cssClass: "red_envelope" },
+        { char: "🍊", name: "oranges", cssClass: "oranges" },
+        { char: "🎆", name: "fireworks", cssClass: "fireworks" }
+    ];
+
+    function getRandomSymbol() {
+        return oxSymbols[Math.floor(Math.random() * oxSymbols.length)];
+    }
+
+    function updateReelDisplay(reelElement, symbolsArray) {
+        reelElement.innerHTML = ""; // Limpa rolo
+        // Para este protótipo, cada rolo mostrará 3 símbolos
+        for (let i = 0; i < 3; i++) {
+            const symbolSpan = document.createElement("span");
+            symbolSpan.classList.add("symbol-ox", symbolsArray[i].cssClass);
+            symbolSpan.textContent = symbolsArray[i].char;
+            reelElement.appendChild(symbolSpan);
+        }
+    }
+
+    if (spinButton) {
+        spinButton.addEventListener("click", () => {
+            const betAmount = parseFloat(betAmountInput.value);
+            if (isNaN(betAmount) || betAmount <= 0) {
+                alert("Por favor, insira um valor de aposta válido.");
+                return;
+            }
+            let currentBalance = parseFloat(userBalanceDisplay.textContent);
+            if (betAmount > currentBalance) {
+                alert("Saldo insuficiente!");
+                return;
+            }
+
+            spinButton.disabled = true;
+            spinButton.textContent = "GIRANDO...";
+            resultDisplay.textContent = "Boa sorte!";
+
+            // Animação de giro (simples)
+            let spinCount = 0;
+            const maxSpins = 15 + Math.floor(Math.random() * 10);
+            const spinInterval = setInterval(() => {
+                reels.forEach(reel => {
+                    const randomSymbolsForReel = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+                    updateReelDisplay(reel, randomSymbolsForReel);
+                });
+                spinCount++;
+                if (spinCount >= maxSpins) {
+                    clearInterval(spinInterval);
+                    // Lógica de resultado final após o "giro"
+                    fetch("{{ url_for(\'casino.fortune_ox_spin\') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ bet_amount: betAmount })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert("Erro: " + data.error);
+                            resultDisplay.textContent = data.error;
+                        } else {
+                            userBalanceDisplay.textContent = data.new_balance;
+                            resultDisplay.textContent = data.message;
+                            // Atualiza os rolos com os símbolos finais do backend
+                            if(data.final_reels) {
+                                for(let i=0; i<reels.length; i++) {
+                                    if(data.final_reels[i]) {
+                                        const backendSymbols = data.final_reels[i].map(s_name => oxSymbols.find(os => os.name === s_name) || {char: \'?\', cssClass: \'placeholder\'});
+                                        updateReelDisplay(reels[i], backendSymbols);
+                                    }
+                                }
+                            }
+                            if (parseFloat(data.winnings) > 0) {
+                                alert(`Parabéns! Você ganhou R$ ${data.winnings}! Multiplicador x10 aplicado!`);
+                            } else if (data.feature_triggered) {
+                                alert(data.message); // Ex: "Respin ativado!"
+                            }
+                        }
+                        spinButton.disabled = false;
+                        spinButton.textContent = "GIRAR";
+                    })
+                    .catch(error => {
+                        console.error("Erro:", error);
+                        alert("Ocorreu um erro ao processar sua aposta.");
+                        resultDisplay.textContent = "Erro ao conectar com o servidor.";
+                        spinButton.disabled = false;
+                        spinButton.textContent = "GIRAR";
+                    });
+                }
+            }, 100);
+        });
+    }
+    
+    // Inicializa os rolos com placeholders
+    reels.forEach(reel => {
+        const placeholderSymbols = [
+            {char: \'?\', cssClass: \'placeholder\'},
+            {char: \'?\', cssClass: \'placeholder\'},
+            {char: \'?\', cssClass: \'placeholder\'}
+        ];
+        updateReelDisplay(reel, placeholderSymbols);
+    });
+
+});
+</script>
+{% endblock %}
+

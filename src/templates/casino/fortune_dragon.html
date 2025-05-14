@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}Fortune Dragon - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card game-container dragon-game-container">
+        <div class="header-balance">
+            <h2>{{ game_name|default("Fortune Dragon") }} (Protótipo)</h2>
+            {% if session.get("user_phone") %}
+                <span class="balance-info">Saldo: R$ <span id="user-balance-fd">{{ session.get("user_credits", "0.00") }}</span></span>
+            {% endif %}
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if session.get("user_phone") %}
+            <div class="fortune-dragon-game-area">
+                <div class="reels-area-fd" id="reels-area-fd">
+                    <!-- 3x3 Reels -->
+                    <div class="reel-fd"><span class="symbol-fd">🐉</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">🏮</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">💰</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">💎</span></div>
+                    <div class="reel-fd central-symbol-fd"><span class="symbol-fd">🐅</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">🪙</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">🏮</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">💰</span></div>
+                    <div class="reel-fd"><span class="symbol-fd">🐉</span></div>
+                </div>
+
+                <div class="controls-area">
+                    <div class="info-display">
+                        <span>Aposta: R$ <span id="current-bet-fd">1.00</span></span>
+                        <span>Ganhos: R$ <span id="last-win-fd">0.00</span></span>
+                    </div>
+                    <div class="bet-controls-fd">
+                        <button class="btn btn-secondary btn-sm control-btn-fd" id="decrease-bet-fd"><i data-lucide="minus"></i></button>
+                        <input type="number" id="bet-amount-fd" value="1.00" min="0.20" step="0.20" class="bet-input-fd" readonly>
+                        <button class="btn btn-secondary btn-sm control-btn-fd" id="increase-bet-fd"><i data-lucide="plus"></i></button>
+                    </div>
+                    <button class="btn btn-verde btn-spin-fd" id="spin-button-fd">GIRAR</button>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+        {% else %}
+            <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.dragon-game-container {
+    max-width: 500px; /* Limita a largura para melhor visualização em desktop */
+    margin: 20px auto;
+}
+.fortune-dragon-game-area {
+    border: 2px solid var(--cor-borda-elementos);
+    border-radius: var(--raio-borda-padrao);
+    padding: 20px;
+    background-color: #2a2f34; /* Fundo escuro para a área do jogo */
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.reels-area-fd {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 300px; /* Tamanho da grade de rolos */
+    height: 300px;    /* Altura da grade de rolos */
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    background-color: #1e2225; /* Fundo interno dos rolos */
+    border-radius: var(--raio-borda-elementos);
+    border: 2px solid var(--cor-destaque-verde);
+}
+
+.reel-fd {
+    background-color: #3a3f44; /* Cor de fundo de cada célula do rolo */
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em; /* Tamanho do símbolo aumentado */
+    font-weight: bold;
+    color: var(--cor-texto-principal);
+    border: 1px solid #4a4f54;
+    overflow: hidden; 
+    transition: transform 0.1s ease-out; /* Para efeito de "parada" */
+}
+
+.reel-fd.central-symbol-fd {
+    border: 2px solid gold; 
+}
+
+.symbol-fd {
+    display: inline-block;
+    transition: opacity 0.2s; 
+}
+
+.symbol-fd.spinning {
+    animation: spinSymbolPulse 0.2s linear infinite alternate;
+}
+
+@keyframes spinSymbolPulse {
+    0% { opacity: 0.6; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1.05); }
+}
+
+.controls-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.info-display {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px;
+    font-size: 0.9em;
+    color: var(--cor-texto-secundaria);
+    padding: 8px 12px;
+    background-color: #3a3f44;
+    border-radius: var(--raio-borda-elementos);
+}
+
+.bet-controls-fd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-btn-fd {
+    background-color: var(--cor-botao-secundario);
+    color: var(--cor-texto-principal);
+    border: none;
+    padding: 8px;
+    border-radius: 50%; 
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.control-btn-fd:hover {
+    background-color: var(--cor-botao-secundario-hover);
+}
+
+.bet-input-fd {
+    width: 70px;
+    text-align: center;
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda-elementos);
+    border-radius: var(--raio-borda-elementos);
+    padding: 8px;
+}
+
+.btn-spin-fd {
+    padding: 12px 40px;
+    font-size: 1.2em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background-color: var(--cor-destaque-verde);
+    border-color: var(--cor-destaque-verde);
+}
+.btn-spin-fd:hover {
+    background-color: #00b371; 
+    border-color: #00b371;
+}
+.btn-spin-fd:disabled {
+    background-color: #555;
+    border-color: #555;
+    cursor: not-allowed;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const betAmountInputFd = document.getElementById("bet-amount-fd");
+    const currentBetDisplayFd = document.getElementById("current-bet-fd");
+    const decreaseBetBtnFd = document.getElementById("decrease-bet-fd");
+    const increaseBetBtnFd = document.getElementById("increase-bet-fd");
+    const spinButtonFd = document.getElementById("spin-button-fd");
+    const lastWinDisplayFd = document.getElementById("last-win-fd");
+    const userBalanceDisplayFd = document.getElementById("user-balance-fd");
+    const reelSymbolElementsFd = document.querySelectorAll(".reels-area-fd .reel-fd .symbol-fd");
+
+    const initialSymbols = ["🐉", "🏮", "💰", "💎", "🐅", "🪙", "🏮", "💰", "🐉"];
+    reelSymbolElementsFd.forEach((el, index) => {
+        el.textContent = initialSymbols[index] || "?";
+    });
+
+    let currentBetFd = 1.00;
+    const minBetFd = 0.20;
+    const maxBetFd = 100.00; 
+    const stepFd = 0.20;
+
+    function updateBetDisplayFd() {
+        betAmountInputFd.value = currentBetFd.toFixed(2);
+        currentBetDisplayFd.textContent = currentBetFd.toFixed(2);
+    }
+
+    if (decreaseBetBtnFd) {
+        decreaseBetBtnFd.addEventListener("click", () => {
+            if (currentBetFd - stepFd >= minBetFd) {
+                currentBetFd -= stepFd;
+                updateBetDisplayFd();
+            }
+        });
+    }
+
+    if (increaseBetBtnFd) {
+        increaseBetBtnFd.addEventListener("click", () => {
+            if (currentBetFd + stepFd <= maxBetFd) {
+                currentBetFd += stepFd;
+                updateBetDisplayFd();
+            }
+        });
+    }
+
+    if (spinButtonFd) {
+        spinButtonFd.addEventListener("click", () => {
+            let currentBalance = parseFloat(userBalanceDisplayFd.textContent);
+            if (currentBetFd > currentBalance) {
+                alert("Saldo insuficiente para esta aposta!");
+                return;
+            }
+
+            spinButtonFd.textContent = "GIRANDO...";
+            spinButtonFd.disabled = true;
+            lastWinDisplayFd.textContent = "0.00";
+
+            // Animação de giro visual
+            let spinVisualInterval = setInterval(() => {
+                reelSymbolElementsFd.forEach(reel => {
+                    reel.textContent = initialSymbols[Math.floor(Math.random() * initialSymbols.length)];
+                    reel.classList.add("spinning");
+                });
+            }, 80);
+
+            // Chamada AJAX para o backend
+            fetch("{{ url_for("casino.fortune_dragon_spin") }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    // Adicionar CSRF token se estiver usando Flask-WTF
+                },
+                body: JSON.stringify({ bet_amount: currentBetFd })
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(spinVisualInterval);
+                reelSymbolElementsFd.forEach(reel => reel.classList.remove("spinning"));
+
+                if (data.error) {
+                    alert("Erro: " + data.error);
+                    spinButtonFd.textContent = "GIRAR";
+                    spinButtonFd.disabled = false;
+                    return;
+                }
+
+                if (data.success) {
+                    // Atualizar os símbolos na tela com os resultados do backend
+                    if (data.final_symbols && data.final_symbols.length === reelSymbolElementsFd.length) {
+                        reelSymbolElementsFd.forEach((reel, index) => {
+                            reel.textContent = data.final_symbols[index];
+                        });
+                    } else {
+                         // Fallback se os símbolos não vierem como esperado
+                        reelSymbolElementsFd.forEach(reel => reel.textContent = initialSymbols[Math.floor(Math.random() * initialSymbols.length)]);
+                    }
+
+                    lastWinDisplayFd.textContent = data.winnings;
+                    userBalanceDisplayFd.textContent = data.new_balance;
+                    
+                    spinButtonFd.textContent = "GIRAR";
+                    spinButtonFd.disabled = false;
+
+                    if (parseFloat(data.winnings) > 0) {
+                        alert(`Parabéns! Você apostou R$${currentBetFd.toFixed(2)} e ganhou R$${data.winnings}! Novo saldo: R$${data.new_balance}`);
+                    } else {
+                        alert(`Você apostou R$${currentBetFd.toFixed(2)}. Tente novamente! Novo saldo: R$${data.new_balance}`);
+                    }
+                }
+            })
+            .catch(error => {
+                clearInterval(spinVisualInterval);
+                reelSymbolElementsFd.forEach(reel => reel.classList.remove("spinning"));
+                console.error("Erro ao girar:", error);
+                alert("Ocorreu um erro ao processar sua aposta. Tente novamente.");
+                spinButtonFd.textContent = "GIRAR";
+                spinButtonFd.disabled = false;
+            });
+        });
+    }
+    updateBetDisplayFd(); // Initialize
+});
+</script>
+{% endblock %}
+

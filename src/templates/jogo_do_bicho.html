@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Jogo do Bicho (Protótipo)</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if session.get("user_phone") %}
+    <p>Seu saldo atual: R$ {{ session.get("user_credits", "0.00") }}</p>
+
+    <form method="POST" action="{{ url_for("games.fazer_aposta_bicho") }}">
+        <div>
+            <label for="tipo_aposta">Tipo de Aposta:</label>
+            <select id="tipo_aposta" name="tipo_aposta" required>
+                <option value="grupo">Grupo (1 dos 25 grupos)</option>
+                <option value="milhar">Milhar (0000 a 9999)</option>
+                <option value="centena">Centena (000 a 999)</option>
+                <option value="dezena">Dezena (00 a 99)</option>
+            </select>
+        </div>
+        <div>
+            <label for="aposta_valor_input">Seu Jogo (Número/Grupo):</label>
+            <input type="text" id="aposta_valor_input" name="aposta_valor_input" placeholder="Ex: 16 (Grupo), 1234 (Milhar)" required>
+            <small>Para Grupo, insira o número do animal (1 a 25). Para os demais, o número desejado.</small>
+        </div>
+        <div>
+            <label for="valor_aposta">Valor da Aposta (R$):</label>
+            <input type="number" id="valor_aposta" name="valor_aposta" min="0.01" step="0.01" required>
+        </div>
+        <button type="submit">Fazer Aposta</button>
+    </form>
+
+    {% if session.get("ultimo_resultado_bicho") %}
+        <div style="margin-top: 20px; padding: 10px; border: 1px solid #00FF7F;">
+            <h4>Resultado do Último Sorteio (Simulado)</h4>
+            <p><strong>Seu jogo:</strong> Tipo: {{ session.get("ultimo_jogo_bicho").tipo }}, Valor/Número: {{ session.get("ultimo_jogo_bicho").numero }}, Apostou: R$ {{ session.get("ultimo_jogo_bicho").valor_apostado }}</p>
+            <p><strong>Resultado Sorteado:</strong> {{ session.get("ultimo_resultado_bicho").descricao_sorteio }}</p>
+            <p><strong>Prêmio:</strong> R$ {{ session.get("ultimo_resultado_bicho").premio }}</p>
+            <p>{{ session.get("ultimo_resultado_bicho").mensagem }}</p>
+        </div>
+    {% endif %}
+    <p style="margin-top:20px;"><a href="{{ url_for("main.index") }}">Voltar para a página inicial</a></p>
+{% else %}
+    <p>Você precisa estar logado para jogar. <a href="{{ url_for("auth.login") }}">Faça login</a>.</p>
+{% endif %}
+
+{% endblock %}

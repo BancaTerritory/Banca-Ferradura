@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Cassino - Banca Ferradura{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<style>
+  .casino-lobby-container {
+    padding: 0 10px; /* Ajuste de padding para o container do lobby */
+  }
+
+  .swiper-container {
+    width: 100%;
+    height: auto;
+    margin-bottom: 25px;
+    border-radius: var(--raio-borda-padrao);
+    overflow: hidden;
+  }
+
+  .swiper-slide img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  .swiper-pagination-bullet-active {
+    background-color: var(--cor-destaque-verde) !important;
+  }
+
+  .search-bar-container {
+    margin-bottom: 25px;
+    padding: 0 5px;
+  }
+
+  .search-input-group {
+    display: flex;
+    align-items: center;
+    background-color: var(--cor-fundo-input);
+    border-radius: var(--raio-borda-padrao);
+    padding: 5px 10px;
+    border: 1px solid var(--cor-borda-elementos);
+  }
+
+  .search-input-group .lucide-search {
+    color: var(--cor-texto-secundaria);
+    margin-right: 8px;
+  }
+
+  .search-input-group input {
+    flex-grow: 1;
+    background-color: transparent;
+    border: none;
+    color: var(--cor-texto-principal);
+    font-size: 1em;
+    padding: 8px 0;
+  }
+
+  .search-input-group input::placeholder {
+    color: var(--cor-texto-secundaria);
+  }
+
+  .game-section {
+    margin-bottom: 30px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 5px;
+  }
+
+  .section-header h2 {
+    font-size: 1.4em;
+    color: var(--cor-texto-principal);
+    margin: 0;
+  }
+
+  .section-header .view-all-link {
+    font-size: 0.9em;
+    color: var(--cor-link);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+   .section-header .view-all-link:hover {
+    text-decoration: underline;
+   }
+   .section-header .view-all-link .lucide-chevron-right {
+    width: 1em;
+    height: 1em;
+    margin-left: 4px;
+   }
+
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 0 5px;
+  }
+
+  .game-card {
+    background-color: var(--cor-fundo-card);
+    border-radius: var(--raio-borda-elementos);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--cor-texto-principal);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid var(--cor-borda-elementos);
+    display: flex;
+    flex-direction: column;
+  }
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+  }
+
+  .game-card img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-bottom: 1px solid var(--cor-borda-elementos);
+  }
+
+  .game-card-name {
+    padding: 10px;
+    font-size: 0.9em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: auto; /* Empurra o nome para baixo se o card for mais alto */
+  }
+
+  @media (max-width: 480px) {
+    .games-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    .section-header h2 {
+        font-size: 1.2em;
+    }
+    .swiper-container {
+        margin-left: -10px;
+        margin-right: -10px;
+        border-radius: 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container casino-lobby-container">
+    <div class="swiper-container" id="banner-carousel">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><a href="{{ url_for('casino.fortune_tiger_game') }}"><img src="{{ url_for('static', filename='img/casino_banners/fortune_tiger_banner.png') }}" alt="Fortune Tiger Banner"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for('casino.fortune_dragon_game') }}"><img src="{{ url_for('static', filename='img/casino_banners/fortune_dragon_banner.png') }}" alt="Fortune Dragon Banner"></a></div>
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <div class="search-bar-container">
+        <div class="search-input-group">
+            <i data-lucide="search" class="lucide-search"></i>
+            <input type="text" placeholder="Pesquisar jogo" id="search-game-input">
+        </div>
+    </div>
+
+    <div class="game-section" id="new-games-section">
+        <div class="section-header">
+            <h2>Novos jogos</h2>
+            <a href="#" class="view-all-link">Ver todos <i data-lucide="chevron-right"></i></a>
+        </div>
+        <div class="games-grid" id="new-games-grid">
+            {% if new_games %}
+                {% for game in new_games %}
+                <a href="{{ url_for(game.endpoint) }}" class="game-card">
+                    <img src="{{ url_for('static', filename=game.img_card) }}" alt="{{ game.name }}">
+                    <div class="game-card-name">{{ game.name }}</div>
+                </a>
+                {% endfor %}
+            {% else %}
+            <p>Nenhum jogo novo no momento.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="game-section" id="popular-games-section">
+        <div class="section-header">
+            <h2>Populares</h2>
+            <a href="#" class="view-all-link">Ver todos <i data-lucide="chevron-right"></i></a>
+        </div>
+        <div class="games-grid" id="popular-games-grid">
+            {% if popular_games %}
+                {% for game in popular_games %}
+                <a href="{{ url_for(game.endpoint) }}" class="game-card">
+                    <img src="{{ url_for('static', filename=game.img_card) }}" alt="{{ game.name }}">
+                    <div class="game-card-name">{{ game.name }}</div>
+                </a>
+                {% endfor %}
+            {% else %}
+            <p>Nenhum jogo popular no momento.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    lucide.createIcons();
+
+    var bannerCarousel = new Swiper('#banner-carousel', {
+      loop: true,
+      autoplay: {
+        delay: 4000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+    });
+
+    const searchInput = document.getElementById('search-game-input');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const filterText = searchInput.value.toLowerCase();
+            
+            ['new-games-grid', 'popular-games-grid'].forEach(gridId => {
+                const grid = document.getElementById(gridId);
+                if (!grid) return;
+                const gameCards = grid.querySelectorAll('.game-card');
+                let hasVisibleCardInGrid = false;
+                let originalNoGamesMessage = grid.querySelector('p.no-games-message-placeholder'); // Placeholder for specific message
+
+                gameCards.forEach(card => {
+                    const gameName = card.querySelector('.game-card-name').textContent.toLowerCase();
+                    if (gameName.includes(filterText)) {
+                        card.style.display = 'flex'; // Changed from '' to 'flex' to match .game-card display
+                        hasVisibleCardInGrid = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                const section = grid.closest('.game-section');
+                if (section) {
+                    const sectionHeader = section.querySelector('.section-header');
+                    const jinjaNoGamesMessage = grid.querySelector('p'); // The one from {% else %}
+
+                    if (filterText.length > 0) { // Search is active
+                        if (hasVisibleCardInGrid) {
+                            if (sectionHeader) sectionHeader.style.display = 'flex';
+                            if (jinjaNoGamesMessage) jinjaNoGamesMessage.style.display = 'none';
+                            if (originalNoGamesMessage) originalNoGamesMessage.remove(); // Remove old search message
+                        } else {
+                            if (sectionHeader) sectionHeader.style.display = 'none';
+                            if (jinjaNoGamesMessage) jinjaNoGamesMessage.style.display = 'none';
+                            if (!originalNoGamesMessage) {
+                                const p = document.createElement('p');
+                                p.className = 'no-games-message-placeholder';
+                                p.textContent = 'Nenhum jogo encontrado para "' + searchInput.value + '".';
+                                grid.appendChild(p);
+                            }
+                        }
+                    } else { // Search is empty
+                        if (sectionHeader) sectionHeader.style.display = 'flex';
+                        if (originalNoGamesMessage) originalNoGamesMessage.remove();
+                        // Visibility of jinjaNoGamesMessage is handled by Jinja itself
+                        // If there were no games from backend, it's shown. If there were, it's not.
+                        // So, if gameCards.length === 0 (and it's not because of filter), jinjaNoGamesMessage is already there.
+                        if (gameCards.length > 0 && jinjaNoGamesMessage) {
+                             jinjaNoGamesMessage.style.display = 'none'; // Ensure it's hidden if cards are present
+                        } else if (gameCards.length === 0 && jinjaNoGamesMessage) {
+                             jinjaNoGamesMessage.style.display = ''; // Ensure it's shown if no cards from backend
+                        }
+                    }
+                }
+            });
+        });
+    }
+  });
+</script>
+{% endblock %}
+

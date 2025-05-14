@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Sweet Bonanza - Banca Ferradura{% endblock %}
+
+{% block extra_css %}
+<style>
+  .sweet-bonanza-game-container {
+    max-width: 700px; /* Ajustar para grade 6x5 */
+    margin: 20px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); /* Fundo temático doce e colorido */
+    border-radius: var(--raio-borda-padrao);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    color: #5c3c10; /* Marrom escuro para texto, bom contraste */
+    border: 3px solid #fff;
+  }
+
+  .sweet-bonanza-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px dashed #fff;
+  }
+
+  .sweet-bonanza-header h2 {
+    margin: 0;
+    color: #fff;
+    font-family: 'Arial Rounded MT Bold', sans-serif; /* Fonte divertida */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-size: 2em;
+  }
+
+  .balance-info {
+    font-size: 1.1em;
+    color: #fff;
+    background-color: rgba(0,0,0,0.2);
+    padding: 5px 10px;
+    border-radius: var(--raio-borda-pequena);
+  }
+
+  .slot-grid-bonanza {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* Grade 6x5 */
+    grid-template-rows: repeat(5, 1fr);
+    gap: 5px; /* Espaço pequeno entre símbolos */
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5); /* Fundo semi-transparente para a grade */
+    border-radius: var(--raio-borda-padrao);
+    margin-bottom: 20px;
+    border: 2px solid #fff;
+    height: 400px; /* Altura ajustada para 5 linhas */
+    overflow: hidden; /* Para efeito cascata */
+  }
+
+  .symbol-cell-bonanza {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    font-size: 1.8em; /* Ajustar tamanho dos símbolos */
+    /* Adicionar transições para efeito cascata */
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  }
+  .symbol-cell-bonanza.falling {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  .symbol-cell-bonanza.new-symbol {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  /* Símbolos de exemplo - usar imagens/ícones depois */
+  .sb-banana { background-color: #ffe135; color: #fff; } /* Amarelo */
+  .sb-grapes { background-color: #540057; color: #fff; } /* Roxo */
+  .sb-watermelon { background-color: #fc6c85; color: #fff; } /* Rosa/Vermelho */
+  .sb-plum { background-color: #9b59b6; color: #fff; } /* Ameixa */
+  .sb-apple { background-color: #e74c3c; color: #fff; } /* Maçã Vermelha */
+  .sb-blue-candy { background-color: #3498db; color: #fff; } /* Doce Azul */
+  .sb-green-candy { background-color: #2ecc71; color: #fff; } /* Doce Verde */
+  .sb-purple-candy { background-color: #8e44ad; color: #fff; } /* Doce Roxo */
+  .sb-red-heart-candy { background-color: #e91e63; color: #fff; } /* Coração Vermelho */
+  .sb-lollipop-scatter { background-color: #ff69b4; color: #fff; font-weight: bold; } /* Pirulito Scatter */
+  .sb-bomb-multiplier { background-color: #f1c40f; color: #000; font-weight: bold; } /* Bomba Multiplicadora */
+  .sb-placeholder { background-color: #ecf0f1; color: #bdc3c7; }
+
+  .controls-area-bonanza {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .bet-input-area-bonanza {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(0,0,0,0.1);
+    padding: 10px 15px;
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .bet-input-bonanza {
+    width: 100px;
+    padding: 8px;
+    text-align: center;
+    background-color: #fff;
+    color: #5c3c10;
+    border: 1px solid #f08080;
+    border-radius: var(--raio-borda-padrao);
+  }
+
+  .btn-spin-bonanza {
+    padding: 12px 40px;
+    font-size: 1.2em;
+    font-weight: bold;
+    background: linear-gradient(to right, #ff758c, #ff7eb3); /* Gradiente rosa/vermelho */
+    color: white;
+    border: none;
+    border-radius: var(--raio-borda-arredondada);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  .btn-spin-bonanza:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+    text-shadow: none;
+    box-shadow: none;
+  }
+  
+  .result-display-bonanza {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(255,255,255,0.7);
+    border-radius: var(--raio-borda-padrao);
+    text-align: center;
+    font-size: 1.2em;
+    min-height: 50px;
+    color: #d6336c; /* Rosa escuro */
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container sweet-bonanza-game-container">
+    <div class="sweet-bonanza-header">
+        <h2>{{ game_name|default("Sweet Bonanza") }} (Protótipo)</h2>
+        {% if session.get("user_phone") %}
+            <span class="balance-info">Saldo: R$ <span id="user-balance-bonanza">{{ session.get("user_credits", "0.00") }}</span></span>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if session.get("user_phone") %}
+        <div class="slot-grid-bonanza" id="slot-grid-bonanza">
+            <!-- 6 colunas x 5 linhas = 30 células -->
+            {% for i in range(30) %}
+            <div class="symbol-cell-bonanza sb-placeholder" data-index="{{i}}">?</div>
+            {% endfor %}
+        </div>
+
+        <div class="controls-area-bonanza">
+            <div class="bet-input-area-bonanza">
+                <label for="bet-amount-bonanza">Aposta: R$</label>
+                <input type="number" id="bet-amount-bonanza" value="1.00" min="0.20" step="0.20" class="bet-input-bonanza">
+            </div>
+            <button class="btn btn-rosa btn-spin-bonanza" id="spin-button-bonanza">GIRAR</button>
+        </div>
+
+        <div class="result-display-bonanza" id="result-display-bonanza">
+            Gire para um mundo de doces!
+        </div>
+        <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+    {% else %}
+        <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const spinButton = document.getElementById("spin-button-bonanza");
+    const betAmountInput = document.getElementById("bet-amount-bonanza");
+    const userBalanceDisplay = document.getElementById("user-balance-bonanza");
+    const resultDisplay = document.getElementById("result-display-bonanza");
+    const slotGrid = document.getElementById("slot-grid-bonanza");
+    const cells = slotGrid.querySelectorAll(".symbol-cell-bonanza");
+
+    // Símbolos do Sweet Bonanza (simplificado para protótipo)
+    // 🍌 (Banana), 🍇 (Uvas), 🍉 (Melancia), 💜 (Ameixa), ❤️ (Maçã)
+    // 🍬 (Doce Azul), 🟢 (Doce Verde), 🟣 (Doce Roxo),💖 (Coração Vermelho)
+    // 🍭 (Pirulito - Scatter), 💣 (Bomba - Multiplicador)
+    const bonanzaSymbols = [
+        { char: "🍌", name: "banana", cssClass: "sb-banana" },
+        { char: "🍇", name: "grapes", cssClass: "sb-grapes" },
+        { char: "🍉", name: "watermelon", cssClass: "sb-watermelon" },
+        { char: "💜", name: "plum", cssClass: "sb-plum" }, // Usando coração roxo para ameixa
+        { char: "❤️", name: "apple", cssClass: "sb-apple" }, // Usando coração vermelho para maçã
+        { char: "🍬", name: "blue_candy", cssClass: "sb-blue-candy" },
+        { char: "🟢", name: "green_candy", cssClass: "sb-green-candy" },
+        { char: "🟣", name: "purple_candy", cssClass: "sb-purple-candy" },
+        { char: "💖", name: "red_heart_candy", cssClass: "sb-red-heart-candy" },
+        { char: "🍭", name: "lollipop_scatter", cssClass: "sb-lollipop-scatter" },
+        { char: "💣", name: "bomb_multiplier", cssClass: "sb-bomb-multiplier" }
+    ];
+
+    function getRandomBonanzaSymbol() {
+        // Evitar muitos scatters/bombas em giros normais para protótipo
+        let symbolPool = bonanzaSymbols.filter(s => s.name !== 'lollipop_scatter' && s.name !== 'bomb_multiplier');
+        if (Math.random() < 0.1) { // Pequena chance de scatter/bomba
+            symbolPool = bonanzaSymbols;
+        }
+        return symbolPool[Math.floor(Math.random() * symbolPool.length)];
+    }
+
+    function updateGridDisplay(gridSymbols) { // gridSymbols é um array 1D de 30 símbolos
+        cells.forEach((cell, index) => {
+            const symbolData = gridSymbols[index] || getRandomBonanzaSymbol(); // Fallback
+            cell.textContent = symbolData.char;
+            // Limpa classes antigas de símbolos e adiciona a nova
+            bonanzaSymbols.forEach(s => cell.classList.remove(s.cssClass));
+            cell.classList.add(symbolData.cssClass);
+            cell.classList.remove('sb-placeholder');
+        });
+    }
+    
+    // Simulação de cascata (muito simplificada)
+    async function cascadeEffect(winningIndexes) {
+        // Animação de remoção
+        winningIndexes.forEach(idx => cells[idx].classList.add('falling'));
+        await new Promise(resolve => setTimeout(resolve, 300)); // Duração da animação de queda
+
+        // Remove os símbolos e preenche com novos de cima (simulado)
+        let newGridSymbols = [];
+        cells.forEach((cell, idx) => {
+            if (winningIndexes.includes(idx)) {
+                newGridSymbols[idx] = getRandomBonanzaSymbol(); // Novo símbolo caindo
+                cells[idx].classList.remove('falling');
+                cells[idx].classList.add('new-symbol');
+            } else {
+                // Mantém o símbolo existente se não for vencedor
+                const currentSymbolChar = cell.textContent;
+                newGridSymbols[idx] = bonanzaSymbols.find(s => s.char === currentSymbolChar) || getRandomBonanzaSymbol();
+            }
+        });
+        updateGridDisplay(newGridSymbols);
+        await new Promise(resolve => setTimeout(resolve, 10)); // Pequeno delay para renderizar
+        cells.forEach(cell => cell.classList.remove('new-symbol'));
+    }
+
+
+    if (spinButton) {
+        spinButton.addEventListener("click", () => {
+            const betAmount = parseFloat(betAmountInput.value);
+            if (isNaN(betAmount) || betAmount <= 0) {
+                alert("Por favor, insira um valor de aposta válido.");
+                return;
+            }
+            let currentBalance = parseFloat(userBalanceDisplay.textContent);
+            if (betAmount > currentBalance) {
+                alert("Saldo insuficiente!");
+                return;
+            }
+
+            spinButton.disabled = true;
+            spinButton.textContent = "DOCES GIRANDO...";
+            resultDisplay.textContent = "Que a sorte seja doce!";
+
+            // Lógica de resultado final após o "giro"
+            fetch("{{ url_for(\'casino.sweet_bonanza_spin\') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ bet_amount: betAmount })
+            })
+            .then(response => response.json())
+            .then(async data => { // Adicionado async para await na cascata
+                if (data.error) {
+                    alert("Erro: " + data.error);
+                    resultDisplay.textContent = data.error;
+                } else {
+                    userBalanceDisplay.textContent = data.new_balance;
+                    resultDisplay.textContent = data.message;
+                    
+                    // Atualiza a grade com os símbolos finais do backend
+                    if(data.final_grid_symbols) {
+                        const backendSymbols = data.final_grid_symbols.map(s_name => bonanzaSymbols.find(bs => bs.name === s_name) || {char: \'?\', cssClass: \'sb-placeholder\'});
+                        updateGridDisplay(backendSymbols);
+                    }
+
+                    if (data.winning_clusters && data.winning_clusters.length > 0) {
+                        // Simula cascata para cada cluster vencedor
+                        // Para um protótipo, podemos fazer uma cascata geral ou simplificar
+                        let allWinningIndexes = [];
+                        data.winning_clusters.forEach(cluster => {
+                            cluster.indexes.forEach(idx => {
+                                if(!allWinningIndexes.includes(idx)) allWinningIndexes.push(idx);
+                            });
+                        });
+                        if(allWinningIndexes.length > 0){
+                            // No jogo real, haveria múltiplas cascatas até não haver mais ganhos.
+                            // Aqui, simulamos uma única cascata para demonstração.
+                            // await cascadeEffect(allWinningIndexes); 
+                            // A lógica de cascata completa seria mais complexa e gerenciada pelo backend.
+                            // O backend já deve retornar o resultado final após todas as cascatas.
+                        }
+                        alert(`Doce vitória! Você ganhou R$ ${data.winnings}!`);
+                    } else if (data.free_spins_triggered) {
+                        alert(data.message); // Ex: "Rodadas Grátis ativadas!"
+                    }
+                }
+                spinButton.disabled = false;
+                spinButton.textContent = "GIRAR";
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                alert("Ocorreu um erro ao processar sua aposta.");
+                resultDisplay.textContent = "Erro ao conectar com o servidor.";
+                spinButton.disabled = false;
+                spinButton.textContent = "GIRAR";
+            });
+        });
+    }
+    
+    // Inicializa a grade com placeholders
+    let initialSymbols = [];
+    for(let i=0; i<30; i++) initialSymbols.push({char: \'?\', cssClass: \'sb-placeholder\'});
+    updateGridDisplay(initialSymbols);
+
+});
+</script>
+{% endblock %}
+

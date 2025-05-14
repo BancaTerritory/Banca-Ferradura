@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitar Saque - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container" style="max-width: 500px; margin-top: 20px;">
+        <div class="auth-logo">BANCA FERRADURA</div>
+        <div class="auth-logo-subtitle">SOLICITAÇÃO DE SAQUE</div>
+
+        <div class="saldo-container card" style="margin-bottom: 20px;">
+            <h3>SEU SALDO ATUAL</h3>
+            <p class="saldo-disponivel" style="font-size: 1.5em; text-align: center;">R$ {{ "%.2f"|format(session.get("user_credits", 0)|float) }}</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for(\'payments.request_withdrawal_page\') }}" class="auth-form">
+            <div class="form-group">
+                <label for="amount" class="form-label">Valor do Saque (R$):</label>
+                <input type="number" name="amount" id="amount" class="input-full-width" placeholder="Ex: 100.00" required min="1" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="pix_key" class="form-label">Chave PIX para Recebimento:</label>
+                <input type="text" name="pix_key" id="pix_key" class="input-full-width" placeholder="Sua chave PIX (CPF, Celular, E-mail, Aleatória)" required>
+            </div>
+            <p style="font-size: 0.8em; color: #777; margin-bottom: 15px;">O valor solicitado será processado e pago em sua chave PIX em até 24 horas após a aprovação.</p>
+            <button type="submit" class="btn btn-roxo btn-block">Solicitar Saque</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for(\'main.index\') }}" class="auth-link">&larr; Voltar para o Dashboard</a>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+

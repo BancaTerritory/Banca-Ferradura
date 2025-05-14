@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Verificar Código - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">BANCA FERRADURA</div>
+    <div class="auth-logo-subtitle">VERIFICAÇÃO DE CONTA</div>
+
+    <p class="auth-instructions">
+        Olá, {{ name }}! Um código de verificação foi enviado (simulado) para o número {{ phone }}.
+        Por favor, insira o código abaixo para ativar sua conta.
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.verify_code_page') }}" class="auth-form">
+        <div class="form-group">
+            <span class="input-icon"><i data-lucide="key-round"></i></span>
+            <input type="text" name="verification_code" class="input-with-icon" placeholder="Código de 4 dígitos" required minlength="4" maxlength="4" pattern="[0-9]{4}" title="Código de 4 dígitos numéricos">
+        </div>
+        <button type="submit" class="btn btn-neutro">Verificar e Ativar</button>
+    </form>
+
+    <div class="auth-divider">OU</div>
+
+    <a href="{{ url_for('auth.register') }}" class="auth-link">Reenviar código / Alterar número</a> {# Placeholder para funcionalidade de reenviar #}
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+

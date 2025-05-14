@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="dashboard-logo">BANCA FERRADURA</div> {# Adaptado para o nome do site, estilizado para lembrar Yellowstone #}
+        <div class="dashboard-unit">UNIDADE: {{ session.get("user_phone", "XXXXXX")[:6] }}</div>
+        <div class="dashboard-menu-icon">
+            <i data-lucide="menu"></i>
+        </div>
+    </header>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="saldo-container card">
+            <h3>SALDO</h3>
+            <div class="saldo-valores">
+                <p class="saldo-disponivel">Disp/ Games: <span>R$ {{ "%.2f"|format(session.get("user_credits", 0)|float) }}</span></p>
+                <p class="saldo-bonus">Bônus: <span>R$ 0,00</span></p> {# Placeholder Bônus #}
+            </div>
+        </section>
+
+        <section class="share-link-container">
+            <input type="text" value="https://app.bancaferradura.vip/pr/{{ session.get("user_phone", "convide")[:4] }}blvk" readonly>
+            <button class="btn btn-verde btn-sm" onclick="copyLink(this)" title="Copiar Link">
+                <i data-lucide="copy"></i>
+            </button>
+        </section>
+
+        <section class="dashboard-grid-principal">
+            <a href="#loterias" class="btn btn-roxo">
+                <i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clover"><path d="M16.28 8.28a4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36 4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36z"/><path d="M16.28 15.72a4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36 4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36z"/><path d="M8.28 8.28a4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36 4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36z"/><path d="M8.28 15.72a4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36 4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36z"/></svg></i>
+                <span>LOTERIAS</span>
+            </a>
+            <a href="#cassino" class="btn btn-roxo">
+                 <i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-swords"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg></i>
+                <span>CASSINO</span>
+            </a>
+            <a href="#suporte" class="btn btn-verde">
+                <i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></i>
+                <span>SUPORTE</span>
+            </a>
+            <a href="{{ url_for("payments.add_credits_page") }}" class="btn btn-verde">
+                <i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></i>
+                <span>RECARGA PIX</span>
+            </a>
+        </section>
+
+        <section class="dashboard-grid-secundario">
+            <a href="{{ url_for("games.jogo_do_bicho") }}" class="btn" title="Jogo do Bicho">
+                <i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rabbit"><path d="M13 16a3 3 0 0 1 2.24 5M18 12H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><path d="M18 8a4 4 0 0 0-4-4h-2a4 4 0 1 0 0 8h4V8Z"/><path d="M7 12a2.5 2.5 0 0 1-5 0"/><path d="M15.5 6.5a.5.5 0 0 0-.5-.5"/></svg></i>
+            </a>
+            <a href="{{ url_for("games.bet_futebol") }}" class="btn" title="Futebol">
+                <i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-siren"><path d="M12 2.69l.19.09L14.1 4.1c1.88.9 3.4 2.42 4.31 4.31l.09.19L20.31 12l-.09.19-1.31 1.91c-.9 1.88-2.42 3.4-4.31 4.31l-.19.09L12 20.31l-.19-.09-1.91-1.31c-1.88-.9-3.4-2.42-4.31-4.31l-.09-.19L2.69 12l.09-.19L4.1 10.1c.9-1.88 2.42-3.4 4.31-4.31l.19-.09L12 2.69z"/><path d="M12 2.69L12 8"/><path d="M12 16l0 5.31"/><path d="M2.69 12L8 12"/><path d="M16 12h5.31"/><path d="M8 8L2.69 12"/><path d="M16 8l5.31 4"/><path d="M8 16l-5.31-4"/><path d="M16 16l5.31-4"/></svg></i> {# Usando Siren como placeholder para Futebol, pode ser trocado #}
+            </a>
+            <a href="#financeiro" class="btn" title="Financeiro">
+                <i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></i>
+            </a>
+             <a href="#ranking" class="btn" title="Ranking">
+                <i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></i>
+            </a>
+            <a href="#config" class="btn" title="Configurações">
+                <i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-2"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg></i>
+            </a>
+            <a href="{{ url_for("auth.logout") }}" class="btn" title="Sair">
+                <i><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></i>
+            </a>
+        </section>
+    </div>
+</div>
+
+<script>
+function copyLink(button) {
+    const input = button.previousElementSibling;
+    input.select();
+    input.setSelectionRange(0, 99999); // For mobile devices
+    try {
+        navigator.clipboard.writeText(input.value).then(function() {
+            // Ideal: usar um toast/flash message do Flask em vez de alert
+            // Por ora, alert para simplicidade
+            // flash("Link copiado para a área de transferência!", "success") - não funciona aqui
+            console.log("Link copiado!");
+        }, function(err) {
+            document.execCommand("copy");
+            console.log("Link copiado (fallback)!");
+        });
+    } catch (err) {
+        document.execCommand("copy");
+        console.log("Link copiado (catch fallback)!");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+    // Adicionar quaisquer scripts JS específicos do dashboard aqui, se necessário.
+});
+</script>
+{% endblock %}
+

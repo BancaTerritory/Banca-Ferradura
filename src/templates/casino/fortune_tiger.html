@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}Fortune Tiger - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card game-container tiger-game-container">
+        <div class="header-balance">
+            <h2>{{ game_name|default("Fortune Tiger") }} (Protótipo)</h2>
+            {% if session.get("user_phone") %}
+                <span class="balance-info">Saldo: R$ <span id="user-balance-ft">{{ session.get("user_credits", "0.00") }}</span></span>
+            {% endif %}
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if session.get("user_phone") %}
+            <div class="fortune-tiger-game-area">
+                <div class="reels-area-ft" id="reels-area-ft">
+                    <!-- 3x3 Reels -->
+                    <div class="reel-ft"><span class="symbol-ft">🐅</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">🍊</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">💰</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">🧧</span></div>
+                    <div class="reel-ft central-symbol-ft"><span class="symbol-ft">🐅</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">💎</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">🍀</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">💰</span></div>
+                    <div class="reel-ft"><span class="symbol-ft">🐅</span></div>
+                </div>
+
+                <div class="controls-area">
+                    <div class="info-display">
+                        <span>Aposta: R$ <span id="current-bet-ft">1.00</span></span>
+                        <span>Ganhos: R$ <span id="last-win-ft">0.00</span></span>
+                    </div>
+                    <div class="bet-controls-ft">
+                        <button class="btn btn-secondary btn-sm control-btn-ft" id="decrease-bet-ft"><i data-lucide="minus"></i></button>
+                        <input type="number" id="bet-amount-ft" value="1.00" min="0.20" step="0.20" class="bet-input-ft" readonly>
+                        <button class="btn btn-secondary btn-sm control-btn-ft" id="increase-bet-ft"><i data-lucide="plus"></i></button>
+                    </div>
+                    <button class="btn btn-verde btn-spin-ft" id="spin-button-ft">GIRAR</button>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:30px;"><a href="{{ url_for("casino.casino_lobby") }}" class="auth-link"><i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar ao Cassino</a></p>
+        {% else %}
+            <p style="text-align:center;">Você precisa estar logado para jogar. <a href="{{ url_for("auth.login_page") }}" class="auth-link">Faça login</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.tiger-game-container {
+    max-width: 500px; /* Limita a largura para melhor visualização em desktop */
+    margin: 20px auto;
+    /* Adicionar um gradiente ou cor de fundo temática para o tigre, se desejado */
+    /* background: linear-gradient(135deg, #ff8c00, #ff6347); */
+}
+.fortune-tiger-game-area {
+    border: 2px solid var(--cor-borda-elementos);
+    border-radius: var(--raio-borda-padrao);
+    padding: 20px;
+    background-color: #2c221c; /* Fundo escuro temático (marrom/laranja escuro) */
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.reels-area-ft {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 300px; /* Tamanho da grade de rolos */
+    height: 300px;    /* Altura da grade de rolos */
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    background-color: #1a140f; /* Fundo interno dos rolos mais escuro */
+    border-radius: var(--raio-borda-elementos);
+    border: 2px solid #ff8c00; /* Laranja para o tema do tigre */
+}
+
+.reel-ft {
+    background-color: #4a3b32; /* Cor de fundo de cada célula do rolo (marrom médio) */
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em; /* Tamanho do símbolo aumentado */
+    font-weight: bold;
+    color: var(--cor-texto-principal);
+    border: 1px solid #5a4b42;
+    overflow: hidden; 
+    transition: transform 0.1s ease-out; /* Para efeito de "parada" */
+}
+
+.reel-ft.central-symbol-ft {
+    border: 2px solid gold; 
+}
+
+.symbol-ft {
+    display: inline-block;
+    transition: opacity 0.2s; 
+}
+
+.symbol-ft.spinning {
+    animation: spinSymbolPulseTiger 0.2s linear infinite alternate;
+}
+
+@keyframes spinSymbolPulseTiger {
+    0% { opacity: 0.6; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1.05); }
+}
+
+.controls-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.info-display {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px;
+    font-size: 0.9em;
+    color: var(--cor-texto-secundaria);
+    padding: 8px 12px;
+    background-color: #4a3b32;
+    border-radius: var(--raio-borda-elementos);
+}
+
+.bet-controls-ft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-btn-ft {
+    background-color: var(--cor-botao-secundario);
+    color: var(--cor-texto-principal);
+    border: none;
+    padding: 8px;
+    border-radius: 50%; 
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.control-btn-ft:hover {
+    background-color: var(--cor-botao-secundario-hover);
+}
+
+.bet-input-ft {
+    width: 70px;
+    text-align: center;
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda-elementos);
+    border-radius: var(--raio-borda-elementos);
+    padding: 8px;
+}
+
+.btn-spin-ft {
+    padding: 12px 40px;
+    font-size: 1.2em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background-color: #ff8c00; /* Laranja para o botão de girar */
+    border-color: #ff8c00;
+    color: #FFFFFF; /* Texto branco para contraste */
+}
+.btn-spin-ft:hover {
+    background-color: #e67e00; 
+    border-color: #e67e00;
+}
+.btn-spin-ft:disabled {
+    background-color: #555;
+    border-color: #555;
+    cursor: not-allowed;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const betAmountInputFt = document.getElementById("bet-amount-ft");
+    const currentBetDisplayFt = document.getElementById("current-bet-ft");
+    const decreaseBetBtnFt = document.getElementById("decrease-bet-ft");
+    const increaseBetBtnFt = document.getElementById("increase-bet-ft");
+    const spinButtonFt = document.getElementById("spin-button-ft");
+    const lastWinDisplayFt = document.getElementById("last-win-ft");
+    const userBalanceDisplayFt = document.getElementById("user-balance-ft");
+    const reelSymbolElementsFt = document.querySelectorAll(".reels-area-ft .reel-ft .symbol-ft");
+
+    const initialSymbolsFt = ["🐅", "🍊", "💰", "🧧", "🐅", "💎", "🍀", "💰", "🐅"];
+    reelSymbolElementsFt.forEach((el, index) => {
+        el.textContent = initialSymbolsFt[index] || "?";
+    });
+
+    let currentBetFt = 1.00;
+    const minBetFt = 0.20;
+    const maxBetFt = 100.00; 
+    const stepFt = 0.20;
+
+    function updateBetDisplayFt() {
+        betAmountInputFt.value = currentBetFt.toFixed(2);
+        currentBetDisplayFt.textContent = currentBetFt.toFixed(2);
+    }
+
+    if (decreaseBetBtnFt) {
+        decreaseBetBtnFt.addEventListener("click", () => {
+            if (currentBetFt - stepFt >= minBetFt) {
+                currentBetFt -= stepFt;
+                updateBetDisplayFt();
+            }
+        });
+    }
+
+    if (increaseBetBtnFt) {
+        increaseBetBtnFt.addEventListener("click", () => {
+            if (currentBetFt + stepFt <= maxBetFt) {
+                currentBetFt += stepFt;
+                updateBetDisplayFt();
+            }
+        });
+    }
+
+    if (spinButtonFt) {
+        spinButtonFt.addEventListener("click", () => {
+            let currentBalance = parseFloat(userBalanceDisplayFt.textContent);
+            if (currentBetFt > currentBalance) {
+                alert("Saldo insuficiente para esta aposta!");
+                return;
+            }
+
+            spinButtonFt.textContent = "GIRANDO...";
+            spinButtonFt.disabled = true;
+            lastWinDisplayFt.textContent = "0.00";
+
+            // Animação de giro visual
+            let spinVisualInterval = setInterval(() => {
+                reelSymbolElementsFt.forEach(reel => {
+                    reel.textContent = initialSymbolsFt[Math.floor(Math.random() * initialSymbolsFt.length)];
+                    reel.classList.add("spinning");
+                });
+            }, 80);
+
+            // Chamada AJAX para o backend
+            fetch("{{ url_for("casino.fortune_tiger_spin") }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    // Adicionar CSRF token se estiver usando Flask-WTF
+                },
+                body: JSON.stringify({ bet_amount: currentBetFt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(spinVisualInterval);
+                reelSymbolElementsFt.forEach(reel => reel.classList.remove("spinning"));
+
+                if (data.error) {
+                    alert("Erro: " + data.error);
+                    spinButtonFt.textContent = "GIRAR";
+                    spinButtonFt.disabled = false;
+                    return;
+                }
+
+                if (data.success) {
+                    // Atualizar os símbolos na tela com os resultados do backend
+                    if (data.final_symbols && data.final_symbols.length === reelSymbolElementsFt.length) {
+                        reelSymbolElementsFt.forEach((reel, index) => {
+                            reel.textContent = data.final_symbols[index];
+                        });
+                    } else {
+                         // Fallback se os símbolos não vierem como esperado
+                        reelSymbolElementsFt.forEach(reel => reel.textContent = initialSymbolsFt[Math.floor(Math.random() * initialSymbolsFt.length)]);
+                    }
+
+                    lastWinDisplayFt.textContent = data.winnings;
+                    userBalanceDisplayFt.textContent = data.new_balance;
+                    
+                    spinButtonFt.textContent = "GIRAR";
+                    spinButtonFt.disabled = false;
+
+                    if (parseFloat(data.winnings) > 0) {
+                        alert(`Parabéns! Você apostou R$${currentBetFt.toFixed(2)} e ganhou R$${data.winnings}! Novo saldo: R$${data.new_balance}`);
+                    } else {
+                        alert(`Você apostou R$${currentBetFt.toFixed(2)}. Tente novamente! Novo saldo: R$${data.new_balance}`);
+                    }
+                }
+            })
+            .catch(error => {
+                clearInterval(spinVisualInterval);
+                reelSymbolElementsFt.forEach(reel => reel.classList.remove("spinning"));
+                console.error("Erro ao girar:", error);
+                alert("Ocorreu um erro ao processar sua aposta. Tente novamente.");
+                spinButtonFt.textContent = "GIRAR";
+                spinButtonFt.disabled = false;
+            });
+        });
+    }
+    updateBetDisplayFt(); // Initialize
+});
+</script>
+{% endblock %}
+
