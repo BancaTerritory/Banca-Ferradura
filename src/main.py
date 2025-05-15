@@ -14,7 +14,22 @@ app.config["SECRET_KEY"] = os.urandom(24) # Needed for session management
 # app.config[\'SQLALCHEMY_TRACK_MODIFICATIONS\'] = False # Uncomment if using database
 
 # db = SQLAlchemy(app) # Uncomment if using database
+# Definição do filtro customizado para formatar data/hora
+def format_datetime(value, fmt=	hemed_text_color_light_on_surface_variant
+    if isinstance(value, str):
+        try:
+            # Tenta converter string para datetime (se estiver em formato ISO)
+            dt_obj = datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
+            return dt_obj.strftime(fmt)
+        except ValueError:
+            # Se não conseguir converter, retorna o valor original
+            return value
+    if isinstance(value, datetime.datetime):
+        return value.strftime(fmt)
+    return value
 
+# Registra o filtro no ambiente Jinja2 do Flask
+app.jinja_env.filters["datetimeformat"] = format_datetime
 # Import and register blueprints
 from src.routes.main_routes import main_bp
 from src.routes.auth_routes import auth_bp
