@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # DON'T CHANGE THIS !!!
 
 from flask import Flask
-# from flask_sqlalchemy import SQLAlchemy # Uncomment if using database
+import datetime# from flask_sqlalchemy import SQLAlchemy # Uncomment if using database
 
 # Uncomment the following line if you need to use mysql, do not modify the SQLALCHEMY_DATABASE_URI configuration
 # SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.getenv(\'DB_USERNAME\', \'root\')}:{os.getenv(\'DB_PASSWORD\', \'password\')}@{os.getenv(\'DB_HOST\', \'localhost\')}:{os.getenv(\'DB_PORT\', \'3306\')}/{os.getenv(\'DB_NAME\', \'mydb\')}"
