@@ -15,7 +15,7 @@ app.config["SECRET_KEY"] = os.urandom(24) # Needed for session management
 
 # db = SQLAlchemy(app) # Uncomment if using database
 # Definição do filtro customizado para formatar data/hora
-def format_datetime(value, fmt=	hemed_text_color_light_on_surface_variant
+'def format_datetime(value, fmt="%d/%m/%Y %H:%M"):'
     if isinstance(value, str):
         try:
             # Tenta converter string para datetime (se estiver em formato ISO)
