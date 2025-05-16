@@ -102,6 +102,23 @@ function copyLink(button) {
 
 document.addEventListener("DOMContentLoaded", function() {
     lucide.createIcons();
+    lucide.createIcons();
+// Adicionar funcionalidade ao botão de menu
+const menuButton = document.querySelector('.dashboard-menu-icon');
+if (menuButton) {
+    menuButton.addEventListener('click', function() {
+        // Toggle da classe 'active' no ícone do menu
+        this.classList.toggle('active');
+        
+        // Toggle da visibilidade do menu
+        const menu = document.querySelector('.dashboard-grid-secundario');
+        if (menu) {
+            menu.classList.toggle('show');
+        }
+    });
+}
+// Adicionar quaisquer scripts JS específicos do dashboard aqui, se necessário.
+
     // Adicionar quaisquer scripts JS específicos do dashboard aqui, se necessário.
 });
 </script>
