@@ -1,5 +1,11 @@
 import sys
+from twilio.rest import Client
 import os
+# Credenciais do Twilio
+TWILIO_ACCOUNT_SID = 'ACb43a431fa025e2cc4ca995ae474a52c9'
+TWILIO_AUTH_TOKEN = '557e45063300131b1dd9805ab7244bea'
+TWILIO_VERIFY_SERVICE_ID = 'VAe357d2ce1d153201d31c423d830deb6e'
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
@@ -64,9 +70,24 @@ def register():
         }
         
         session["registering_phone"] = full_phone_number
-        flash(f"Um código de verificação foi enviado (simulado) para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+        # Inicializar cliente Twilio
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-        return redirect(url_for("auth.verify_code_page"))
+# Enviar código de verificação via Twilio Verify
+try:
+    verification = client.verify \
+        .services(TWILIO_VERIFY_SERVICE_ID) \
+        .verifications \
+        .create    flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+except Exception as e:
+    # Em caso de erro, ainda permite o teste com um código gerado localmente
+    flash(f"Não foi possível enviar o SMS: {str(e)}. Use o código {verification_code} para testes.", "warning")
+(to=full_phone_number, channel='sms')
+   
+
+
+
+       
 
     return render_template("register.html")
 
