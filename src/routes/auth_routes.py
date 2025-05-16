@@ -64,7 +64,8 @@ def register():
         }
         
         session["registering_phone"] = full_phone_number
-        flash(f"Código de verificação para {name} ({full_phone_number}): {verification_code}. Insira abaixo para confirmar.", "info")
+        flash(f"Um código de verificação foi enviado (simulado) para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+
         return redirect(url_for("auth.verify_code_page"))
 
     return render_template("register.html")
