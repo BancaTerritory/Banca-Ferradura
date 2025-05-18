@@ -1,10 +1,7 @@
 import sys
 from twilio.rest import Client
 import os
-# Credenciais do Twilio
-TWILIO_ACCOUNT_SID = 'ACb43a431fa025e2cc4ca995ae474a52c9'
-TWILIO_AUTH_TOKEN = '557e45063300131b1dd9805ab7244bea'
-TWILIO_VERIFY_SERVICE_ID = 'VAe357d2ce1d153201d31c423d830deb6e'
+
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
@@ -54,9 +51,7 @@ def register():
             return redirect(url_for("auth.register"))
 
         full_phone_number = ddd + phone_number_part
-                # Formatando o número para o padrão internacional exigido pelo Twilio
-        international_phone = "+55" + full_phone_number
-
+  
 
         if full_phone_number in users_db:
             flash("Este número de celular (DDD + Número) já está cadastrado. Tente fazer login.", "error")
@@ -73,9 +68,7 @@ def register():
         }
         
         session["registering_phone"] = full_phone_number
-        # Inicializar cliente Twilio
-client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
+      
 # Enviar código de verificação via Twilio Verify
 try:
     # try:
@@ -93,9 +86,8 @@ try:
 
     verification = client.verify \
         .services(TWILIO_VERIFY_SERVICE_ID) \
-        .verifications \
-        .create(to=international_phone, channel='sms')
-            
+  
+      
             flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
 
 except Exception as e:
