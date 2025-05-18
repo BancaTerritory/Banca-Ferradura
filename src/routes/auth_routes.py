@@ -54,6 +54,9 @@ def register():
             return redirect(url_for("auth.register"))
 
         full_phone_number = ddd + phone_number_part
+                # Formatando o número para o padrão internacional exigido pelo Twilio
+        international_phone = "+55" + full_phone_number
+
 
         if full_phone_number in users_db:
             flash("Este número de celular (DDD + Número) já está cadastrado. Tente fazer login.", "error")
