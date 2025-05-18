@@ -78,6 +78,19 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 # Enviar código de verificação via Twilio Verify
 try:
+    # try:
+#     verification = client.verify \
+#         .services(TWILIO_VERIFY_SERVICE_ID) \
+#         .verifications \
+#         .create(to=international_phone, channel='sms')
+#     
+#     flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+# except Exception as e:
+#     # Em caso de erro, ainda permite o teste com um código gerado localmente
+#     flash(f"Não foi possível enviar o SMS: {str(e)}. Use o código {verification_code} para testes.", "warning")
+            flash(f"Código de verificação para teste: {verification_code}. Use este código para ativar sua conta.", "info")
+
+
     verification = client.verify \
         .services(TWILIO_VERIFY_SERVICE_ID) \
         .verifications \
