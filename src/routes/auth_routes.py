@@ -69,11 +69,10 @@ def register():
         
         session["registering_phone"] = full_phone_number
       
-# Enviar código de verificação via Twilio Verify
-try:
+
     # try:
 #     verification = client.verify \
-#         .services(TWILIO_VERIFY_SERVICE_ID) \
+
 #         .verifications \
 #         .create(to=international_phone, channel='sms')
 #     
@@ -85,12 +84,12 @@ try:
 
 
     verification = client.verify \
-        .services(TWILIO_VERIFY_SERVICE_ID) \
+      
   
       
-            flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+    
 
-except Exception as e:
+
     # Em caso de erro, ainda permite o teste com um código gerado localmente
     flash(f"Não foi possível enviar o SMS: {str(e)}. Use o código {verification_code} para testes.", "warning")
 (to=full_phone_number, channel='sms')
