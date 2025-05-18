@@ -58,6 +58,8 @@ def register():
             return redirect(url_for("auth.register"))
 
         verification_code = generate_short_code()
+        flash(f"Código de verificação para teste: {verification_code}. Use este código para ativar sua conta.", "info")
+
         users_db[full_phone_number] = {
             "name": name,
             "password": None, 
@@ -70,7 +72,7 @@ def register():
         session["registering_phone"] = full_phone_number
       
 
-    # try:
+
 #     verification = client.verify \
 
 #         .verifications \
