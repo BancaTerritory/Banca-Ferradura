@@ -68,6 +68,9 @@ def register():
             "verification_code": verification_code,
             "is_admin": False # Jogadores nunca são admin por este fluxo
         }
+        session["registering_phone"] = full_phone_number
+        
+        return redirect(url_for("auth_bp.verify_code_page"))
         
         session["registering_phone"] = full_phone_number
       
