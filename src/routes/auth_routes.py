@@ -1,8 +1,5 @@
 import sys
-
 import os
-
-
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
@@ -51,15 +48,12 @@ def register():
             return redirect(url_for("auth.register"))
 
         full_phone_number = ddd + phone_number_part
-  
 
         if full_phone_number in users_db:
             flash("Este número de celular (DDD + Número) já está cadastrado. Tente fazer login.", "error")
             return redirect(url_for("auth.register"))
 
         verification_code = generate_short_code()
-        flash(f"Código de verificação para teste: {verification_code}. Use este código para ativar sua conta.", "info")
-
         users_db[full_phone_number] = {
             "name": name,
             "password": None, 
@@ -68,48 +62,14 @@ def register():
             "verification_code": verification_code,
             "is_admin": False # Jogadores nunca são admin por este fluxo
         }
-        session["registering_phone"] = full_phone_number
-                return redirect(url_for("auth_bp.verify_code_page"))
-    return render_template("register.html")
-
-        
-        return redirect(url_for("auth_bp.verify_code_page"))
         
         session["registering_phone"] = full_phone_number
-      
-
-
-#     verification = client.verify \
-
-#         .verifications \
-#         .create(to=international_phone, channel='sms')
-#     
-#     flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
-# except Exception as e:
-#     # Em caso de erro, ainda permite o teste com um código gerado localmente
-#     flash(f"Não foi possível enviar o SMS: {str(e)}. Use o código {verification_code} para testes.", "warning")
-                 # Exibir código de verificação para teste
-     print(f"Código de verificação: {verification_code}")
-     flash("Código de verificação enviado. Verifique o console.", "info")
-
-
-
-
-    verification = client.verify \
-      
-  
-      
-    
-
-
-    # Em caso de erro, ainda permite o teste com um código gerado localmente
-    flash(f"Não foi possível enviar o SMS: {str(e)}. Use o código {verification_code} para testes.", "warning")
-(to=full_phone_number, channel='sms')
-   
-
-
-
-       
+        
+        # Exibir código para teste
+        print(f"Código de verificação: {verification_code}")
+        flash(f"Um código de verificação foi enviado (simulado) para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+        
+        return redirect(url_for("auth.verify_code_page"))
 
     return render_template("register.html")
 
@@ -128,6 +88,7 @@ def verify_code_page():
             flash("Código de verificação é obrigatório.", "error")
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
+        # Verificar o código inserido pelo usuário
         if code_entered == user_data_pending.get("verification_code"):
             final_password = generate_short_code() 
             users_db[registering_phone]["password"] = final_password
@@ -143,7 +104,7 @@ def verify_code_page():
             flash(f"Cadastro de {user_data_pending.get('name')} confirmado! Sua senha de acesso é: {final_password}. Você já está logado.", "success")
             return redirect(url_for("main.index")) # Redireciona para o dashboard do jogador
         else:
-            flash("Código de verificação incorreto. Tente novamente.", "error")
+            flash("Código de verificação inválido. Tente novamente.", "error")
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
     return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
@@ -217,5 +178,3 @@ def logout():
     session.pop("admin_name", None)
     flash("Você foi desconectado.", "success")
     return redirect(url_for("main.index"))
-
-
