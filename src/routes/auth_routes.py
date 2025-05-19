@@ -82,7 +82,10 @@ def register():
 # except Exception as e:
 #     # Em caso de erro, ainda permite o teste com um código gerado localmente
 #     flash(f"Não foi possível enviar o SMS: {str(e)}. Use o código {verification_code} para testes.", "warning")
-            flash(f"Código de verificação para teste: {verification_code}. Use este código para ativar sua conta.", "info")
+                 # Exibir código de verificação para teste
+     print(f"Código de verificação: {verification_code}")
+     flash("Código de verificação enviado. Verifique o console.", "info")
+
 
 
 
