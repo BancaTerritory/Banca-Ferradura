@@ -85,6 +85,7 @@ def register():
             flash(f"Código de verificação para teste: {verification_code}. Use este código para ativar sua conta.", "info")
 
 
+
     verification = client.verify \
       
   
