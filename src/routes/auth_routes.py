@@ -9,8 +9,9 @@ from twilio.rest import Client
 
 # Credenciais do Twilio
 TWILIO_ACCOUNT_SID = 'ACb43a431fa025e2cc4ca995ae474a52c9'
-TWILIO_AUTH_TOKEN = '63817bea093d6f189aa5f4cac963a3f8'  # Auth Token atualizado
+TWILIO_AUTH_TOKEN = '63817bea093d6f189aa5f4cac963a318'  # Auth Token atualizado
 TWILIO_VERIFY_SERVICE_ID = 'VAe357d2ce1d153201d31c423d830deb6e'
+TWILIO_PHONE_NUMBER = '+12189750606'  # Número de telefone Twilio adquirido
 
 # For a prototype, we'll use a simple in-memory dictionary to store users and their passwords.
 # In a real application, you would use a database.
@@ -73,11 +74,16 @@ def register():
             # Inicializar cliente Twilio
             client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
             
-            # Enviar código de verificação via Twilio Verify
-            verification = client.verify \
-                .services(TWILIO_VERIFY_SERVICE_ID) \
-                .verifications \
-                .create(to=international_phone, channel='sms')
+            # Gerar código de verificação
+            verification_code = generate_short_code(4)
+            users_db[full_phone_number]["verification_code"] = verification_code
+            
+            # Enviar código de verificação via SMS direto
+            message = client.messages.create(
+                body=f"Banca Ferradura: Seu código de verificação é {verification_code}",
+                from_=TWILIO_PHONE_NUMBER,
+                to=international_phone
+            )
             
             flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código recebido por SMS para ativar sua conta.", "info")
             return redirect(url_for("auth.verify_code_page"))
@@ -109,29 +115,23 @@ def verify_code_page():
         international_phone = "+55" + registering_phone
         
         try:
-            # Verificar o código inserido pelo usuário usando Twilio Verify
+            # Verificar o código inserido pelo usuário comparando com o código armazenado
             client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-            verification_check = client.verify \
-                .services(TWILIO_VERIFY_SERVICE_ID) \
-                .verification_checks \
-                .create(to=international_phone, code=code_entered)
+            stored_code = users_db[registering_phone].get("verification_code")
             
-            if verification_check.status == 'approved':
+            if stored_code and code_entered == stored_code:
                 # Código correto, ativar a conta e gerar senha
                 final_password = generate_short_code(6)  # Senha de 6 dígitos para maior segurança
                 users_db[registering_phone]["password"] = final_password
                 users_db[registering_phone]["verified"] = True
                 
                 try:
-                    # Enviar senha via Twilio Verify com mensagem personalizada
-                    verification = client.verify \
-                        .services(TWILIO_VERIFY_SERVICE_ID) \
-                        .verifications \
-                        .create(
-                            to=international_phone, 
-                            channel='sms',
-                            custom_message=f"Banca Ferradura: Sua senha de acesso é {final_password}. Guarde-a com segurança!"
-                        )
+                    # Enviar senha via SMS direto
+                    message = client.messages.create(
+                        body=f"Banca Ferradura: Sua senha de acesso é {final_password}. Guarde-a com segurança!",
+                        from_=TWILIO_PHONE_NUMBER,
+                        to=international_phone
+                    )
                     
                     session.pop("registering_phone", None)
                     # Logar o usuário automaticamente após verificação bem-sucedida
