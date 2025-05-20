@@ -4,16 +4,35 @@
 
 {% block content %}
 <div class="auth-container">
-    <div class="auth-logo">BANCA FERRADURA</div>
+    <div class="logo-container">
+        <img src="https://raw.githubusercontent.com/BancaTerritory/Banca-Ferradura/main/src/static/img/ferradura.jpg" alt="Ferradura" class="ferradura-logo">
+        <div class="logo-text">BANCA FERRADURA</div>
+    </div>
     <div class="auth-logo-subtitle">A SUA SORTE NO DESTINO CERTO</div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(with_categories=true ) %}
         {% if messages %}
             {% for category, message in messages %}
             <div class="flash-message flash-{{ category }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
+
+    <h2 class="auth-title">Cadastre-se</h2>
+    <p class="auth-subtitle">Preencha seus dados de cadastro e receba o código por WhatsApp ou SMS</p>
+
+    <div class="channel-selector">
+        <label class="channel-option">
+            <input type="radio" name="channel" value="whatsapp" disabled>
+            <span class="channel-icon"><i data-lucide="message-circle"></i></span>
+            <span class="channel-text">Whatsapp</span>
+        </label>
+        <label class="channel-option">
+            <input type="radio" name="channel" value="sms" checked>
+            <span class="channel-icon"><i data-lucide="message-square"></i></span>
+            <span class="channel-text">SMS</span>
+        </label>
+    </div>
 
     <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
         <div class="form-group">
@@ -25,49 +44,186 @@
             <input type="tel" name="ddd" class="input-ddd" placeholder="DDD" required pattern="[0-9]{2}" title="Digite um DDD válido com 2 dígitos">
             <input type="tel" name="phone_number" class="input-phone-number" placeholder="Número (Ex: 987654321)" required pattern="[0-9]{8,9}" title="Digite um número válido com 8 ou 9 dígitos">
         </div>
-        {# A senha é gerada automaticamente no backend e "enviada" por SMS (simulado) #}
-        {# Não pedimos senha no cadastro inicial #}
-        <button type="submit" class="btn btn-neutro">Cadastrar e Receber Código</button>
+        <button type="submit" class="btn btn-neutro">Avançar</button>
     </form>
 
     <div class="auth-divider">OU</div>
 
     <a href="{{ url_for('auth.login_page') }}" class="btn btn-cadastro">Já tenho conta &rarr;</a>
+    
+    <div class="back-link">
+        <a href="#" onclick="history.back(); return false;"><i data-lucide="arrow-left"></i> Voltar</a>
+    </div>
 </div>
+
 <style>
-.phone-group {
+.logo-container {
+    position: relative;
     display: flex;
-    align-items: center; /* Alinha verticalmente o ícone e os inputs */
-}
-.input-ddd {
-    width: 60px; /* Largura menor para o DDD */
-    margin-right: 10px; /* Espaço entre DDD e número */
-    text-align: center;
-    padding-left: 10px !important; /* Ajuste para não sobrepor o ícone se o ícone fosse por input */
-}
-.input-phone-number {
-    flex-grow: 1; /* Ocupa o espaço restante */
-    padding-left: 10px !important; /* Ajuste para não sobrepor o ícone se o ícone fosse por input */
-}
-/* Ajuste para o ícone ficar à esquerda do grupo DDD + Número */
-.phone-group .input-icon {
-    margin-right: 10px; /* Espaço entre o ícone e o campo DDD */
-    /* Removido o posicionamento absoluto para fluir com os inputs */
-}
-.input-ddd,
-.input-phone-number {
-    padding-left: 5px !important; /* Reduzir padding para campos menores */
-}
-.form-group input[type="tel"].input-ddd,
-.form-group input[type="tel"].input-phone-number {
-    padding-left: 10px; /* Reset para o padding normal sem ícone individual */
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
+.ferradura-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.logo-text {
+    font-family: var(--fonte-titulos);
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #FFD700;
+    text-transform: uppercase;
+}
+
+.auth-title {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.channel-selector {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.channel-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    margin: 0 5px;
+    background-color: #3e444c;
+    border-radius: var(--raio-borda-padrao);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.channel-option:hover {
+    background-color: #495057;
+}
+
+.channel-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.channel-option input[type="radio"]:checked + .channel-icon + .channel-text,
+.channel-option input[type="radio"]:checked + .channel-icon {
+    color: #FFD700;
+}
+
+.channel-option input[type="radio"]:disabled + .channel-icon,
+.channel-option input[type="radio"]:disabled + .channel-icon + .channel-text {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.channel-icon {
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.channel-text {
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+.phone-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-ddd {
+    width: 60px;
+    margin-right: 10px;
+    text-align: center;
+    padding-left: 10px !important; 
+}
+
+.input-phone-number {
+    flex-grow: 1;
+    padding-left: 10px !important; 
+}
+
+.phone-group .input-icon {
+    margin-right: 10px;
+}
+
+.input-ddd,
+.input-phone-number {
+    padding-left: 5px !important; 
+}
+
+.form-group input[type="tel"].input-ddd,
+.form-group input[type="tel"].input-phone-number {
+    padding-left: 10px;
+}
+
+.back-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.back-link a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.back-link a:hover {
+    color: #fff;
+}
+
+.back-link a i {
+    margin-right: 5px;
+}
+
+.auth-container {
+    background-color: #282c34;
+    max-width: 400px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: var(--raio-borda-grande);
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-neutro {
+    background-color: #8B6969;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: var(--raio-borda-padrao);
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-neutro:hover {
+    background-color: #795548;
+}
 </style>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         lucide.createIcons();
     });
 </script>
 {% endblock %}
-
