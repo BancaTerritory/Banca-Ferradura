@@ -5,6 +5,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import random
 import string
+from twilio.rest import Client
+
+# Credenciais do Twilio
+TWILIO_ACCOUNT_SID = 'ACb43a431fa025e2cc4ca995ae474a52c9'
+TWILIO_AUTH_TOKEN = '557e45063300131b1dd9805ab7244bea'
+TWILIO_VERIFY_SERVICE_ID = 'VAe357d2ce1d153201d31c423d830deb6e'
+TWILIO_PHONE_NUMBER = '+18149648465'  # Número do Twilio para envio de SMS
 
 # For a prototype, we'll use a simple in-memory dictionary to store users and their passwords.
 # In a real application, you would use a database.
@@ -17,10 +24,6 @@ admin_credentials = {
     "password": "admin123",
     "name": "Administrador Principal"
 }
-
-# Exemplo de um usuário admin antigo, pode ser removido ou adaptado se não for mais necessário o login admin por telefone.
-# admin_phone = "00999999999"
-# users_db[admin_phone] = {"name": "Admin User", "password": "0000", "credits": 1000000.0, "verified": True, "is_admin": True}
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -53,23 +56,38 @@ def register():
             flash("Este número de celular (DDD + Número) já está cadastrado. Tente fazer login.", "error")
             return redirect(url_for("auth.register"))
 
-        verification_code = generate_short_code()
+        # Armazenar dados do usuário temporariamente
         users_db[full_phone_number] = {
             "name": name,
             "password": None, 
             "credits": 0.0,
             "verified": False,
-            "verification_code": verification_code,
             "is_admin": False # Jogadores nunca são admin por este fluxo
         }
         
         session["registering_phone"] = full_phone_number
         
-        # Exibir código para teste
-        print(f"Código de verificação: {verification_code}")
-        flash(f"Um código de verificação foi enviado (simulado) para o número {full_phone_number}. Por favor, insira o código abaixo para ativar sua conta.", "info")
+        # Formatando o número para o padrão internacional exigido pelo Twilio
+        international_phone = "+55" + full_phone_number
         
-        return redirect(url_for("auth.verify_code_page"))
+        try:
+            # Inicializar cliente Twilio
+            client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+            
+            # Enviar código de verificação via Twilio Verify
+            verification = client.verify \
+                .services(TWILIO_VERIFY_SERVICE_ID) \
+                .verifications \
+                .create(to=international_phone, channel='sms')
+            
+            flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código recebido por SMS para ativar sua conta.", "info")
+            return redirect(url_for("auth.verify_code_page"))
+        except Exception as e:
+            # Em caso de erro, informamos o usuário e removemos o cadastro temporário
+            users_db.pop(full_phone_number, None)
+            session.pop("registering_phone", None)
+            flash(f"Não foi possível enviar o SMS: {str(e)}. Por favor, verifique se o número está correto e tente novamente.", "error")
+            return redirect(url_for("auth.register"))
 
     return render_template("register.html")
 
@@ -88,23 +106,48 @@ def verify_code_page():
             flash("Código de verificação é obrigatório.", "error")
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
-        # Verificar o código inserido pelo usuário
-        if code_entered == user_data_pending.get("verification_code"):
-            final_password = generate_short_code() 
-            users_db[registering_phone]["password"] = final_password
-            users_db[registering_phone]["verified"] = True
-            users_db[registering_phone].pop("verification_code", None) 
+        # Formatando o número para o padrão internacional exigido pelo Twilio
+        international_phone = "+55" + registering_phone
+        
+        try:
+            # Verificar o código inserido pelo usuário usando Twilio Verify
+            client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+            verification_check = client.verify \
+                .services(TWILIO_VERIFY_SERVICE_ID) \
+                .verification_checks \
+                .create(to=international_phone, code=code_entered)
             
-            session.pop("registering_phone", None)
-            # Logar o usuário automaticamente após verificação bem-sucedida
-            session["user_phone"] = registering_phone
-            session["user_name"] = user_data_pending.get("name")
-            session["user_credits"] = user_data_pending.get("credits", 0.0)
-            session["is_admin"] = False # Garante que é um jogador
-            flash(f"Cadastro de {user_data_pending.get('name')} confirmado! Sua senha de acesso é: {final_password}. Você já está logado.", "success")
-            return redirect(url_for("main.index")) # Redireciona para o dashboard do jogador
-        else:
-            flash("Código de verificação inválido. Tente novamente.", "error")
+            if verification_check.status == 'approved':
+                # Código correto, ativar a conta e gerar senha
+                final_password = generate_short_code(6)  # Senha de 6 dígitos para maior segurança
+                users_db[registering_phone]["password"] = final_password
+                users_db[registering_phone]["verified"] = True
+                
+                try:
+                    # Enviar senha via SMS usando Twilio
+                    message = client.messages.create(
+                        body=f"Banca Ferradura: Sua senha de acesso é {final_password}. Guarde-a com segurança!",
+                        from_=TWILIO_PHONE_NUMBER,
+                        to=international_phone
+                    )
+                    
+                    session.pop("registering_phone", None)
+                    # Logar o usuário automaticamente após verificação bem-sucedida
+                    session["user_phone"] = registering_phone
+                    session["user_name"] = user_data_pending.get("name")
+                    session["user_credits"] = user_data_pending.get("credits", 0.0)
+                    session["is_admin"] = False # Garante que é um jogador
+                    flash(f"Cadastro de {user_data_pending.get('name')} confirmado! Sua senha de acesso foi enviada por SMS. Você já está logado.", "success")
+                    return redirect(url_for("main.index")) # Redireciona para o dashboard do jogador
+                except Exception as e:
+                    # Em caso de erro no envio da senha, informamos o usuário
+                    flash(f"Seu cadastro foi confirmado, mas não foi possível enviar a senha por SMS: {str(e)}. Por favor, entre em contato com o suporte.", "error")
+                    return redirect(url_for("main.index"))
+            else:
+                flash("Código de verificação inválido. Tente novamente.", "error")
+                return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
+        except Exception as e:
+            flash(f"Erro na verificação: {str(e)}. Por favor, tente novamente ou entre em contato com o suporte.", "error")
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
     return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
