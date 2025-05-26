@@ -30,6 +30,9 @@ from src.routes.lottery.lottery_routes import lottery_bp # Importa o blueprint d
 
 app.register_blueprint(main_bp, url_prefix="/")
 app.register_blueprint(auth_bp, url_prefix="/auth")
+# Registra o blueprint de loteria
+app.register_blueprint(lottery_bp, url_prefix="/lottery")
+
 app.register_blueprint(payment_bp, url_prefix="/payments")
 app.register_blueprint(game_bp, url_prefix="/games")
 app.register_blueprint(casino_bp, url_prefix="/casino")
