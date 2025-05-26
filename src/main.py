@@ -20,13 +20,14 @@ from src.routes.main_routes import main_bp
 from src.routes.auth_routes import auth_bp
 # Importa o blueprint de loteria diretamente do arquivo
 from flask import Blueprint
-lottery_bp = Blueprint('lottery', __name__, url_prefix='/lottery')
+
 
 from src.routes.payment_routes import payment_bp
 from src.routes.game_routes import game_bp
 from src.routes.casino_routes import casino_bp
 from src.routes.admin_routes import admin_bp # Importa o blueprint do admin
-from src.routes.lottery.lottery_routes import lottery_bp # Importa o blueprint de loteria
+from src.routes.lottery import lottery_bp # Importa o blueprint de loteria
+
 
 app.register_blueprint(main_bp, url_prefix="/")
 app.register_blueprint(auth_bp, url_prefix="/auth")
