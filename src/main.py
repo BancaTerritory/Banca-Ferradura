@@ -18,6 +18,10 @@ app.config["SECRET_KEY"] = os.urandom(24) # Needed for session management
 # Import and register blueprints
 from src.routes.main_routes import main_bp
 from src.routes.auth_routes import auth_bp
+# Importa o blueprint de loteria diretamente do arquivo
+from flask import Blueprint
+lottery_bp = Blueprint('lottery', __name__, url_prefix='/lottery')
+
 from src.routes.payment_routes import payment_bp
 from src.routes.game_routes import game_bp
 from src.routes.casino_routes import casino_bp
