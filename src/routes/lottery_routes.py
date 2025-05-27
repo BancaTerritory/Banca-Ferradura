@@ -1,4 +1,6 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
+lottery_bp = Blueprint('lottery', __name__)
 
 # Lista de modalidades do jogo do bicho
 MODALIDADES = {
@@ -35,7 +37,8 @@ GRUPOS_ANIMAIS = {
 COLOCACOES = ['1º PRÊMIO', '2º PRÊMIO', '3º PRÊMIO', '4º PRÊMIO', '5º PRÊMIO']
 
 # Importamos o blueprint diretamente do main.py
-from src.main import lottery_bp
+# from src.main import lottery_bp
+
 
 # Rota principal da loteria
 @lottery_bp.route('/')
