@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
-lottery_bp = Blueprint('lottery_routes', __name__)
+lottery_bp = Blueprint('lottery_blueprint_v1', __name__)
 
 # Lista de modalidades do jogo do bicho
 MODALIDADES = {
