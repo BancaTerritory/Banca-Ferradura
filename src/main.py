@@ -26,7 +26,7 @@ from src.routes.payment_routes import payment_bp
 from src.routes.game_routes import game_bp
 from src.routes.casino_routes import casino_bp
 from src.routes.admin_routes import admin_bp # Importa o blueprint do admin
-from src.routes.lottery import lottery_bp # Importa o blueprint de loteria
+from src.routes.lottery_routes import lottery_bp # Importa o blueprint de loteria
 
 
 app.register_blueprint(main_bp, url_prefix="/")
