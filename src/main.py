@@ -38,7 +38,7 @@ app.register_blueprint(payment_bp, url_prefix="/payments")
 app.register_blueprint(game_bp, url_prefix="/games")
 app.register_blueprint(casino_bp, url_prefix="/casino")
 app.register_blueprint(admin_bp, url_prefix="/admin") # Registra o blueprint do admin
-app.register_blueprint(lottery_bp, url_prefix="/lottery") # Registra o blueprint de loteria
+#app.register_blueprint(lottery_bp, url_prefix="/lottery") # Registra o blueprint de loteria
 
 if __name__ == "__main__":
     # For development, ensure it runs on 0.0.0.0 to be accessible if exposed
