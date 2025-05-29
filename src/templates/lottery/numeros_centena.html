@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Escolha de Números - Centena - Jogo do Bicho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Escolha a Centena</h1>
+    
+    <form action="{{ url_for('lottery_blueprint_v1.processar_numeros') }}" method="post">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="numeros">Digite a centena (000-999):</label>
+                    <input type="text" class="form-control" id="numeros" name="numeros" pattern="[0-9]{3}" maxlength="3" required>
+                    <small class="form-text text-muted">Digite três números de 000 a 999.</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+            <a href="{{ url_for('lottery_blueprint_v1.colocacao', colocacao=session.aposta.colocacao) }}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
