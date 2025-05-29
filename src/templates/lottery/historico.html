@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de Apostas - Jogo do Bicho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Histórico de Apostas</h1>
+    
+    {% if apostas %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Modalidade</th>
+                    <th>Colocação</th>
+                    <th>Números</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aposta in apostas %}
+                <tr>
+                    <td>{{ aposta.data }}</td>
+                    <td>{{ aposta.modalidade }}</td>
+                    <td>{{ aposta.colocacao }}</td>
+                    <td>{{ aposta.numeros }}</td>
+                    <td>R$ {{ aposta.valor|float }}</td>
+                    <td>{{ aposta.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Você ainda não realizou nenhuma aposta.
+    </div>
+    {% endif %}
+    
+    <div class="text-center mt-3">
+        <a href="{{ url_for('lottery_blueprint_v1.index') }}" class="btn btn-primary">Nova Aposta</a>
+        <a href="{{ url_for('main_bp.index') }}" class="btn btn-secondary">Voltar ao Início</a>
+    </div>
+</div>
+{% endblock %}
