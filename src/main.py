@@ -1,15 +1,24 @@
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # DON'T CHANGE THIS !!!
 
 from flask import Flask
+from dotenv import load_dotenv
+
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 # from flask_sqlalchemy import SQLAlchemy # Uncomment if using database
 
 # Uncomment the following line if you need to use mysql, do not modify the SQLALCHEMY_DATABASE_URI configuration
 # SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.getenv('DB_USERNAME', 'root')}:{os.getenv('DB_PASSWORD', 'password')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '3306')}/{os.getenv('DB_NAME', 'mydb')}"
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.config["SECRET_KEY"] = os.urandom(24) # Needed for session management
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", os.urandom(24))
 # app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI # Uncomment if using database
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Uncomment if using database
 
