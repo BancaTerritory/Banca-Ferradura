@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmação de Aposta - Jogo do Bicho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Confirme sua Aposta</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5>Detalhes da Aposta</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Modalidade:</strong> {{ aposta.modalidade }}</p>
+            <p><strong>Colocação:</strong> {{ aposta.colocacao }}</p>
+            <p><strong>Números:</strong> {{ aposta.numeros }}</p>
+            <p><strong>Valor:</strong> R$ {{ aposta.valor|float }}</p>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <form action="{{ url_for('lottery_blueprint_v1.finalizar') }}" method="post">
+            <button type="submit" class="btn btn-success">Confirmar Aposta</button>
+            <a href="{{ url_for('lottery_blueprint_v1.valor') }}" class="btn btn-secondary">Voltar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
