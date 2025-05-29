@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Definição de Valor - Jogo do Bicho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Defina o Valor da Aposta</h1>
+    
+    <form action="{{ url_for('lottery_blueprint_v1.processar_valor') }}" method="post">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="valor">Valor da aposta (R$):</label>
+                    <input type="text" class="form-control" id="valor" name="valor" placeholder="Ex: 5,00" required>
+                    <small class="form-text text-muted">Digite o valor que deseja apostar.</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+            <a href="{{ url_for('lottery_blueprint_v1.numeros', colocacao=session.aposta.colocacao) }}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
