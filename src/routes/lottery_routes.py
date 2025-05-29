@@ -43,7 +43,11 @@ COLOCACOES = ['1º PRÊMIO', '2º PRÊMIO', '3º PRÊMIO', '4º PRÊMIO', '5º P
 # Rota principal da loteria
 @lottery_bp.route('/')
 def index():
-    return render_template('lottery/index.html')
+    # Adiciona a variável balance que está faltando no template
+    balance = 0
+    if 'user_credits' in session:
+        balance = session.get('user_credits', 0)
+    return render_template('lottery/index.html', balance=balance)
 
 # Rota para seleção de modalidade
 @lottery_bp.route('/modalidade')
