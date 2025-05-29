@@ -1,17 +1,27 @@
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import random
 import string
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+from dotenv import load_dotenv
 
-# Credenciais do Twilio
-TWILIO_ACCOUNT_SID = 'ACb43a431fa025e2cc4ca995ae474a52c9'
-TWILIO_AUTH_TOKEN = '63817bea093d6f189aa5f4cac963a318'  # Auth Token atualizado
-TWILIO_VERIFY_SERVICE_ID = 'VAe357d2ce1d153201d31c423d830deb6e'
-TWILIO_PHONE_NUMBER = '+12189750606'  # Número de telefone Twilio adquirido
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Credenciais do Twilio a partir de variáveis de ambiente
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'ACb43a431fa025e2cc4ca995ae474a52c9')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '63817bea093d6f189aa5f4cac963a318')
+TWILIO_VERIFY_SERVICE_ID = os.getenv('TWILIO_VERIFY_SERVICE_ID', 'VAe357d2ce1d153201d31c423d830deb6e')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+12189750606')
 
 # For a prototype, we'll use a simple in-memory dictionary to store users and their passwords.
 # In a real application, you would use a database.
