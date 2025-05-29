@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Escolha de Números - Dezena - Jogo do Bicho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Escolha a Dezena</h1>
+    
+    <form action="{{ url_for('lottery_blueprint_v1.processar_numeros') }}" method="post">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="numeros">Digite a dezena (00-99):</label>
+                    <input type="text" class="form-control" id="numeros" name="numeros" pattern="[0-9]{2}" maxlength="2" required>
+                    <small class="form-text text-muted">Digite dois números de 00 a 99.</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+            <a href="{{ url_for('lottery_blueprint_v1.colocacao', colocacao=session.aposta.colocacao) }}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
