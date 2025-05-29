@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Escolha de Colocação - Jogo do Bicho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Escolha a Colocação</h1>
+    
+    <div class="row">
+        {% for colocacao in colocacoes %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ colocacao }}</h5>
+                    <a href="{{ url_for('lottery_blueprint_v1.numeros', colocacao=colocacao) }}" class="btn btn-primary">Selecionar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-3">
+        <a href="{{ url_for('lottery_blueprint_v1.modalidade') }}" class="btn btn-secondary">Voltar</a>
+    </div>
+</div>
+{% endblock %}
