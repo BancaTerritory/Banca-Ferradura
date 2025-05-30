@@ -152,7 +152,7 @@
 </style>
 {% endblock %}
 {% set draw_date = draw_date|default('') %}
-
+{% set draw_numbers = draw_numbers|default([]) %}
 {% block content %}
 <div class="header">
     <a href="{{ url_for('main.index') }}" class="back-button">←</a>
