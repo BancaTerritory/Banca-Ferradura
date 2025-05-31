@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% set grupos = grupos|default([]) %}
+{% set modalidades = modalidades|default([]) %}
 
 {% block title %}Escolha de Modalidade - Jogo do Bicho{% endblock %}
 
