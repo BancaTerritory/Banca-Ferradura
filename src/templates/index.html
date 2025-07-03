@@ -36,12 +36,20 @@
             </button>
         </section>
 
-        <section class="dashboard-grid-principal">
-            <a href="{{ url_for('lottery_blueprint_v1.index') }}" class="btn btn-roxo">
-                <i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clover"><path d="M16.28 8.28a4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36 4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36z"/><path d="M16.28 15.72a4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36 4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36z"/><path d="M8.28 8.28a4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36 4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36z"/><path d="M8.28 15.72a4.5 4.5 0 0 0 6.36 0 4.5 4.5 0 0 0 0-6.36 4.5 4.5 0 0 0-6.36 0 4.5 4.5 0 0 0 0 6.36z"/></svg></i>
-                <span>LOTERIAS</span>
-            </a>
-            <a href="#cassino" class="btn btn-roxo">
+        <div class="dropdown">
+  <a href="#" class="btn btn-roxo dropdown-toggle"> {# Removido o url_for para que não navegue diretamente #}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lottery">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 6v6l4 2"/>
+    </svg>
+    <span>LOTERIAS</span>
+  </a>
+  <div class="dropdown-menu">
+    <a href="{{ url_for('lottery_blueprint_v1.modalidade') }}" class="dropdown-item">Jogo do Bicho</a>
+    <a href="{{ url_for('lottery_blueprint_v1.index') }}" class="dropdown-item">Visão Geral</a> {# Link para a página principal de loterias #}
+    {# Adicione outros links de loteria aqui, se houver #}
+  </div>
+</div>
                  <i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-swords"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg></i>
                 <span>CASSINO</span>
             </a>
