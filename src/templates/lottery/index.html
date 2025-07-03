@@ -1,226 +1,465 @@
 {% extends "base.html" %}
+{% set lottery_numbers = lottery_numbers|default([]) %}
+{% set draw_date = draw_date|default('') %}
+{% set draw_numbers = draw_numbers|default([]) %}
 
 {% block title %}Loterias - Banca Ferradura{% endblock %}
 
-{% block styles %}
-<style>
-    body {
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
-    
-    .header {
-        background-color: #444;
-        color: white;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .header h1 {
-        margin: 0;
-        font-size: 20px;
-    }
-    
-    .back-button {
-        color: white;
-        text-decoration: none;
-        font-size: 24px;
-    }
-    
-    .menu-button {
-        color: white;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-    }
-    
-    .balance {
-        background-color: #555;
-        color: white;
-        padding: 8px 15px;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .balance-icon {
-        margin-right: 8px;
-    }
-    
-    .options-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        padding: 15px;
-    }
-    
-    .option-card {
-        background-color: #673AB7;
-        color: white;
-        border-radius: 8px;
-        padding: 30px 15px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .option-icon {
-        font-size: 36px;
-        margin-bottom: 15px;
-    }
-    
-    .option-title {
-        font-size: 18px;
-        font-weight: bold;
-    }
-    
-    .menu-overlay {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 100;
-        display: none;
-    }
-    
-    .menu-sidebar {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 80%;
-        max-width: 300px;
-        background-color: white;
-        z-index: 101;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        overflow-y: auto;
-    }
-    
-    .menu-header {
-        background-color: #444;
-        color: white;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .menu-close {
-        color: white;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-    }
-    
-    .menu-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .menu-item {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .menu-item a {
-        color: #333;
-        text-decoration: none;
-        display: block;
-    }
-    
-    .menu-active .menu-overlay {
-        display: block;
-    }
-    
-    .menu-active .menu-sidebar {
-        transform: translateX(0);
-    }
-</style>
-{% endblock %}
-{% set draw_date = draw_date|default('') %}
-{% set draw_numbers = draw_numbers|default([]) %}
-{% set lottery_numbers = lottery_numbers|default([]) %}
 {% block content %}
-<div class="header">
-    <a href="{{ url_for('main.index') }}" class="back-button">←</a>
+<div class="lottery-container">
+  <!-- Cabeçalho com saldo -->
+  <div class="lottery-header">
     <h1>LOTERIAS</h1>
-    <div style="display: flex; align-items: center;">
-        <div class="balance">
-            <span class="balance-icon">💰</span>
-            <span>{{ "%.2f"|format(balance|default(0)) }}</span>
-        </div>
-        <button class="menu-button" id="menuButton">☰</button>
+    <div class="balance-container">
+      <i class="fas fa-coins"></i>
+      <span class="balance">{{ "%.2f"|format(balance|default(0)) }}</span>
+      <button class="balance-details"><i class="fas fa-bars"></i></button>
     </div>
-</div>
+  </div>
 
-<div class="options-grid">
-    <a href="{{ url_for('lottery_blueprint_v1.modalidade') }}" class="option-card">
-        <div class="option-icon">🎲</div>
-        <div class="option-title">APOSTAR</div>
+  <!-- Menu de navegação principal -->
+  <div class="lottery-nav">
+    <a href="#" class="nav-item active" data-target="apostar">
+      <i class="fas fa-ticket-alt"></i>
+      <span>APOSTAR</span>
     </a>
-    <a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}" class="option-card">
-        <div class="option-icon">📋</div>
-        <div class="option-title">MINHAS APOSTAS</div>
+    <a href="#" class="nav-item" data-target="minhas-apostas">
+      <i class="fas fa-list-alt"></i>
+      <span>MINHAS APOSTAS</span>
     </a>
-    <a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}" class="option-card">
-        <div class="option-icon">🏆</div>
-        <div class="option-title">HISTÓRICO</div>
+    <a href="#" class="nav-item" data-target="historico">
+      <i class="fas fa-history"></i>
+      <span>HISTÓRICO</span>
     </a>
-    <a href="#" class="option-card">
-        <div class="option-icon">❓</div>
-        <div class="option-title">COMO JOGAR</div>
+    <a href="#" class="nav-item" data-target="como-jogar">
+      <i class="fas fa-question-circle"></i>
+      <span>COMO JOGAR</span>
     </a>
-</div>
+  </div>
 
-<!-- Menu Lateral -->
-<div class="menu-overlay" id="menuOverlay"></div>
-<div class="menu-sidebar" id="menuSidebar">
+  <!-- Conteúdo das seções -->
+  <div class="content-section active" id="apostar">
+    <div class="options-grid">
+      <a href="{{ url_for('lottery_blueprint_v1.modalidade') }}" class="option-card">
+        <div class="option-icon"><i class="fas fa-paw"></i></div>
+        <div class="option-title">Jogo do Bicho</div>
+      </a>
+      <!-- Adicione mais opções de jogos aqui -->
+    </div>
+  </div>
+
+  <div class="content-section" id="minhas-apostas">
+    <h2>Minhas Apostas</h2>
+    <div class="bets-list">
+      <!-- Lista de apostas do usuário -->
+      {% if user_bets|default([]) %}
+        {% for bet in user_bets %}
+          <div class="bet-item">
+            <div class="bet-info">
+              <span class="bet-type">{{ bet.type }}</span>
+              <span class="bet-date">{{ bet.date }}</span>
+            </div>
+            <div class="bet-amount">R$ {{ "%.2f"|format(bet.amount) }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="empty-message">Você ainda não fez nenhuma aposta.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="content-section" id="historico">
+    <h2>Histórico</h2>
+    <div class="history-list">
+      <!-- Histórico de resultados -->
+      {% if lottery_history|default([]) %}
+        {% for item in lottery_history %}
+          <div class="history-item">
+            <div class="history-date">{{ item.date }}</div>
+            <div class="history-result">{{ item.result }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="empty-message">Nenhum histórico disponível.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="content-section" id="como-jogar">
+    <h2>Como Jogar</h2>
+    <div class="instructions">
+      <div class="instruction-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>Escolha o jogo</h3>
+          <p>Selecione entre as diversas modalidades disponíveis.</p>
+        </div>
+      </div>
+      <div class="instruction-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Faça sua aposta</h3>
+          <p>Escolha os números, grupos ou combinações de sua preferência.</p>
+        </div>
+      </div>
+      <div class="instruction-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Confirme o pagamento</h3>
+          <p>Revise sua aposta e confirme o pagamento.</p>
+        </div>
+      </div>
+      <div class="instruction-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h3>Acompanhe o resultado</h3>
+          <p>Verifique os resultados na seção de histórico.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu lateral (opcional) -->
+  <div class="side-menu">
     <div class="menu-header">
-        <h2>Menu</h2>
-        <button class="menu-close" id="menuClose">×</button>
+      <h2>Menu</h2>
+      <button class="close-menu"><i class="fas fa-times"></i></button>
     </div>
     <ul class="menu-list">
-        <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.modalidade') }}">Apostar</a></li>
-        <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}">Minhas Apostas</a></li>
-<li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}">Histórico</a></li>
-        <li class="menu-item"><a href="{{ url_for('main.index') }}">Voltar ao Dashboard</a></li>
+      <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.modalidade') }}">Apostar</a></li>
+      <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}">Minhas Apostas</a></li>
+      <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}">Histórico</a></li>
+      <li class="menu-item"><a href="{{ url_for('main.index') }}">Voltar ao Dashboard</a></li>
     </ul>
+  </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    // Funcionalidade para o menu lateral
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuButton = document.getElementById('menuButton');
-        const menuClose = document.getElementById('menuClose');
-        const menuOverlay = document.getElementById('menuOverlay');
-        const body = document.body;
-        
-        menuButton.addEventListener('click', function() {
-            body.classList.add('menu-active');
-        });
-        
-        menuClose.addEventListener('click', function() {
-            body.classList.remove('menu-active');
-        });
-        
-        menuOverlay.addEventListener('click', function() {
-            body.classList.remove('menu-active');
-        });
+document.addEventListener('DOMContentLoaded', function() {
+  // Navegação entre abas
+  const navItems = document.querySelectorAll('.nav-item');
+  const contentSections = document.querySelectorAll('.content-section');
+  
+  navItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remover classe ativa de todos os itens
+      navItems.forEach(nav => nav.classList.remove('active'));
+      contentSections.forEach(section => section.classList.remove('active'));
+      
+      // Adicionar classe ativa ao item clicado
+      this.classList.add('active');
+      
+      // Mostrar seção correspondente
+      const targetId = this.getAttribute('data-target');
+      document.getElementById(targetId).classList.add('active');
     });
+  });
+  
+  // Controle do menu lateral
+  const menuButton = document.querySelector('.balance-details');
+  const closeMenuButton = document.querySelector('.close-menu');
+  const sideMenu = document.querySelector('.side-menu');
+  
+  if (menuButton) {
+    menuButton.addEventListener('click', function() {
+      sideMenu.classList.add('active');
+    });
+  }
+  
+  if (closeMenuButton) {
+    closeMenuButton.addEventListener('click', function() {
+      sideMenu.classList.remove('active');
+    });
+  }
+  
+  // Fechar menu ao clicar fora
+  document.addEventListener('click', function(e) {
+    if (sideMenu.classList.contains('active') && 
+        !sideMenu.contains(e.target) && 
+        e.target !== menuButton) {
+      sideMenu.classList.remove('active');
+    }
+  });
+});
 </script>
 {% endblock %}
 
+{% block styles %}
+<style>
+/* Estilos gerais */
+.lottery-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  background-color: #1e2130;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Cabeçalho */
+.lottery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.lottery-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.balance-container {
+  display: flex;
+  align-items: center;
+  background-color: #2a2e43;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.balance-container i {
+  color: #ffd700;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.balance {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.balance-details {
+  background: none;
+  border: none;
+  color: #fff;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+/* Menu de navegação */
+.lottery-nav {
+  display: flex;
+  background-color: #2a2e43;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.nav-item {
+  flex: 1;
+  text-align: center;
+  padding: 15px 10px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-item i {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+.nav-item.active {
+  background-color: #3a3f58;
+  color: #4caf50;
+}
+
+.nav-item:hover {
+  background-color: #3a3f58;
+}
+
+/* Seções de conteúdo */
+.content-section {
+  display: none;
+  padding: 20px;
+  background-color: #2a2e43;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.content-section.active {
+  display: block;
+}
+
+/* Grade de opções */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.option-card {
+  background-color: #3a3f58;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.option-card:hover {
+  transform: translateY(-5px);
+}
+
+.option-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: #4caf50;
+}
+
+.option-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Listas */
+.bets-list, .history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bet-item, .history-item {
+  background-color: #3a3f58;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 20px;
+  color: #aaa;
+}
+
+/* Instruções */
+.instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.instruction-step {
+  display: flex;
+  gap: 15px;
+  background-color: #3a3f58;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  background-color: #4caf50;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.step-content h3 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.step-content p {
+  margin: 0;
+  color: #ccc;
+}
+
+/* Menu lateral */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100vh;
+  background-color: #2a2e43;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.side-menu.active {
+  right: 0;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #3a3f58;
+}
+
+.menu-header h2 {
+  margin: 0;
+}
+
+.close-menu {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  border-bottom: 1px solid #3a3f58;
+}
+
+.menu-item a {
+  display: block;
+  padding: 15px 20px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item a:hover {
+  background-color: #3a3f58;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .lottery-nav {
+    flex-wrap: wrap;
+  }
+  
+  .nav-item {
+    flex-basis: 50%;
+  }
+  
+  .options-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-item {
+    flex-basis: 100%;
+  }
+}
+</style>
+{% endblock %}
