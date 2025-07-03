@@ -46,3 +46,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+// Controle do dropdown de Loterias
+  const lotteryDropdown = document.querySelector('.dropdown');
+  const dropdownToggle = document.querySelector('.dropdown-toggle');
+  const dropdownMenu = document.querySelector('.dropdown-menu');
+
+  if (dropdownToggle && dropdownMenu) {
+    dropdownToggle.addEventListener('click', function(e) {
+      e.preventDefault(); // Previne a navegação para '#'
+      dropdownMenu.classList.toggle('show');
+    });
+
+    // Fechar o dropdown se o usuário clicar fora
+    document.addEventListener('click', function(e) {
+      if (lotteryDropdown && !lotteryDropdown.contains(e.target) && !dropdownToggle.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  }
