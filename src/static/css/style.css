@@ -643,4 +643,47 @@ select:focus {
         height: 20px;
     }
 }
+/* Estilos para o Dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block; /* Ou block, dependendo do layout desejado */
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+  /* Garante que o botão do dropdown não tenha um estilo de link padrão */
+  text-decoration: none;
+  color: inherit;
+}
+
+.dropdown-menu {
+  display: none; /* Esconde o menu por padrão */
+  position: absolute;
+  background-color: #2a2e43; /* Cor de fundo do menu */
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 8px;
+  padding: 10px 0;
+  left: 0; /* Alinha o menu com o botão */
+  top: 100%; /* Posiciona o menu abaixo do botão */
+}
+
+.dropdown-menu a {
+  color: #fff; /* Cor do texto dos itens do menu */
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-menu a:hover {
+  background-color: #3a3f58; /* Cor de fundo ao passar o mouse */
+}
+
+/* Mostra o menu quando a classe 'show' é adicionada */
+.dropdown-menu.show {
+  display: block;
+}
+
 
