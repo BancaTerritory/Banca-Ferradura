@@ -102,7 +102,7 @@
 
 .option-item span {
   font-weight: 500;
-  color: #333;
+  color: #333 !important; /* Força a cor do texto */
 }
 
 .date-list {
@@ -140,12 +140,12 @@
 
 .date-info .date {
   font-weight: 500;
-  color: #333;
+  color: #333 !important;
 }
 
 .date-info .day {
   font-size: 12px;
-  color: #6c757d;
+  color: #6c757d !important;
 }
 
 .modalidade-grid {
@@ -163,6 +163,8 @@
   text-align: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: background 0.2s;
+  color: #333 !important; /* Força a cor do texto */
+  font-weight: 500;
 }
 
 .modalidade-item:hover {
@@ -190,9 +192,14 @@
   background: #f8f9fa;
 }
 
+.colocacao-item > span:first-child {
+  color: #333 !important; /* Força a cor do texto principal */
+  font-weight: 500;
+}
+
 .colocacao-tag {
   background: #28a745;
-  color: white;
+  color: white !important;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -213,6 +220,7 @@
   display: block;
   margin-bottom: 5px;
   font-weight: 500;
+  color: #333 !important;
 }
 
 .form-group input {
@@ -221,6 +229,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+  color: #333 !important;
 }
 
 .valor-buttons {
@@ -236,6 +245,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  color: #333 !important;
 }
 
 .valor-btn:hover {
@@ -261,7 +271,7 @@
 
 .btn-primary {
   background: #8b6f47;
-  color: white;
+  color: white !important;
 }
 
 .btn-primary:hover {
@@ -270,7 +280,7 @@
 
 .btn-secondary {
   background: #6c757d;
-  color: white;
+  color: white !important;
 }
 
 .btn-secondary:hover {
@@ -298,9 +308,14 @@
   background: #f8f9fa;
 }
 
+.loteria-item > span:first-child {
+  color: #333 !important; /* Força a cor do texto */
+  font-weight: 500;
+}
+
 .loteria-counter {
   background: #6c757d;
-  color: white;
+  color: white !important;
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -319,7 +334,7 @@
 
 .resumo-header {
   background: #8b6f47;
-  color: white;
+  color: white !important;
   padding: 15px;
   border-radius: 8px 8px 0 0;
   text-align: center;
@@ -331,6 +346,7 @@
   justify-content: space-between;
   padding: 8px 0;
   border-bottom: 1px dotted #ddd;
+  color: #333 !important;
 }
 
 .resumo-line:last-child {
@@ -361,6 +377,10 @@
   width: 90%;
 }
 
+.success-content h3 {
+  color: #333 !important;
+}
+
 .success-icon {
   width: 60px;
   height: 60px;
@@ -370,7 +390,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  color: white;
+  color: white !important;
   font-size: 24px;
 }
 
@@ -388,7 +408,7 @@
 .avancar-btn {
   width: 100%;
   background: #8b6f47;
-  color: white;
+  color: white !important;
   border: none;
   padding: 15px;
   border-radius: 8px;
@@ -399,6 +419,15 @@
 
 .avancar-btn:hover {
   background: #7a5f3f;
+}
+
+/* Força cor do texto em todos os elementos */
+* {
+  color: inherit;
+}
+
+.content * {
+  color: #333;
 }
 </style>
 
@@ -558,18 +587,23 @@
         </div>
         <div class="colocacao-item" onclick="selectColocacao('1-e-1-5-premio')">
           <span>1 E 1/5 PRÊMIO</span>
+          <span class="colocacao-tag">Combinado</span>
         </div>
         <div class="colocacao-item" onclick="selectColocacao('2-premio')">
           <span>2 PRÊMIO</span>
+          <span class="colocacao-tag">2º lugar</span>
         </div>
         <div class="colocacao-item" onclick="selectColocacao('3-premio')">
           <span>3 PRÊMIO</span>
+          <span class="colocacao-tag">3º lugar</span>
         </div>
         <div class="colocacao-item" onclick="selectColocacao('4-premio')">
           <span>4 PRÊMIO</span>
+          <span class="colocacao-tag">4º lugar</span>
         </div>
         <div class="colocacao-item" onclick="selectColocacao('5-premio')">
           <span>5 PRÊMIO</span>
+          <span class="colocacao-tag">5º lugar</span>
         </div>
       </div>
     </div>
@@ -592,11 +626,11 @@
       <div class="valor-form">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
           <div>
-            <div style="font-weight: bold;" id="modalidade-display">MILHAR E CT</div>
+            <div style="font-weight: bold; color: #333;" id="modalidade-display">MILHAR E CT</div>
             <div style="color: #666; font-size: 14px;">Palpites 1</div>
           </div>
           <div style="text-align: right;">
-            <div style="font-weight: bold;" id="colocacao-display">1/5 PRÊMIO</div>
+            <div style="font-weight: bold; color: #333;" id="colocacao-display">1/5 PRÊMIO</div>
             <div style="color: #666; font-size: 14px;">Hoje 04/07/2025</div>
           </div>
         </div>
@@ -608,7 +642,7 @@
         
         <div class="form-group">
           <input type="text" id="valor-input" placeholder="R$20,00" />
-          <button style="float: right; background: none; border: none; color: #666; cursor: pointer;">Limpar</button>
+          <button style="float: right; background: none; border: none; color: #666; cursor: pointer;" onclick="limparValor()">Limpar</button>
         </div>
         
         <div class="valor-buttons">
@@ -647,27 +681,27 @@
       <div class="loteria-list">
         <div class="loteria-item" onclick="toggleLoteria('rio-federal')">
           <span>RIO/FEDERAL</span>
-          <span class="loteria-counter">0</span>
+          <span class="loteria-counter" id="counter-rio-federal">0</span>
         </div>
         <div class="loteria-item" onclick="toggleLoteria('maluquinha')">
           <span>MALUQUINHA</span>
-          <span class="loteria-counter">0</span>
+          <span class="loteria-counter" id="counter-maluquinha">0</span>
         </div>
         <div class="loteria-item" onclick="toggleLoteria('lotece')">
           <span>LOTECE/LOTEP</span>
-          <span class="loteria-counter">0</span>
+          <span class="loteria-counter" id="counter-lotece">0</span>
         </div>
         <div class="loteria-item" onclick="toggleLoteria('sao-paulo')">
           <span>SAO-PAULO</span>
-          <span class="loteria-counter">0</span>
+          <span class="loteria-counter" id="counter-sao-paulo">0</span>
         </div>
         <div class="loteria-item" onclick="toggleLoteria('capital')">
           <span>CAPITAL</span>
-          <span class="loteria-counter">0</span>
+          <span class="loteria-counter" id="counter-capital">0</span>
         </div>
         <div class="loteria-item" onclick="toggleLoteria('look-goias')">
           <span>LOOK/GOIAS</span>
-          <span class="loteria-counter">0</span>
+          <span class="loteria-counter" id="counter-look-goias">0</span>
         </div>
       </div>
       
@@ -697,7 +731,7 @@
           <div>04/07/25 12:11:16</div>
         </div>
         
-        <div style="text-align: center; margin: 20px 0; font-weight: bold;">
+        <div style="text-align: center; margin: 20px 0; font-weight: bold; color: #333;">
           RESUMO DA APOSTA
         </div>
         
@@ -768,13 +802,20 @@ let appState = {
 
 // Funções de navegação
 function goToScreen(screenId) {
+  console.log('Navegando para:', screenId);
+  
   // Esconder todas as telas
   document.querySelectorAll('.screen').forEach(screen => {
     screen.classList.remove('active');
   });
   
   // Mostrar tela selecionada
-  document.getElementById(screenId).classList.add('active');
+  const targetScreen = document.getElementById(screenId);
+  if (targetScreen) {
+    targetScreen.classList.add('active');
+  } else {
+    console.error('Tela não encontrada:', screenId);
+  }
 }
 
 function goBack() {
@@ -784,36 +825,57 @@ function goBack() {
 
 // Funções de seleção
 function selectModalidade(modalidade) {
+  console.log('Modalidade selecionada:', modalidade);
   appState.modalidade = modalidade;
   goToScreen('screen-data');
 }
 
 function selectData(data) {
+  console.log('Data selecionada:', data);
   appState.data = data;
   goToScreen('screen-modalidade-jogo');
 }
 
 function selectModalidadeJogo(modalidade) {
+  console.log('Modalidade do jogo selecionada:', modalidade);
   appState.modalidadeJogo = modalidade;
-  document.getElementById('modalidade-display').textContent = modalidade.toUpperCase();
+  const displayElement = document.getElementById('modalidade-display');
+  if (displayElement) {
+    displayElement.textContent = modalidade.toUpperCase().replace('-', ' ');
+  }
   goToScreen('screen-colocacao');
 }
 
 function selectColocacao(colocacao) {
+  console.log('Colocação selecionada:', colocacao);
   appState.colocacao = colocacao;
-  document.getElementById('colocacao-display').textContent = colocacao.replace('-', ' ').toUpperCase();
+  const displayElement = document.getElementById('colocacao-display');
+  if (displayElement) {
+    displayElement.textContent = colocacao.replace('-', ' ').toUpperCase();
+  }
   goToScreen('screen-valor');
 }
 
 function addValor(valor) {
   const valorInput = document.getElementById('valor-input');
-  const currentValue = parseFloat(valorInput.value.replace('R$', '').replace(',', '.')) || 0;
-  const newValue = currentValue + valor;
-  valorInput.value = `R$${newValue.toFixed(2).replace('.', ',')}`;
-  appState.valor = newValue;
+  if (valorInput) {
+    const currentValue = parseFloat(valorInput.value.replace('R$', '').replace(',', '.')) || 0;
+    const newValue = currentValue + valor;
+    valorInput.value = `R$${newValue.toFixed(2).replace('.', ',')}`;
+    appState.valor = newValue;
+  }
+}
+
+function limparValor() {
+  const valorInput = document.getElementById('valor-input');
+  if (valorInput) {
+    valorInput.value = '';
+    appState.valor = 0;
+  }
 }
 
 function toggleLoteria(loteria) {
+  console.log('Toggling loteria:', loteria);
   const index = appState.loterias.indexOf(loteria);
   if (index > -1) {
     appState.loterias.splice(index, 1);
@@ -822,15 +884,19 @@ function toggleLoteria(loteria) {
   }
   
   // Atualizar contador visual
-  const counter = document.querySelector(`[onclick="toggleLoteria('${loteria}')"] .loteria-counter`);
-  counter.textContent = appState.loterias.includes(loteria) ? '1' : '0';
+  const counter = document.getElementById(`counter-${loteria}`);
+  if (counter) {
+    counter.textContent = appState.loterias.includes(loteria) ? '1' : '0';
+  }
 }
 
 function finalizarAposta() {
+  console.log('Finalizando aposta');
   document.getElementById('success-modal').style.display = 'flex';
 }
 
 function novaAposta() {
+  console.log('Nova aposta');
   // Reset do estado
   appState = {
     modalidade: '',
@@ -842,12 +908,24 @@ function novaAposta() {
     loterias: []
   };
   
+  // Reset dos contadores
+  document.querySelectorAll('.loteria-counter').forEach(counter => {
+    counter.textContent = '0';
+  });
+  
+  // Reset dos inputs
+  const palpitesInput = document.getElementById('palpites-input');
+  const valorInput = document.getElementById('valor-input');
+  if (palpitesInput) palpitesInput.value = '';
+  if (valorInput) valorInput.value = '';
+  
   document.getElementById('success-modal').style.display = 'none';
   goToScreen('screen-modalidades');
 }
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM carregado, inicializando...');
   // Garantir que apenas a primeira tela esteja visível
   goToScreen('screen-modalidades');
 });
