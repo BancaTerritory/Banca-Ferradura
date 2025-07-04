@@ -3,8 +3,407 @@
 {% block title %}Jogo do Bicho - Banca Ferradura{% endblock %}
 
 {% block content %}
-<div class="lottery-app">
-  <!-- Tela 1: Seleção de Modalidades -->
+<style>
+.lottery-container {
+  max-width: 400px;
+  margin: 0 auto;
+  background: #f5f5f5;
+  min-height: 100vh;
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.screen.active {
+  display: block;
+}
+
+.header {
+  background: #6c757d;
+  color: white;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.header-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.content {
+  padding: 20px;
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 80%;
+  max-width: 300px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.option-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.option-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+}
+
+.option-icon.green { background: #28a745; }
+.option-icon.yellow { background: #ffc107; }
+.option-icon.purple { background: #6f42c1; }
+.option-icon.pink { background: #e83e8c; }
+.option-icon.orange { background: #fd7e14; }
+.option-icon.teal { background: #20c997; }
+
+.option-item span {
+  font-weight: 500;
+  color: #333;
+}
+
+.date-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 80%;
+  max-width: 300px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.date-item:hover {
+  background: #f8f9fa;
+}
+
+.date-icon {
+  font-size: 20px;
+  color: #6c757d;
+}
+
+.date-info {
+  flex: 1;
+}
+
+.date-info .date {
+  font-weight: 500;
+  color: #333;
+}
+
+.date-info .day {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.modalidade-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.modalidade-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background 0.2s;
+}
+
+.modalidade-item:hover {
+  background: #f8f9fa;
+}
+
+.colocacao-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.colocacao-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.colocacao-item:hover {
+  background: #f8f9fa;
+}
+
+.colocacao-tag {
+  background: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.valor-form {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.valor-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.valor-btn {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.valor-btn:hover {
+  background: #e9ecef;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary {
+  background: #8b6f47;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #7a5f3f;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.loteria-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.loteria-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.loteria-item:hover {
+  background: #f8f9fa;
+}
+
+.loteria-counter {
+  background: #6c757d;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.resumo-aposta {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.resumo-header {
+  background: #8b6f47;
+  color: white;
+  padding: 15px;
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+  margin: -20px -20px 20px -20px;
+}
+
+.resumo-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.resumo-line:last-child {
+  border-bottom: none;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.success-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 300px;
+  width: 90%;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: #28a745;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: white;
+  font-size: 24px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 400px;
+  width: 100%;
+  background: #8b6f47;
+  padding: 15px;
+}
+
+.avancar-btn {
+  width: 100%;
+  background: #8b6f47;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.avancar-btn:hover {
+  background: #7a5f3f;
+}
+</style>
+
+<div class="lottery-container">
+  <!-- Tela 1: Modalidades -->
   <div class="screen active" id="screen-modalidades">
     <div class="header">
       <button class="back-btn" onclick="goBack()">
@@ -44,33 +443,14 @@
           <span>SUPER15</span>
         </div>
         <div class="option-item" onclick="selectModalidade('repetir-pule')">
-          <div class="option-icon dark-green">💚</div>
+          <div class="option-icon teal">💚</div>
           <span>REPETIR PULE</span>
         </div>
       </div>
     </div>
-    
-    <div class="bottom-nav">
-      <div class="nav-item">
-        <i class="fas fa-trophy"></i>
-        <span>Prêmio</span>
-      </div>
-      <div class="nav-item">
-        <i class="fas fa-star"></i>
-        <span>Horóscopo</span>
-      </div>
-      <div class="nav-item">
-        <i class="fas fa-moon"></i>
-        <span>Sonhos</span>
-      </div>
-      <div class="nav-item">
-        <i class="fas fa-clock"></i>
-        <span>Atrasados</span>
-      </div>
-    </div>
   </div>
 
-  <!-- Tela 2: Seleção de Data -->
+  <!-- Tela 2: Data -->
   <div class="screen" id="screen-data">
     <div class="header">
       <button class="back-btn" onclick="goToScreen('screen-modalidades')">
@@ -84,62 +464,48 @@
     </div>
     
     <div class="content">
-      <div class="option-list">
-        <div class="option-item" onclick="selectData('04/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">04/07/2025</span>
-            <small>Hoje</small>
+      <div class="date-list">
+        <div class="date-item" onclick="selectData('04/07/2025')">
+          <div class="date-icon">📅</div>
+          <div class="date-info">
+            <div class="date">04/07/2025</div>
+            <div class="day">Hoje</div>
           </div>
         </div>
-        <div class="option-item" onclick="selectData('05/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">05/07/2025</span>
-            <small>Sábado</small>
+        <div class="date-item" onclick="selectData('05/07/2025')">
+          <div class="date-icon">📅</div>
+          <div class="date-info">
+            <div class="date">05/07/2025</div>
+            <div class="day">Sábado</div>
           </div>
         </div>
-        <div class="option-item" onclick="selectData('06/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">06/07/2025</span>
-            <small>Domingo</small>
+        <div class="date-item" onclick="selectData('06/07/2025')">
+          <div class="date-icon">📅</div>
+          <div class="date-info">
+            <div class="date">06/07/2025</div>
+            <div class="day">Domingo</div>
           </div>
         </div>
-        <div class="option-item" onclick="selectData('07/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">07/07/2025</span>
-            <small>Segunda</small>
+        <div class="date-item" onclick="selectData('07/07/2025')">
+          <div class="date-icon">📅</div>
+          <div class="date-info">
+            <div class="date">07/07/2025</div>
+            <div class="day">Segunda</div>
           </div>
         </div>
-        <div class="option-item" onclick="selectData('08/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">08/07/2025</span>
-            <small>Terça</small>
-          </div>
-        </div>
-        <div class="option-item" onclick="selectData('09/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">09/07/2025</span>
-            <small>Quarta</small>
-          </div>
-        </div>
-        <div class="option-item" onclick="selectData('10/07/2025')">
-          <div class="option-icon calendar">📅</div>
-          <div class="option-text">
-            <span class="date">10/07/2025</span>
-            <small>Quinta</small>
+        <div class="date-item" onclick="selectData('08/07/2025')">
+          <div class="date-icon">📅</div>
+          <div class="date-info">
+            <div class="date">08/07/2025</div>
+            <div class="day">Terça</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tela 3: Modalidades de Jogo -->
-  <div class="screen" id="screen-modalidades-jogo">
+  <!-- Tela 3: Modalidade do Jogo -->
+  <div class="screen" id="screen-modalidade-jogo">
     <div class="header">
       <button class="back-btn" onclick="goToScreen('screen-data')">
         <i class="fas fa-arrow-left"></i>
@@ -152,47 +518,17 @@
     </div>
     
     <div class="content">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Buscar modalidade...">
-      </div>
-      
-      <div class="option-list scrollable">
-        <div class="option-item simple" onclick="selectModalidadeJogo('MILHAR INV')">MILHAR INV</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('MILHAR E CT')">MILHAR E CT</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('UNIDADE')">UNIDADE</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DEZENA')">DEZENA</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DEZENA ESQ')">DEZENA ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DEZENA MEIO')">DEZENA MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DUQUE DEZ')">DUQUE DEZ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DUQUE DEZ ESQ')">DUQUE DEZ ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DUQUE DEZ MEIO')">DUQUE DEZ MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO DEZ SECO')">TERNO DEZ SECO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO DEZ SECO ESQ')">TERNO DEZ SECO ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO DEZ SECO MEIO')">TERNO DEZ SECO MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO DEZ')">TERNO DEZ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO DEZ ESQ')">TERNO DEZ ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('CENTENA')">CENTENA</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('CENTENA INV')">CENTENA INV</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('CENTENA 3X')">CENTENA 3X</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('CENTENA ESQUERDA')">CENTENA ESQUERDA</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('CENTENA INV ESQ')">CENTENA INV ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('MILHAR')">MILHAR</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DUQUE GP')">DUQUE GP</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DUQUE GP ESQ')">DUQUE GP ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('DUQUE GP MEIO')">DUQUE GP MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO GP')">TERNO GP</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO GP ESQ')">TERNO GP ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('TERNO GP MEIO')">TERNO GP MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('QUADRA GP')">QUADRA GP</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('QUADRA GP ESQ')">QUADRA GP ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('QUADRA GP MEIO')">QUADRA GP MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('QUINA GP 8/5')">QUINA GP 8/5</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('QUINA GP 8/5 ESQ')">QUINA GP 8/5 ESQ</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('QUINA GP 8/5 MEIO')">QUINA GP 8/5 MEIO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('SENA GP 10/6')">SENA GP 10/6</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('PALPITAO')">PALPITAO</div>
-        <div class="option-item simple" onclick="selectModalidadeJogo('SENA GP 10/6 ESQ')">SENA GP 10/6 ESQ</div>
+      <div class="modalidade-grid">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar')">MILHAR</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar-inv')">MILHAR INV</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar-e-ct')">MILHAR E CT</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('unidade')">UNIDADE</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('dezena')">DEZENA</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('dezena-esq')">DEZENA ESQ</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('dezena-meio')">DEZENA MEIO</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('duque-dez')">DUQUE DEZ</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('centena')">CENTENA</div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo('centena-inv')">CENTENA INV</div>
       </div>
     </div>
   </div>
@@ -200,7 +536,7 @@
   <!-- Tela 4: Colocação -->
   <div class="screen" id="screen-colocacao">
     <div class="header">
-      <button class="back-btn" onclick="goToScreen('screen-modalidades-jogo')">
+      <button class="back-btn" onclick="goToScreen('screen-modalidade-jogo')">
         <i class="fas fa-arrow-left"></i>
       </button>
       <h1>Colocação</h1>
@@ -211,33 +547,35 @@
     </div>
     
     <div class="content">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Buscar colocação...">
-      </div>
-      
-      <div class="option-list">
-        <div class="option-item with-tag" onclick="selectColocacao('1 PRÊMIO')">
+      <div class="colocacao-grid">
+        <div class="colocacao-item" onclick="selectColocacao('1-premio')">
           <span>1 PRÊMIO</span>
-          <span class="tag green">Maior prêmio</span>
+          <span class="colocacao-tag">Maior prêmio</span>
         </div>
-        <div class="option-item with-tag" onclick="selectColocacao('1/5 PRÊMIO')">
+        <div class="colocacao-item" onclick="selectColocacao('1-5-premio')">
           <span>1/5 PRÊMIO</span>
-          <span class="tag green">5x mais chances</span>
+          <span class="colocacao-tag">5x mais chances</span>
         </div>
-        <div class="option-item simple" onclick="selectColocacao('1 E 1/5 PRÊMIO')">1 E 1/5 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('2 PRÊMIO')">2 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('3 PRÊMIO')">3 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('4 PRÊMIO')">4 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('5 PRÊMIO')">5 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('6 PRÊMIO')">6 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('1/2 PRÊMIO')">1/2 PRÊMIO</div>
-        <div class="option-item simple" onclick="selectColocacao('1/3 PRÊMIO')">1/3 PRÊMIO</div>
+        <div class="colocacao-item" onclick="selectColocacao('1-e-1-5-premio')">
+          <span>1 E 1/5 PRÊMIO</span>
+        </div>
+        <div class="colocacao-item" onclick="selectColocacao('2-premio')">
+          <span>2 PRÊMIO</span>
+        </div>
+        <div class="colocacao-item" onclick="selectColocacao('3-premio')">
+          <span>3 PRÊMIO</span>
+        </div>
+        <div class="colocacao-item" onclick="selectColocacao('4-premio')">
+          <span>4 PRÊMIO</span>
+        </div>
+        <div class="colocacao-item" onclick="selectColocacao('5-premio')">
+          <span>5 PRÊMIO</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Tela 5: Valor/Aposta -->
+  <!-- Tela 5: Valor -->
   <div class="screen" id="screen-valor">
     <div class="header">
       <button class="back-btn" onclick="goToScreen('screen-colocacao')">
@@ -251,49 +589,49 @@
     </div>
     
     <div class="content">
-      <div class="bet-info">
-        <div class="bet-header">
-          <span id="modalidade-selected">MILHAR E CT</span>
-          <span id="colocacao-selected">1/5 PRÊMIO</span>
-        </div>
-        <div class="bet-subheader">
-          <span>Palpites 1</span>
-          <span id="data-selected">Hoje 04/07/2025</span>
-        </div>
-      </div>
-      
-      <div class="bet-input-section">
-        <label>Meus Palpites:</label>
-        <input type="text" id="palpites-input" placeholder="Digite os números" maxlength="4">
-      </div>
-      
-      <div class="value-section">
-        <div class="value-input">
-          <input type="text" id="valor-input" placeholder="R$0,00" value="R$20,00">
-          <button class="clear-btn" onclick="clearValue()">Limpar</button>
+      <div class="valor-form">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+          <div>
+            <div style="font-weight: bold;" id="modalidade-display">MILHAR E CT</div>
+            <div style="color: #666; font-size: 14px;">Palpites 1</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: bold;" id="colocacao-display">1/5 PRÊMIO</div>
+            <div style="color: #666; font-size: 14px;">Hoje 04/07/2025</div>
+          </div>
         </div>
         
-        <div class="quick-values">
-          <button class="value-btn popular" onclick="addValue(5)">
-            <span class="fire-icon">🔥</span>
-            <span>Popular</span>
-            +5
-          </button>
-          <button class="value-btn" onclick="addValue(20)">+20</button>
-          <button class="value-btn" onclick="addValue(50)">+50</button>
-          <button class="value-btn" onclick="addValue(100)">+100</button>
+        <div class="form-group">
+          <label>Meus Palpites:</label>
+          <input type="text" id="palpites-input" placeholder="Digite os números" />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="valor-input" placeholder="R$20,00" />
+          <button style="float: right; background: none; border: none; color: #666; cursor: pointer;">Limpar</button>
+        </div>
+        
+        <div class="valor-buttons">
+          <button class="valor-btn" onclick="addValor(5)">+5</button>
+          <button class="valor-btn" onclick="addValor(20)">+20</button>
+          <button class="valor-btn" onclick="addValor(50)">+50</button>
+          <button class="valor-btn" onclick="addValor(100)">+100</button>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-primary">Todos</button>
+          <button class="btn btn-primary">Cada</button>
         </div>
       </div>
       
       <div class="action-buttons">
-        <button class="action-btn todos" onclick="selectAction('todos')">Todos</button>
-        <button class="action-btn cada" onclick="selectAction('cada')">Cada</button>
+        <button class="btn btn-secondary" onclick="goToScreen('screen-loterias')">Continuar</button>
       </div>
     </div>
   </div>
 
-  <!-- Tela 6: Horários -->
-  <div class="screen" id="screen-horarios">
+  <!-- Tela 6: Loterias -->
+  <div class="screen" id="screen-loterias">
     <div class="header">
       <button class="back-btn" onclick="goToScreen('screen-valor')">
         <i class="fas fa-arrow-left"></i>
@@ -306,57 +644,43 @@
     </div>
     
     <div class="content">
-      <div class="option-list">
-        <div class="option-item with-counter" onclick="toggleLoteria('RIO/FEDERAL')">
+      <div class="loteria-list">
+        <div class="loteria-item" onclick="toggleLoteria('rio-federal')">
           <span>RIO/FEDERAL</span>
-          <span class="counter" id="counter-rio">0</span>
+          <span class="loteria-counter">0</span>
         </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('MALUQUINHA')">
+        <div class="loteria-item" onclick="toggleLoteria('maluquinha')">
           <span>MALUQUINHA</span>
-          <span class="counter" id="counter-maluquinha">0</span>
+          <span class="loteria-counter">0</span>
         </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('LOTECE/LOTEP')">
+        <div class="loteria-item" onclick="toggleLoteria('lotece')">
           <span>LOTECE/LOTEP</span>
-          <span class="counter" id="counter-lotece">0</span>
+          <span class="loteria-counter">0</span>
         </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('SAO-PAULO')">
+        <div class="loteria-item" onclick="toggleLoteria('sao-paulo')">
           <span>SAO-PAULO</span>
-          <span class="counter" id="counter-saopaulo">0</span>
+          <span class="loteria-counter">0</span>
         </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('CAPITAL')">
+        <div class="loteria-item" onclick="toggleLoteria('capital')">
           <span>CAPITAL</span>
-          <span class="counter" id="counter-capital">0</span>
+          <span class="loteria-counter">0</span>
         </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('LOOK/GOIAS')">
+        <div class="loteria-item" onclick="toggleLoteria('look-goias')">
           <span>LOOK/GOIAS</span>
-          <span class="counter" id="counter-look">0</span>
-        </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('SORTE')">
-          <span>SORTE</span>
-          <span class="counter" id="counter-sorte">0</span>
-        </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('BAHIA')">
-          <span>BAHIA</span>
-          <span class="counter" id="counter-bahia">0</span>
-        </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('MINAS GERAIS')">
-          <span>MINAS GERAIS</span>
-          <span class="counter" id="counter-minas">0</span>
-        </div>
-        <div class="option-item with-counter" onclick="toggleLoteria('NACIONAL')">
-          <span>NACIONAL</span>
-          <span class="counter" id="counter-nacional">0</span>
+          <span class="loteria-counter">0</span>
         </div>
       </div>
       
-      <button class="advance-btn" onclick="goToScreen('screen-finalizar')">Avançar</button>
+      <div class="bottom-nav">
+        <button class="avancar-btn" onclick="goToScreen('screen-finalizar')">Avançar</button>
+      </div>
     </div>
   </div>
 
   <!-- Tela 7: Finalizar -->
   <div class="screen" id="screen-finalizar">
     <div class="header">
-      <button class="back-btn" onclick="goToScreen('screen-horarios')">
+      <button class="back-btn" onclick="goToScreen('screen-loterias')">
         <i class="fas fa-arrow-left"></i>
       </button>
       <h1>Finalizar</h1>
@@ -367,725 +691,69 @@
     </div>
     
     <div class="content">
-      <div class="vendor-info">
-        <div class="vendor-header">
-          <i class="fas fa-crown"></i>
-          <div>
-            <span>VENDEDOR: 620500</span>
-            <small id="current-datetime">04/07/25 12:11:16</small>
-          </div>
+      <div class="resumo-aposta">
+        <div class="resumo-header">
+          <div>VENDEDOR: 620500</div>
+          <div>04/07/25 12:11:16</div>
         </div>
-      </div>
-      
-      <div class="bet-summary">
-        <h3>RESUMO DA APOSTA</h3>
-        <div class="summary-line">
+        
+        <div style="text-align: center; margin: 20px 0; font-weight: bold;">
+          RESUMO DA APOSTA
+        </div>
+        
+        <div class="resumo-line">
           <span>VALE</span>
-          <span id="summary-date">04/07/2025</span>
+          <span>04/07/2025</span>
         </div>
-        <div class="summary-line">
-          <span>COTACAO</span>
+        <div class="resumo-line">
+          <span>COTAÇÃO</span>
           <span>8M/800C</span>
         </div>
-        <div class="summary-line">
+        <div class="resumo-line">
           <span>LT PT RIO 14HS</span>
+          <span></span>
         </div>
-        <div class="summary-line">
-          <span id="summary-modalidade">MILHAR E CT 1/5 PRÊMIO</span>
+        <div class="resumo-line">
+          <span>MILHAR E CT 1/5 PRÊMIO</span>
+          <span></span>
         </div>
-        <div class="summary-line">
-          <span id="summary-numero">5068</span>
+        <div class="resumo-line">
+          <span>5068</span>
+          <span></span>
         </div>
-        <div class="summary-line">
-          <span>> <span id="summary-valor">10,00</span> / CADA</span>
+        <div class="resumo-line">
+          <span>> 10,00 / CADA</span>
+          <span></span>
         </div>
-        <div class="summary-line">
-          <span>MILHAR BRINDE! 1 PREMIO</span>
-        </div>
-        <div class="summary-line">
-          <span id="summary-numero-brinde">5068</span>
-        </div>
-      </div>
-      
-      <div class="total-section">
-        <div class="total-line">
+        <div class="resumo-line">
           <span>TOTAL JOGO:</span>
-          <span id="total-jogo">R$ 10,00</span>
+          <span>R$ 10,00</span>
         </div>
-        <div class="total-line final">
+        <div class="resumo-line">
           <span>A PAGAR</span>
-          <span id="total-pagar">R$ 10,00</span>
+          <span>R$ 10,00</span>
         </div>
       </div>
       
-      <div class="final-buttons">
-        <button class="final-btn back" onclick="goToScreen('screen-horarios')">Voltar as apostas</button>
-        <button class="final-btn confirm" onclick="finalizarAposta()">Finalizar</button>
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="goToScreen('screen-valor')">Voltar as apostas</button>
+        <button class="btn btn-secondary" onclick="finalizarAposta()">Finalizar</button>
       </div>
     </div>
   </div>
 
-  <!-- Tela 8: Sucesso -->
-  <div class="screen" id="screen-sucesso">
-    <div class="header success">
-      <button class="back-btn" onclick="goToScreen('screen-modalidades')">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h1>Sucesso</h1>
-      <div class="header-icons">
-        <i class="fas fa-eye"></i>
-        <i class="fas fa-bars"></i>
+  <!-- Modal de Sucesso -->
+  <div class="success-modal" id="success-modal" style="display: none;">
+    <div class="success-content">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
       </div>
-    </div>
-    
-    <div class="content">
-      <!-- Fundo mostra o recibo -->
-      <div class="receipt-background">
-        <div class="vendor-info">
-          <div class="vendor-header">
-            <i class="fas fa-crown"></i>
-            <div>
-              <span>VENDEDOR: 620500</span>
-              <small>04/07/25 12:11:16</small>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bet-summary">
-          <h3>RECIBO DA APOSTA</h3>
-          <!-- Conteúdo do recibo igual à tela anterior -->
-        </div>
-      </div>
-      
-      <!-- Modal de sucesso -->
-      <div class="success-modal">
-        <div class="success-icon">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <p>Aposta Realizada com sucesso</p>
-        <button class="modal-btn" onclick="closeSuccessModal()">Fechar</button>
-      </div>
-      
-      <div class="bottom-actions">
-        <button class="action-btn share">
-          <i class="fas fa-share"></i>
-          Compartilhar
-        </button>
-        <button class="action-btn new-bet" onclick="novaAposta()">Nova aposta</button>
-      </div>
+      <h3>Aposta Realizada com sucesso</h3>
+      <button class="btn btn-primary" onclick="novaAposta()">Fechar</button>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block styles %}
-<style>
-/* Reset e base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.lottery-app {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f5f5;
-  min-height: 100vh;
-  position: relative;
-}
-
-/* Telas */
-.screen {
-  display: none;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #f5f5f5;
-}
-
-.screen.active {
-  display: flex;
-}
-
-/* Header */
-.header {
-  background: #6c757d;
-  color: white;
-  padding: 15px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
-
-.header.success {
-  background: #28a745;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.header h1 {
-  font-size: 18px;
-  font-weight: 500;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.header-icons {
-  display: flex;
-  gap: 15px;
-}
-
-.header-icons i {
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* Content */
-.content {
-  flex: 1;
-  padding: 0;
-  background: white;
-}
-
-/* Option List */
-.option-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.option-list.scrollable {
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-}
-
-.option-item {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #e9ecef;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.option-item:hover {
-  background: #f8f9fa;
-}
-
-.option-item:active {
-  background: #e9ecef;
-}
-
-.option-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 15px;
-  font-size: 20px;
-}
-
-.option-icon.green { background: #28a745; }
-.option-icon.yellow { background: #ffc107; }
-.option-icon.purple { background: #6f42c1; }
-.option-icon.pink { background: #e83e8c; }
-.option-icon.orange { background: #fd7e14; }
-.option-icon.dark-green { background: #20c997; }
-.option-icon.calendar { background: #6c757d; }
-
-.option-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.option-text .date {
-  font-weight: 500;
-  color: #212529;
-}
-
-.option-text small {
-  color: #6c757d;
-  font-size: 12px;
-}
-
-.option-item.simple {
-  font-weight: 500;
-  color: #212529;
-}
-
-.option-item.with-tag {
-  justify-content: space-between;
-}
-
-.tag {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.tag.green {
-  background: #d4edda;
-  color: #155724;
-}
-
-.option-item.with-counter {
-  justify-content: space-between;
-}
-
-.counter {
-  background: #6c757d;
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-/* Search Box */
-.search-box {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f9fa;
-}
-
-.search-box i {
-  color: #6c757d;
-  margin-right: 10px;
-}
-
-.search-box input {
-  border: none;
-  background: none;
-  outline: none;
-  flex: 1;
-  font-size: 14px;
-  color: #6c757d;
-}
-
-/* Bottom Navigation */
-.bottom-nav {
-  display: flex;
-  background: white;
-  border-top: 1px solid #e9ecef;
-  padding: 10px 0;
-}
-
-.nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px;
-  cursor: pointer;
-  color: #6c757d;
-}
-
-.nav-item i {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-.nav-item span {
-  font-size: 11px;
-}
-
-/* Bet Info */
-.bet-info {
-  padding: 20px;
-  background: white;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.bet-header {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #212529;
-  margin-bottom: 5px;
-}
-
-.bet-subheader {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #6c757d;
-}
-
-/* Bet Input Section */
-.bet-input-section {
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.bet-input-section label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: 500;
-  color: #212529;
-}
-
-.bet-input-section input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 16px;
-  background: #f8f9fa;
-}
-
-/* Value Section */
-.value-section {
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.value-input {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.value-input input {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  margin-right: 10px;
-}
-
-.clear-btn {
-  background: none;
-  border: none;
-  color: #6c757d;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.quick-values {
-  display: flex;
-  gap: 10px;
-}
-
-.value-btn {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.value-btn:hover {
-  background: #f8f9fa;
-}
-
-.value-btn.popular {
-  background: #fff3cd;
-  border-color: #ffc107;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.fire-icon {
-  font-size: 12px;
-}
-
-.value-btn.popular span:nth-child(2) {
-  font-size: 10px;
-  color: #856404;
-}
-
-/* Action Buttons */
-.action-buttons {
-  padding: 20px;
-  display: flex;
-  gap: 15px;
-}
-
-.action-btn {
-  flex: 1;
-  padding: 15px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-btn.todos {
-  background: #8d6e63;
-  color: white;
-}
-
-.action-btn.cada {
-  background: #8d6e63;
-  color: white;
-}
-
-.action-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Advance Button */
-.advance-btn {
-  margin: 20px;
-  padding: 15px;
-  background: #8d6e63;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.advance-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Vendor Info */
-.vendor-info {
-  padding: 20px;
-  background: #343a40;
-  color: white;
-}
-
-.vendor-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.vendor-header i {
-  color: #ffc107;
-  font-size: 20px;
-}
-
-.vendor-header div {
-  display: flex;
-  flex-direction: column;
-}
-
-.vendor-header span {
-  font-weight: 600;
-}
-
-.vendor-header small {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-/* Bet Summary */
-.bet-summary {
-  padding: 20px;
-  background: white;
-}
-
-.bet-summary h3 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #212529;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.summary-line {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px dotted #dee2e6;
-  font-size: 14px;
-}
-
-.summary-line:last-child {
-  border-bottom: none;
-}
-
-/* Total Section */
-.total-section {
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #e9ecef;
-}
-
-.total-line {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
-}
-
-.total-line.final {
-  font-weight: 600;
-  font-size: 16px;
-  color: #212529;
-  border-top: 1px solid #dee2e6;
-  padding-top: 15px;
-  margin-top: 10px;
-}
-
-/* Final Buttons */
-.final-buttons {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.final-btn {
-  padding: 15px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.final-btn.back {
-  background: #8d6e63;
-  color: white;
-}
-
-.final-btn.confirm {
-  background: #6c757d;
-  color: white;
-}
-
-.final-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Success Screen */
-.receipt-background {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.success-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  text-align: center;
-  z-index: 1000;
-  min-width: 280px;
-}
-
-.success-icon {
-  color: #28a745;
-  font-size: 48px;
-  margin-bottom: 15px;
-}
-
-.success-modal p {
-  margin-bottom: 20px;
-  color: #212529;
-  font-weight: 500;
-}
-
-.modal-btn {
-  background: #8d6e63;
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.modal-btn:hover {
-  opacity: 0.9;
-}
-
-/* Bottom Actions */
-.bottom-actions {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: white;
-  border-top: 1px solid #e9ecef;
-  z-index: 999;
-}
-
-.bottom-actions .action-btn {
-  flex: 1;
-  padding: 15px;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.bottom-actions .action-btn.share {
-  background: #28a745;
-  color: white;
-}
-
-.bottom-actions .action-btn.new-bet {
-  background: #6c757d;
-  color: white;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: 16px;
-  }
-  
-  .option-item {
-    padding: 12px 15px;
-  }
-  
-  .bet-info, .bet-input-section, .value-section {
-    padding: 15px;
-  }
-}
-</style>
-{% endblock %}
-
-{% block scripts %}
 <script>
 // Estado da aplicação
 let appState = {
@@ -1095,22 +763,23 @@ let appState = {
   colocacao: '',
   palpites: '',
   valor: 0,
-  loterias: [],
-  currentScreen: 'screen-modalidades'
+  loterias: []
 };
 
-// Navegação entre telas
+// Funções de navegação
 function goToScreen(screenId) {
+  // Esconder todas as telas
   document.querySelectorAll('.screen').forEach(screen => {
     screen.classList.remove('active');
   });
+  
+  // Mostrar tela selecionada
   document.getElementById(screenId).classList.add('active');
-  appState.currentScreen = screenId;
 }
 
 function goBack() {
-  // Volta para a página anterior ou dashboard
-  window.location.href = "{{ url_for('lottery_blueprint_v1.index') }}";
+  // Implementar lógica de voltar se necessário
+  window.history.back();
 }
 
 // Funções de seleção
@@ -1121,75 +790,44 @@ function selectModalidade(modalidade) {
 
 function selectData(data) {
   appState.data = data;
-  document.getElementById('data-selected').textContent = data === '04/07/2025' ? 'Hoje 04/07/2025' : data;
-  goToScreen('screen-modalidades-jogo');
+  goToScreen('screen-modalidade-jogo');
 }
 
 function selectModalidadeJogo(modalidade) {
   appState.modalidadeJogo = modalidade;
-  document.getElementById('modalidade-selected').textContent = modalidade;
+  document.getElementById('modalidade-display').textContent = modalidade.toUpperCase();
   goToScreen('screen-colocacao');
 }
 
 function selectColocacao(colocacao) {
   appState.colocacao = colocacao;
-  document.getElementById('colocacao-selected').textContent = colocacao;
+  document.getElementById('colocacao-display').textContent = colocacao.replace('-', ' ').toUpperCase();
   goToScreen('screen-valor');
 }
 
-function selectAction(action) {
-  // Lógica para "Todos" ou "Cada"
-  goToScreen('screen-horarios');
-}
-
-// Funções de valor
-function addValue(amount) {
+function addValor(valor) {
   const valorInput = document.getElementById('valor-input');
-  let currentValue = parseFloat(valorInput.value.replace('R$', '').replace(',', '.')) || 0;
-  currentValue += amount;
-  valorInput.value = `R$${currentValue.toFixed(2).replace('.', ',')}`;
-  appState.valor = currentValue;
+  const currentValue = parseFloat(valorInput.value.replace('R$', '').replace(',', '.')) || 0;
+  const newValue = currentValue + valor;
+  valorInput.value = `R$${newValue.toFixed(2).replace('.', ',')}`;
+  appState.valor = newValue;
 }
 
-function clearValue() {
-  document.getElementById('valor-input').value = 'R$0,00';
-  appState.valor = 0;
-}
-
-// Funções de loteria
 function toggleLoteria(loteria) {
-  const counterId = 'counter-' + loteria.toLowerCase().replace(/[^a-z]/g, '');
-  const counter = document.getElementById(counterId);
-  
-  if (appState.loterias.includes(loteria)) {
-    appState.loterias = appState.loterias.filter(l => l !== loteria);
-    if (counter) counter.textContent = '0';
+  const index = appState.loterias.indexOf(loteria);
+  if (index > -1) {
+    appState.loterias.splice(index, 1);
   } else {
     appState.loterias.push(loteria);
-    if (counter) counter.textContent = '1';
   }
+  
+  // Atualizar contador visual
+  const counter = document.querySelector(`[onclick="toggleLoteria('${loteria}')"] .loteria-counter`);
+  counter.textContent = appState.loterias.includes(loteria) ? '1' : '0';
 }
 
-// Finalizar aposta
 function finalizarAposta() {
-  // Atualizar resumo
-  updateSummary();
-  goToScreen('screen-sucesso');
-}
-
-function updateSummary() {
-  document.getElementById('summary-date').textContent = appState.data;
-  document.getElementById('summary-modalidade').textContent = `${appState.modalidadeJogo} ${appState.colocacao}`;
-  document.getElementById('summary-numero').textContent = appState.palpites || '5068';
-  document.getElementById('summary-valor').textContent = appState.valor.toFixed(2).replace('.', ',');
-  document.getElementById('summary-numero-brinde').textContent = appState.palpites || '5068';
-  document.getElementById('total-jogo').textContent = `R$ ${appState.valor.toFixed(2).replace('.', ',')}`;
-  document.getElementById('total-pagar').textContent = `R$ ${appState.valor.toFixed(2).replace('.', ',')}`;
-}
-
-// Funções de sucesso
-function closeSuccessModal() {
-  document.querySelector('.success-modal').style.display = 'none';
+  document.getElementById('success-modal').style.display = 'flex';
 }
 
 function novaAposta() {
@@ -1201,30 +839,17 @@ function novaAposta() {
     colocacao: '',
     palpites: '',
     valor: 0,
-    loterias: [],
-    currentScreen: 'screen-modalidades'
+    loterias: []
   };
+  
+  document.getElementById('success-modal').style.display = 'none';
   goToScreen('screen-modalidades');
 }
 
-// Event listeners
+// Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-  // Input de palpites
-  const palpitesInput = document.getElementById('palpites-input');
-  if (palpitesInput) {
-    palpitesInput.addEventListener('input', function() {
-      appState.palpites = this.value;
-    });
-  }
-  
-  // Atualizar data/hora atual
-  const now = new Date();
-  const dateTimeString = now.toLocaleDateString('pt-BR').slice(0, 8) + ' ' + 
-                        now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const currentDateTimeElement = document.getElementById('current-datetime');
-  if (currentDateTimeElement) {
-    currentDateTimeElement.textContent = dateTimeString;
-  }
+  // Garantir que apenas a primeira tela esteja visível
+  goToScreen('screen-modalidades');
 });
 </script>
 {% endblock %}
