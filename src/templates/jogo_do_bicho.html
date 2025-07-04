@@ -1,53 +1,909 @@
 {% extends "base.html" %}
 
+{% block title %}Jogo do Bicho - Banca Ferradura{% endblock %}
+
 {% block content %}
-<h2>Jogo do Bicho (Protótipo)</h2>
+<div class="jogo-bicho-container">
+  <!-- Cabeçalho -->
+  <div class="game-header">
+    <h1><i class="fas fa-paw"></i> Jogo do Bicho</h1>
+    <div class="balance-display">
+      <i class="fas fa-coins"></i>
+      <span>Saldo: R$ {{ "%.2f"|format(session.get("user_credits", 0)|float) }}</span>
+    </div>
+  </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="flash-message flash-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+  <!-- Mensagens de feedback -->
+  <div id="message-container"></div>
 
-{% if session.get("user_phone") %}
-    <p>Seu saldo atual: R$ {{ session.get("user_credits", "0.00") }}</p>
+  <!-- Formulário de Aposta -->
+  <div class="betting-form">
+    <div class="form-section">
+      <h3>Tipo de Aposta</h3>
+      <div class="bet-type-selector">
+        <button type="button" class="bet-type-btn active" data-type="grupo">
+          <i class="fas fa-users"></i>
+          <span>Grupo</span>
+          <small>1 a 25</small>
+        </button>
+        <button type="button" class="bet-type-btn" data-type="milhar">
+          <i class="fas fa-hashtag"></i>
+          <span>Milhar</span>
+          <small>0000 a 9999</small>
+        </button>
+        <button type="button" class="bet-type-btn" data-type="centena">
+          <i class="fas fa-list-ol"></i>
+          <span>Centena</span>
+          <small>000 a 999</small>
+        </button>
+        <button type="button" class="bet-type-btn" data-type="dezena">
+          <i class="fas fa-sort-numeric-up"></i>
+          <span>Dezena</span>
+          <small>00 a 99</small>
+        </button>
+      </div>
+    </div>
 
-    <form method="POST" action="{{ url_for("games.fazer_aposta_bicho") }}">
-        <div>
-            <label for="tipo_aposta">Tipo de Aposta:</label>
-            <select id="tipo_aposta" name="tipo_aposta" required>
-                <option value="grupo">Grupo (1 dos 25 grupos)</option>
-                <option value="milhar">Milhar (0000 a 9999)</option>
-                <option value="centena">Centena (000 a 999)</option>
-                <option value="dezena">Dezena (00 a 99)</option>
-            </select>
+    <div class="form-section">
+      <h3>Seus Números</h3>
+      <div class="number-input-section">
+        <div class="input-group">
+          <label for="bet-numbers">Digite seus números:</label>
+          <input type="text" id="bet-numbers" placeholder="Ex: 16 (Grupo), 1234 (Milhar)" maxlength="20">
+          <div class="input-help">
+            <span id="input-help-text">Para Grupo, insira o número do animal (1 a 25). Para os demais, o número desejado.</span>
+          </div>
         </div>
-        <div>
-            <label for="aposta_valor_input">Seu Jogo (Número/Grupo):</label>
-            <input type="text" id="aposta_valor_input" name="aposta_valor_input" placeholder="Ex: 16 (Grupo), 1234 (Milhar)" required>
-            <small>Para Grupo, insira o número do animal (1 a 25). Para os demais, o número desejado.</small>
+        
+        <div class="selected-numbers">
+          <h4>Números Selecionados:</h4>
+          <div id="selected-numbers-display">
+            <span class="no-numbers">Nenhum número selecionado</span>
+          </div>
+          <button type="button" id="clear-numbers" class="clear-btn">
+            <i class="fas fa-trash"></i> Limpar
+          </button>
         </div>
-        <div>
-            <label for="valor_aposta">Valor da Aposta (R$):</label>
-            <input type="number" id="valor_aposta" name="valor_aposta" min="0.01" step="0.01" required>
-        </div>
-        <button type="submit">Fazer Aposta</button>
-    </form>
+      </div>
+    </div>
 
-    {% if session.get("ultimo_resultado_bicho") %}
-        <div style="margin-top: 20px; padding: 10px; border: 1px solid #00FF7F;">
-            <h4>Resultado do Último Sorteio (Simulado)</h4>
-            <p><strong>Seu jogo:</strong> Tipo: {{ session.get("ultimo_jogo_bicho").tipo }}, Valor/Número: {{ session.get("ultimo_jogo_bicho").numero }}, Apostou: R$ {{ session.get("ultimo_jogo_bicho").valor_apostado }}</p>
-            <p><strong>Resultado Sorteado:</strong> {{ session.get("ultimo_resultado_bicho").descricao_sorteio }}</p>
-            <p><strong>Prêmio:</strong> R$ {{ session.get("ultimo_resultado_bicho").premio }}</p>
-            <p>{{ session.get("ultimo_resultado_bicho").mensagem }}</p>
+    <div class="form-section">
+      <h3>Valor da Aposta</h3>
+      <div class="bet-amount-section">
+        <div class="input-group">
+          <label for="bet-amount">Valor (R$):</label>
+          <input type="number" id="bet-amount" min="0.01" step="0.01" placeholder="0.00">
         </div>
-    {% endif %}
-    <p style="margin-top:20px;"><a href="{{ url_for("main.index") }}">Voltar para a página inicial</a></p>
-{% else %}
-    <p>Você precisa estar logado para jogar. <a href="{{ url_for("auth.login") }}">Faça login</a>.</p>
-{% endif %}
+        
+        <div class="quick-amounts">
+          <button type="button" class="quick-amount-btn" data-amount="1.00">R$ 1,00</button>
+          <button type="button" class="quick-amount-btn" data-amount="5.00">R$ 5,00</button>
+          <button type="button" class="quick-amount-btn" data-amount="10.00">R$ 10,00</button>
+          <button type="button" class="quick-amount-btn" data-amount="20.00">R$ 20,00</button>
+        </div>
+      </div>
+    </div>
 
+    <div class="form-section">
+      <h3>Resumo da Aposta</h3>
+      <div class="bet-summary">
+        <div class="summary-item">
+          <span>Tipo:</span>
+          <span id="summary-type">Grupo</span>
+        </div>
+        <div class="summary-item">
+          <span>Números:</span>
+          <span id="summary-numbers">-</span>
+        </div>
+        <div class="summary-item">
+          <span>Valor:</span>
+          <span id="summary-amount">R$ 0,00</span>
+        </div>
+        <div class="summary-item total">
+          <span>Total a Pagar:</span>
+          <span id="summary-total">R$ 0,00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" id="place-bet-btn" class="place-bet-btn" disabled>
+        <i class="fas fa-check"></i>
+        Fazer Aposta
+      </button>
+      <button type="button" id="reset-form-btn" class="reset-btn">
+        <i class="fas fa-undo"></i>
+        Limpar Tudo
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabela de Animais (para referência) -->
+  <div class="animals-reference">
+    <h3>Tabela de Animais</h3>
+    <div class="animals-grid">
+      <div class="animal-item">01 - Avestruz</div>
+      <div class="animal-item">02 - Águia</div>
+      <div class="animal-item">03 - Burro</div>
+      <div class="animal-item">04 - Borboleta</div>
+      <div class="animal-item">05 - Cachorro</div>
+      <div class="animal-item">06 - Cabra</div>
+      <div class="animal-item">07 - Carneiro</div>
+      <div class="animal-item">08 - Camelo</div>
+      <div class="animal-item">09 - Cobra</div>
+      <div class="animal-item">10 - Coelho</div>
+      <div class="animal-item">11 - Cavalo</div>
+      <div class="animal-item">12 - Elefante</div>
+      <div class="animal-item">13 - Galo</div>
+      <div class="animal-item">14 - Gato</div>
+      <div class="animal-item">15 - Jacaré</div>
+      <div class="animal-item">16 - Leão</div>
+      <div class="animal-item">17 - Macaco</div>
+      <div class="animal-item">18 - Porco</div>
+      <div class="animal-item">19 - Pavão</div>
+      <div class="animal-item">20 - Peru</div>
+      <div class="animal-item">21 - Touro</div>
+      <div class="animal-item">22 - Tigre</div>
+      <div class="animal-item">23 - Urso</div>
+      <div class="animal-item">24 - Veado</div>
+      <div class="animal-item">25 - Vaca</div>
+    </div>
+  </div>
+
+  <!-- Histórico de Apostas -->
+  <div class="bet-history">
+    <h3>Suas Últimas Apostas</h3>
+    <div id="bet-history-list">
+      <p class="no-bets">Nenhuma aposta realizada ainda.</p>
+    </div>
+  </div>
+
+  <!-- Botão Voltar -->
+  <div class="back-section">
+    <a href="{{ url_for('main.index') }}" class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      Voltar ao Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Estilos do Jogo do Bicho */
+.jogo-bicho-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #1e2130 0%, #2a2e43 100%);
+  min-height: 100vh;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.game-header h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  color: #4caf50;
+}
+
+.game-header h1 i {
+  margin-right: 15px;
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  background: rgba(76, 175, 80, 0.2);
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: 2px solid #4caf50;
+}
+
+.balance-display i {
+  color: #ffd700;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.balance-display span {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Mensagens */
+#message-container {
+  margin-bottom: 20px;
+}
+
+.message {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.message i {
+  margin-right: 10px;
+}
+
+.message.success {
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid #4caf50;
+  color: #4caf50;
+}
+
+.message.error {
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid #f44336;
+  color: #f44336;
+}
+
+.message.warning {
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid #ffc107;
+  color: #ffc107;
+}
+
+/* Formulário */
+.betting-form {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.form-section h3 {
+  color: #4caf50;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+/* Seletor de Tipo de Aposta */
+.bet-type-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.bet-type-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.bet-type-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.bet-type-btn.active {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
+.bet-type-btn i {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.bet-type-btn span {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.bet-type-btn small {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+/* Entrada de Números */
+.number-input-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.input-group input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #4caf50;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.input-help {
+  margin-top: 5px;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.selected-numbers {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.selected-numbers h4 {
+  margin: 0 0 10px 0;
+  color: #4caf50;
+}
+
+#selected-numbers-display {
+  min-height: 40px;
+  margin-bottom: 10px;
+}
+
+.number-tag {
+  display: inline-block;
+  background: #4caf50;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin: 2px;
+  font-size: 0.9rem;
+}
+
+.no-numbers {
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.clear-btn {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Valor da Aposta */
+.bet-amount-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.quick-amount-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quick-amount-btn:hover {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: #4caf50;
+}
+
+/* Resumo da Aposta */
+.bet-summary {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-item.total {
+  border-bottom: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #4caf50;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 2px solid #4caf50;
+}
+
+/* Ações do Formulário */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.place-bet-btn {
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  color: #fff;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.place-bet-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.place-bet-btn:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+.reset-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reset-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: #f44336;
+  color: #f44336;
+}
+
+/* Tabela de Animais */
+.animals-reference {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.animals-reference h3 {
+  color: #4caf50;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.animals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.animal-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Histórico */
+.bet-history {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.bet-history h3 {
+  color: #4caf50;
+  margin-bottom: 15px;
+}
+
+.no-bets {
+  text-align: center;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Botão Voltar */
+.back-section {
+  text-align: center;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .number-input-section,
+  .bet-amount-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .bet-type-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .animals-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .bet-type-selector {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-amounts {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Elementos do DOM
+  const betTypeButtons = document.querySelectorAll('.bet-type-btn');
+  const betNumbersInput = document.getElementById('bet-numbers');
+  const betAmountInput = document.getElementById('bet-amount');
+  const selectedNumbersDisplay = document.getElementById('selected-numbers-display');
+  const clearNumbersBtn = document.getElementById('clear-numbers');
+  const quickAmountButtons = document.querySelectorAll('.quick-amount-btn');
+  const placeBetBtn = document.getElementById('place-bet-btn');
+  const resetFormBtn = document.getElementById('reset-form-btn');
+  const messageContainer = document.getElementById('message-container');
+  
+  // Elementos do resumo
+  const summaryType = document.getElementById('summary-type');
+  const summaryNumbers = document.getElementById('summary-numbers');
+  const summaryAmount = document.getElementById('summary-amount');
+  const summaryTotal = document.getElementById('summary-total');
+  
+  // Elementos de ajuda
+  const inputHelpText = document.getElementById('input-help-text');
+  
+  // Estado da aplicação
+  let currentBetType = 'grupo';
+  let selectedNumbers = [];
+  let currentAmount = 0;
+  
+  // Textos de ajuda para cada tipo
+  const helpTexts = {
+    grupo: 'Para Grupo, insira o número do animal (1 a 25).',
+    milhar: 'Para Milhar, insira um número de 4 dígitos (0000 a 9999).',
+    centena: 'Para Centena, insira um número de 3 dígitos (000 a 999).',
+    dezena: 'Para Dezena, insira um número de 2 dígitos (00 a 99).'
+  };
+  
+  // Placeholders para cada tipo
+  const placeholders = {
+    grupo: 'Ex: 16 (Leão)',
+    milhar: 'Ex: 1234',
+    centena: 'Ex: 123',
+    dezena: 'Ex: 12'
+  };
+  
+  // Inicialização
+  updateSummary();
+  updatePlaceBetButton();
+  
+  // Event Listeners
+  
+  // Seleção de tipo de aposta
+  betTypeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active de todos os botões
+      betTypeButtons.forEach(btn => btn.classList.remove('active'));
+      // Adiciona active ao botão clicado
+      this.classList.add('active');
+      
+      // Atualiza o tipo atual
+      currentBetType = this.dataset.type;
+      
+      // Atualiza textos de ajuda e placeholder
+      inputHelpText.textContent = helpTexts[currentBetType];
+      betNumbersInput.placeholder = placeholders[currentBetType];
+      
+      // Limpa números selecionados
+      selectedNumbers = [];
+      betNumbersInput.value = '';
+      updateSelectedNumbersDisplay();
+      updateSummary();
+      updatePlaceBetButton();
+    });
+  });
+  
+  // Entrada de números
+  betNumbersInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      addNumber();
+    }
+  });
+  
+  betNumbersInput.addEventListener('blur', function() {
+    if (this.value.trim()) {
+      addNumber();
+    }
+  });
+  
+  // Valor da aposta
+  betAmountInput.addEventListener('input', function() {
+    currentAmount = parseFloat(this.value) || 0;
+    updateSummary();
+    updatePlaceBetButton();
+  });
+  
+  // Botões de valor rápido
+  quickAmountButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const amount = this.dataset.amount;
+      betAmountInput.value = amount;
+      currentAmount = parseFloat(amount);
+      updateSummary();
+      updatePlaceBetButton();
+    });
+  });
+  
+  // Limpar números
+  clearNumbersBtn.addEventListener('click', function() {
+    selectedNumbers = [];
+    betNumbersInput.value = '';
+    updateSelectedNumbersDisplay();
+    updateSummary();
+    updatePlaceBetButton();
+  });
+  
+  // Fazer aposta
+  placeBetBtn.addEventListener('click', function() {
+    if (validateBet()) {
+      placeBet();
+    }
+  });
+  
+  // Resetar formulário
+  resetFormBtn.addEventListener('click', function() {
+    resetForm();
+  });
+  
+  // Funções
+  
+  function addNumber() {
+    const input = betNumbersInput.value.trim();
+    if (!input) return;
+    
+    if (validateNumber(input)) {
+      if (!selectedNumbers.includes(input)) {
+        selectedNumbers.push(input);
+        betNumbersInput.value = '';
+        updateSelectedNumbersDisplay();
+        updateSummary();
+        updatePlaceBetButton();
+        showMessage('Número adicionado com sucesso!', 'success');
+      } else {
+        showMessage('Este número já foi selecionado.', 'warning');
+      }
+    }
+  }
+  
+  function validateNumber(number) {
+    const num = parseInt(number);
+    
+    switch (currentBetType) {
+      case 'grupo':
+        if (num < 1 || num > 25) {
+          showMessage('Para Grupo, o número deve estar entre 1 e 25.', 'error');
+          return false;
+        }
+        break;
+      case 'milhar':
+        if (number.length !== 4 || num < 0 || num > 9999) {
+          showMessage('Para Milhar, digite um número de 4 dígitos (0000 a 9999).', 'error');
+          return false;
+        }
+        break;
+      case 'centena':
+        if (number.length !== 3 || num < 0 || num > 999) {
+          showMessage('Para Centena, digite um número de 3 dígitos (000 a 999).', 'error');
+          return false;
+        }
+        break;
+      case 'dezena':
+        if (number.length !== 2 || num < 0 || num > 99) {
+          showMessage('Para Dezena, digite um número de 2 dígitos (00 a 99).', 'error');
+          return false;
+        }
+        break;
+    }
+    
+    return true;
+  }
+  
+  function updateSelectedNumbersDisplay() {
+    if (selectedNumbers.length === 0) {
+      selectedNumbersDisplay.innerHTML = '<span class="no-numbers">Nenhum número selecionado</span>';
+    } else {
+      selectedNumbersDisplay.innerHTML = selectedNumbers.map(num => 
+        `<span class="number-tag">${num}</span>`
+      ).join('');
+    }
+  }
+  
+  function updateSummary() {
+    // Tipo
+    summaryType.textContent = currentBetType.charAt(0).toUpperCase() + currentBetType.slice(1);
+    
+    // Números
+    summaryNumbers.textContent = selectedNumbers.length > 0 ? selectedNumbers.join(', ') : '-';
+    
+    // Valor
+    summaryAmount.textContent = `R$ ${currentAmount.toFixed(2).replace('.', ',')}`;
+    
+    // Total (mesmo valor por enquanto)
+    summaryTotal.textContent = `R$ ${currentAmount.toFixed(2).replace('.', ',')}`;
+  }
+  
+  function updatePlaceBetButton() {
+    const isValid = selectedNumbers.length > 0 && currentAmount > 0;
+    placeBetBtn.disabled = !isValid;
+  }
+  
+  function validateBet() {
+    if (selectedNumbers.length === 0) {
+      showMessage('Selecione pelo menos um número.', 'error');
+      return false;
+    }
+    
+    if (currentAmount <= 0) {
+      showMessage('Digite um valor válido para a aposta.', 'error');
+      return false;
+    }
+    
+    // Verificar saldo (assumindo que está disponível)
+    const balance = parseFloat(document.querySelector('.balance-display span').textContent.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+    if (currentAmount > balance) {
+      showMessage('Saldo insuficiente para esta aposta.', 'error');
+      return false;
+    }
+    
+    return true;
+  }
+  
+  function placeBet() {
+    // Dados da aposta
+    const betData = {
+      type: currentBetType,
+      numbers: selectedNumbers,
+      amount: currentAmount
+    };
+    
+    // Simular envio para o servidor
+    showMessage('Processando aposta...', 'warning');
+    placeBetBtn.disabled = true;
+    placeBetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+    
+    // Simular delay de processamento
+    setTimeout(() => {
+      // Aqui você faria a requisição real para o servidor
+      console.log('Dados da aposta:', betData);
+      
+      // Simular sucesso
+      showMessage('Aposta realizada com sucesso!', 'success');
+      
+      // Resetar formulário
+      resetForm();
+      
+      // Restaurar botão
+      placeBetBtn.innerHTML = '<i class="fas fa-check"></i> Fazer Aposta';
+    }, 2000);
+  }
+  
+  function resetForm() {
+    selectedNumbers = [];
+    currentAmount = 0;
+    betNumbersInput.value = '';
+    betAmountInput.value = '';
+    updateSelectedNumbersDisplay();
+    updateSummary();
+    updatePlaceBetButton();
+    clearMessages();
+  }
+  
+  function showMessage(text, type) {
+    const message = document.createElement('div');
+    message.className = `message ${type}`;
+    
+    const icon = type === 'success' ? 'check-circle' : 
+                 type === 'error' ? 'exclamation-circle' : 
+                 'exclamation-triangle';
+    
+    message.innerHTML = `<i class="fas fa-${icon}"></i> ${text}`;
+    
+    messageContainer.appendChild(message);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+      if (message.parentNode) {
+        message.parentNode.removeChild(message);
+      }
+    }, 5000);
+  }
+  
+  function clearMessages() {
+    messageContainer.innerHTML = '';
+  }
+});
+</script>
 {% endblock %}
