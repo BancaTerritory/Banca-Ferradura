@@ -949,284 +949,258 @@
 </div>
 
 <script>
-// Estado global da aplicação
-let appState = {
-  modalidade: '',
-  data: '',
-  modalidadeJogo: '',
-  colocacao: '',
-  palpites: '',
-  valor: 0,
-  loterias: [],
-  loteriaAtual: '',
-  horarioSelecionado: ''
-};
-
-// Dados dos horários para cada loteria
-const horariosData = {
-  'rio-federal': [
-    { id: 'rio-14hs', nome: 'LT PT RIO 14HS', horario: '14:15' },
-    { id: 'rio-16hs', nome: 'LT PT RIO 16HS', horario: '16:15' },
-    { id: 'federal', nome: 'LT FEDERAL', horario: '18:57' },
-    { id: 'rio-21hs', nome: 'LT PT RIO 21HS', horario: '21:15' }
-  ],
-  'maluquinha': [
-    { id: 'maluquinha-14hs', nome: 'MALUQUINHA 14HS', horario: '14:00' },
-    { id: 'maluquinha-18hs', nome: 'MALUQUINHA 18HS', horario: '18:00' }
-  ],
-  'sao-paulo': [
-    { id: 'sp-14hs', nome: 'SAO-PAULO 14HS', horario: '14:00' },
-    { id: 'sp-18hs', nome: 'SAO-PAULO 18HS', horario: '18:00' }
-  ]
-  // Adicionar mais loterias conforme necessário
-};
-
-// Navegação entre telas
-function goToScreen(screenId) {
-  console.log('Navegando para:', screenId);
-  
-  // Esconder todas as telas
-  document.querySelectorAll('.screen').forEach(screen => {
-    screen.classList.remove('active');
-  });
-  
-  // Mostrar a tela solicitada
-  const targetScreen = document.getElementById(screenId);
-  if (targetScreen) {
-    targetScreen.classList.add('active');
-  }
-}
-
-function goBack() {
-  console.log('Voltando...');
-  // Implementar lógica de voltar baseada na tela atual
-  const currentScreen = document.querySelector('.screen.active');
-  if (currentScreen) {
-    const currentId = currentScreen.id;
-    
-    switch(currentId) {
-      case 'screen-data':
-        goToScreen('screen-modalidades');
-        break;
-      case 'screen-modalidade-jogo':
-        goToScreen('screen-data');
-        break;
-      case 'screen-colocacao':
-        goToScreen('screen-modalidade-jogo');
-        break;
-      case 'screen-valor':
-        goToScreen('screen-colocacao');
-        break;
-      case 'screen-loterias':
-        goToScreen('screen-valor');
-        break;
-      case 'screen-horarios':
-        goToScreen('screen-loterias');
-        break;
-      case 'screen-finalizar':
-        goToScreen('screen-horarios');
-        break;
-      default:
-        console.log('Tela inicial ou não mapeada');
-    }
-  }
-}
-
-// Funções de seleção
-function selectModalidade(modalidade) {
-  console.log('Modalidade selecionada:', modalidade);
-  appState.modalidade = modalidade;
-  goToScreen('screen-data');
-}
-
-function selectData(data) {
-  console.log('Data selecionada:', data);
-  appState.data = data;
-  goToScreen('screen-modalidade-jogo');
-}
-
-function selectModalidadeJogo(modalidade) {
-  console.log('Modalidade de jogo selecionada:', modalidade);
-  appState.modalidadeJogo = modalidade;
-  goToScreen('screen-colocacao');
-}
-
-function selectColocacao(colocacao) {
-  console.log('Colocação selecionada:', colocacao);
-  appState.colocacao = colocacao;
-  goToScreen('screen-valor');
-}
-
-function goToLoterias() {
-  console.log('Indo para loterias');
-  
-  // Capturar valores dos inputs
-  const palpitesInput = document.getElementById('palpites-input');
-  const valorInput = document.getElementById('valor-input');
-  
-  if (palpitesInput) appState.palpites = palpitesInput.value;
-  if (valorInput) {
-    const valorText = valorInput.value.replace('R$', '').replace(',', '.');
-    appState.valor = parseFloat(valorText) || 0;
-  }
-  
-  goToScreen('screen-loterias');
-}
-
-function selectLoteria(loteria) {
-  console.log('Loteria selecionada:', loteria);
-  appState.loteriaAtual = loteria;
-  
-  // Atualizar contador
-  const loteriaElement = document.querySelector(`[onclick="selectLoteria('${loteria}')"]`);
-  if (loteriaElement) {
-    const counter = loteriaElement.querySelector('.loteria-counter');
-    if (counter) {
-      counter.textContent = '1';
-    }
-  }
-  
-  // Ir para horários específicos
-  goToHorarios();
-}
-
-function goToHorarios() {
-  console.log('Indo para horários da loteria:', appState.loteriaAtual);
-  
-  // Atualizar título
-  const title = document.getElementById('horarios-title');
-  if (title) {
-    title.textContent = 'Loterias';
-  }
-  
-  // Carregar horários específicos
-  const horariosList = document.getElementById('horarios-list');
-  if (horariosList && appState.loteriaAtual) {
-    const horarios = horariosData[appState.loteriaAtual] || [];
-    
-    horariosList.innerHTML = '';
-    horarios.forEach(horario => {
-      const item = document.createElement('div');
-      item.className = 'horario-item';
-      item.onclick = () => selectHorario(horario.id, horario.nome);
-      
-      item.innerHTML = `
-        <input type="radio" name="horario" class="horario-radio" value="${horario.id}">
-        <span class="horario-text">${horario.nome}</span>
-        <span class="horario-time">${horario.horario}</span>
-      `;
-      
-      horariosList.appendChild(item);
-    });
-  }
-  
-  goToScreen('screen-horarios');
-}
-
-function selectHorario(horarioId, horarioNome) {
-  console.log('Horário selecionado:', horarioId, horarioNome);
-  appState.horarioSelecionado = horarioNome;
-  
-  // Marcar radio button
-  const radio = document.querySelector(`input[value="${horarioId}"]`);
-  if (radio) {
-    radio.checked = true;
-  }
-}
-
-function goToFinalizar() {
-  console.log('Indo para finalizar');
-  
-  // Atualizar resumo
-  updateResumo();
-  
-  goToScreen('screen-finalizar');
-}
-
-function updateResumo() {
-  // Atualizar elementos do resumo com os dados do estado
-  const elements = {
-    'resumo-data': appState.data,
-    'resumo-colocacao': '8M/800C', // Exemplo
-    'resumo-loteria': appState.horarioSelecionado,
-    'resumo-modalidade-premio': `${appState.modalidadeJogo.toUpperCase()} E CT ${appState.colocacao.replace('-', ' ').toUpperCase()}`,
-    'resumo-palpites': appState.palpites,
-    'resumo-valor-cada': `> ${appState.valor.toFixed(2).replace('.', ',')} / CADA`,
-    'resumo-modalidade-brinde': `${appState.modalidadeJogo.toUpperCase()} BRINDE! 1 PRÊMIO`,
-    'resumo-palpites-brinde': appState.palpites,
-    'resumo-total-jogo': `R$ ${appState.valor.toFixed(2).replace('.', ',')}`,
-    'resumo-total-pagar': `R$ ${appState.valor.toFixed(2).replace('.', ',')}`
-  };
-  
-  Object.entries(elements).forEach(([id, value]) => {
-    const element = document.getElementById(id);
-    if (element && value) {
-      element.textContent = value;
-    }
-  });
-  
-  // Atualizar data/hora atual
-  const now = new Date();
-  const dateTimeString = now.toLocaleDateString('pt-BR').slice(0, 8) + ' ' + 
-                        now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const resumoDateTime = document.getElementById('resumo-datetime');
-  if (resumoDateTime) {
-    resumoDateTime.textContent = dateTimeString;
-  }
-}
-
-function addValor(valor) {
-  console.log('Adicionando valor:', valor);
-  const valorInput = document.getElementById('valor-input');
-  if (valorInput) {
-    const currentValue = parseFloat(valorInput.value.replace('R$', '').replace(',', '.')) || 0;
-    const newValue = currentValue + valor;
-    valorInput.value = `R$${newValue.toFixed(2).replace('.', ',')}`;
-    appState.valor = newValue;
-  }
-}
-
-function finalizarAposta() {
-  console.log('Finalizando aposta');
-  document.getElementById('success-modal').style.display = 'flex';
-}
-
-function novaAposta() {
-  console.log('Nova aposta');
-  
-  // Reset do estado
-  appState = {
-    modalidade: '',
-    data: '',
-    modalidadeJogo: '',
-    colocacao: '',
-    palpites: '',
+  const appState = {
+    screenHistory: ["screen-modalidades"], // Histórico de telas para o botão voltar
+    currentScreen: "screen-modalidades",
+    selectedModalidade: null,
+    selectedDate: null,
+    selectedModalidadeJogo: null,
+    selectedColocacao: null,
+    palpites: "",
     valor: 0,
     loterias: [],
-    loteriaAtual: '',
-    horarioSelecionado: ''
+    selectedHorarios: [],
+    resumo: {
+      vendedor: "620500",
+      dataHora: "",
+      cotacao: "8M/800C",
+      loteriaNome: "",
+      modalidadeColocacao: "",
+      palpitesResumo: "",
+      valorTotal: 0
+    }
   };
-  
-  // Reset dos contadores
-  document.querySelectorAll('.loteria-counter').forEach(counter => {
-    counter.textContent = '0';
-  });
-  
-  // Reset dos inputs
-  const palpitesInput = document.getElementById('palpites-input');
-  const valorInput = document.getElementById('valor-input');
-  if (palpitesInput) palpitesInput.value = '';
-  if (valorInput) valorInput.value = '';
-  
-  // Fechar modal e voltar ao início
-  document.getElementById('success-modal').style.display = 'none';
-  goToScreen('screen-modalidades');
-}
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM carregado, inicializando jogo do bicho...');
-  goToScreen('screen-modalidades');
-});
+  const loteriaHorarios = {
+    "rio-federal": [
+      { time: "09:00", name: "LT PT RIO" },
+      { time: "11:00", name: "LT PT RIO" },
+      { time: "14:00", name: "LT PT RIO" },
+      { time: "16:00", name: "LT PT RIO" },
+      { time: "18:00", name: "LT PT RIO" },
+      { time: "21:00", name: "LT PT RIO" }
+    ],
+    "maluquinha": [
+      { time: "10:00", name: "MALUQUINHA" },
+      { time: "15:00", name: "MALUQUINHA" }
+    ],
+    "lotece-lotep": [
+      { time: "13:00", name: "LOTECE/LOTEP" },
+      { time: "19:00", name: "LOTECE/LOTEP" }
+    ],
+    "sao-paulo": [
+      { time: "12:00", name: "SAO-PAULO" },
+      { time: "17:00", name: "SAO-PAULO" }
+    ],
+    "capital": [
+      { time: "10:00", name: "CAPITAL" },
+      { time: "14:00", name: "CAPITAL" }
+    ],
+    "look-goias": [
+      { time: "11:00", name: "LOOK/GOIAS" },
+      { time: "16:00", name: "LOOK/GOIAS" }
+    ],
+    "sorte": [
+      { time: "12:00", name: "SORTE" },
+      { time: "18:00", name: "SORTE" }
+    ],
+    "bahia": [
+      { time: "13:00", name: "BAHIA" },
+      { time: "20:00", name: "BAHIA" }
+    ],
+    "minas-gerais": [
+      { time: "09:00", name: "MINAS GERAIS" },
+      { time: "17:00", name: "MINAS GERAIS" }
+    ],
+    "nacional": [
+      { time: "10:00", name: "NACIONAL" },
+      { time: "19:00", name: "NACIONAL" }
+    ]
+  };
+
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+      screen.classList.remove('active');
+    });
+    document.getElementById(screenId).classList.add('active');
+    appState.currentScreen = screenId;
+  }
+
+  function goToScreen(screenId) {
+    appState.screenHistory.push(screenId);
+    showScreen(screenId);
+  }
+
+  function goBack() {
+    if (appState.screenHistory.length > 1) {
+      appState.screenHistory.pop();
+      showScreen(appState.screenHistory[appState.screenHistory.length - 1]);
+    } else {
+      // Se não houver histórico, volta para a página anterior do navegador ou home
+      window.history.back(); 
+    }
+  }
+
+  function selectModalidade(modalidade) {
+    appState.selectedModalidade = modalidade;
+    goToScreen('screen-data');
+  }
+
+  function selectData(date) {
+    appState.selectedDate = date;
+    goToScreen('screen-modalidade-jogo');
+  }
+
+  function selectModalidadeJogo(modalidadeJogo) {
+    appState.selectedModalidadeJogo = modalidadeJogo;
+    document.getElementById('valor-title').textContent = modalidadeJogo.toUpperCase().replace(/-/g, ' ');
+    goToScreen('screen-colocacao');
+  }
+
+  function selectColocacao(colocacao) {
+    appState.selectedColocacao = colocacao;
+    document.getElementById('valor-date').textContent = `${appState.selectedDate}`;
+    goToScreen('screen-valor');
+  }
+
+  function addValor(value) {
+    let currentValor = parseFloat(document.getElementById('valor-input').value.replace('R$', '').replace(',', '.')) || 0;
+    currentValor += value;
+    document.getElementById('valor-input').value = `R$${currentValor.toFixed(2).replace('.', ',')}`;
+    appState.valor = currentValor;
+  }
+
+  function goToLoterias() {
+    appState.palpites = document.getElementById('palpites-input').value;
+    appState.valor = parseFloat(document.getElementById('valor-input').value.replace('R$', '').replace(',', '.')) || 0;
+    goToScreen('screen-loterias');
+  }
+
+  function selectLoteria(loteria) {
+    const index = appState.loterias.indexOf(loteria);
+    if (index > -1) {
+      appState.loterias.splice(index, 1);
+    } else {
+      appState.loterias.push(loteria);
+    }
+    updateLoteriaCounters();
+  }
+
+  function updateLoteriaCounters() {
+    document.querySelectorAll('.loteria-item').forEach(item => {
+      const loteriaId = item.onclick.toString().match(/selectLoteria\(\'([^\']+)\'\)/)[1];
+      const counter = item.querySelector('.loteria-counter');
+      if (counter) {
+        counter.textContent = appState.loterias.includes(loteriaId) ? '1' : '0';
+      }
+    });
+  }
+
+  function goToHorarios() {
+    if (appState.loterias.length === 0) {
+      alert('Por favor, selecione pelo menos uma loteria.');
+      return;
+    }
+    const horariosList = document.getElementById('horarios-list');
+    horariosList.innerHTML = ''; // Limpa horários anteriores
+    appState.selectedHorarios = []; // Limpa seleção anterior
+
+    appState.loterias.forEach(loteriaKey => {
+      const horarios = loteriaHorarios[loteriaKey];
+      if (horarios) {
+        horarios.forEach(horario => {
+          const div = document.createElement('div');
+          div.className = 'horario-item';
+          div.onclick = () => selectHorario(horario.time, loteriaKey);
+          div.innerHTML = `
+            <input type="radio" name="horario-${loteriaKey}" class="horario-radio" value="${horario.time}">
+            <span class="horario-text">${horario.time}</span>
+            <span class="horario-time">${horario.name}</span>
+          `;
+          horariosList.appendChild(div);
+        });
+      }
+    });
+    goToScreen('screen-horarios');
+  }
+
+  function selectHorario(time, loteriaKey) {
+    // Lógica para selecionar múltiplos horários se necessário, ou apenas um por loteria
+    // Por enquanto, vamos considerar que seleciona um por loteria
+    const existingIndex = appState.selectedHorarios.findIndex(h => h.loteriaKey === loteriaKey);
+    if (existingIndex > -1) {
+      appState.selectedHorarios[existingIndex] = { time, loteriaKey };
+    } else {
+      appState.selectedHorarios.push({ time, loteriaKey });
+    }
+    console.log('Horário selecionado:', appState.selectedHorarios);
+  }
+
+  function goToFinalizar() {
+    if (appState.selectedHorarios.length === 0) {
+      alert('Por favor, selecione pelo menos um horário.');
+      return;
+    }
+
+    // Preencher resumo
+    const now = new Date();
+    appState.resumo.dataHora = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    
+    appState.resumo.loteriaNome = appState.loterias.map(key => {
+      const loteriaNames = {
+        "rio-federal": "LT PT RIO",
+        "maluquinha": "MALUQUINHA",
+        "lotece-lotep": "LOTECE/LOTEP",
+        "sao-paulo": "SAO-PAULO",
+        "capital": "CAPITAL",
+        "look-goias": "LOOK/GOIAS",
+        "sorte": "SORTE",
+        "bahia": "BAHIA",
+        "minas-gerais": "MINAS GERAIS",
+        "nacional": "NACIONAL"
+      };
+      return loteriaNames[key] || key.toUpperCase().replace(/-/g, ' ');
+    }).join(', ');
+
+    appState.resumo.modalidadeColocacao = `${appState.selectedModalidadeJogo.toUpperCase().replace(/-/g, ' ')} ${appState.selectedColocacao.toUpperCase().replace(/-/g, ' ')}`;
+    appState.resumo.palpitesResumo = appState.palpites;
+    appState.resumo.valorTotal = appState.valor;
+
+    document.getElementById('resumo-vendedor').textContent = appState.resumo.vendedor;
+    document.getElementById('resumo-data-hora').textContent = appState.resumo.dataHora;
+    document.getElementById('resumo-cotacao').textContent = appState.resumo.cotacao;
+    document.getElementById('resumo-loteria-nome').textContent = appState.resumo.loteriaNome;
+    document.getElementById('resumo-modalidade-colocacao').textContent = appState.resumo.modalidadeColocacao;
+    document.getElementById('resumo-palpites').textContent = appState.resumo.palpitesResumo;
+    document.getElementById('resumo-valor-total').textContent = `R$ ${appState.resumo.valorTotal.toFixed(2).replace('.', ',')}`;
+
+    goToScreen('screen-finalizar');
+  }
+
+  function finalizarAposta() {
+    // Aqui você enviaria os dados da aposta para o servidor
+    console.log('Aposta Finalizada:', appState);
+    document.getElementById('success-modal').style.display = 'flex';
+  }
+
+  function closeSuccessModal() {
+    document.getElementById('success-modal').style.display = 'none';
+    // Opcional: resetar o estado ou voltar para a tela inicial
+    appState.screenHistory = ["screen-modalidades"];
+    showScreen('screen-modalidades');
+    // Resetar outros estados se necessário
+    appState.selectedModalidade = null;
+    appState.selectedDate = null;
+    appState.selectedModalidadeJogo = null;
+    appState.selectedColocacao = null;
+    appState.palpites = "";
+    appState.valor = 0;
+    appState.loterias = [];
+    appState.selectedHorarios = [];
+  }
+
+  // Inicializa a primeira tela
+  document.addEventListener('DOMContentLoaded', () => {
+    showScreen('screen-modalidades');
+  });
 </script>
-{% endblock %}
