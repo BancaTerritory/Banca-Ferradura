@@ -634,22 +634,54 @@
       </div>
     </div>
     
-    <div class="content">
-      <div class="option-list">
-        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar')">
+   <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar\')">
           <span class="modalidade-text">MILHAR</span>
           <span class="modalidade-tag">4 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('centena')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'centena\')">
           <span class="modalidade-text">CENTENA</span>
           <span class="modalidade-tag">3 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('dezena')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'dezena\')">
           <span class="modalidade-text">DEZENA</span>
           <span class="modalidade-tag">2 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('grupo')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'grupo\')">
           <span class="modalidade-text">GRUPO</span>
+          <span class="modalidade-tag">1 animal</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar-centena\')">
+          <span class="modalidade-text">MILHAR E CENTENA</span>
+          <span class="modalidade-tag">4 e 3 números</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'centena-combinada\')">
+          <span class="modalidade-text">CENTENA COMBINADA</span>
+          <span class="modalidade-tag">3 números</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar-combinada\')">
+          <span class="modalidade-text">MILHAR COMBINADA</span>
+          <span class="modalidade-tag">4 números</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'dupla-grupo\')">
+          <span class="modalidade-text">DUPLA DE GRUPO</span>
+          <span class="modalidade-tag">2 grupos</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'dupla-dezena\')">
+          <span class="modalidade-text">DUPLA DE DEZENA</span>
+          <span class="modalidade-tag">2 dezenas</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'terno-grupo\')">
+          <span class="modalidade-text">TERNO DE GRUPO</span>
+          <span class="modalidade-tag">3 grupos</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'terno-dezena\')">
+          <span class="modalidade-text">TERNO DE DEZENA</span>
+          <span class="modalidade-tag">3 dezenas</span>
+        </div>
+        <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar-centena-combinado\')">
+          <span class="modalidade-text">MILHAR E CENTENA COMBINADO</span>
+          <span class="modalidade-tag">4 e 3 números</span>
+        </div>
           <span class="modalidade-tag">1 animal</span>
         </div>
       </div>
@@ -825,6 +857,21 @@
     <div class="content">
       <div class="option-list" id="horarios-list">
         <!-- Horários serão inseridos dinamicamente -->
+        <div class="horario-item" onclick="selectHorario(\'09:00\')">
+          <input type="radio" name="horario" class="horario-radio" value="09:00">
+          <span class="horario-text">09:00</span>
+          <span class="horario-time">LT PT RIO</span>
+        </div>
+        <div class="horario-item" onclick="selectHorario(\'11:00\')">
+          <input type="radio" name="horario" class="horario-radio" value="11:00">
+          <span class="horario-text">11:00</span>
+          <span class="horario-time">LT PT RIO</span>
+        </div>
+        <div class="horario-item" onclick="selectHorario(\'18:00\')">
+          <input type="radio" name="horario" class="horario-radio" value="18:00">
+          <span class="horario-text">18:00</span>
+          <span class="horario-time">LT PT RIO</span>
+        </div>
       </div>
       
       <button class="btn-avancar" onclick="goToFinalizar()">Avançar</button>
