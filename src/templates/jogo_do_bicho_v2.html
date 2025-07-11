@@ -1,4 +1,4 @@
-{# Versão 2.0 - Completa e Funcional #}
+{# Versão 2.0 - Final Limpa e Correta #}
 {% extends "base.html" %}
 
 {% block title %}Jogo do Bicho - Banca Ferradura{% endblock %}
@@ -187,7 +187,7 @@
   max-width: 300px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s;
-  margin-bottom: 10px;
+  margin: 0 auto 10px auto;
 }
 
 .colocacao-item:hover {
@@ -310,7 +310,7 @@
   max-width: 300px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s;
-  margin-bottom: 10px;
+  margin: 0 auto 10px auto;
 }
 
 .loteria-item:hover {
@@ -346,7 +346,7 @@
   max-width: 300px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s;
-  margin-bottom: 10px;
+  margin: 0 auto 10px auto;
 }
 
 .horario-item:hover {
@@ -622,7 +622,7 @@
     </div>
   </div>
 
-   <!-- Tela 3: Modalidade de Jogo -->
+  <!-- Tela 3: Modalidade de Jogo -->
   <div class="screen" id="screen-modalidade-jogo">
     <div class="header">
       <button class="back-btn" onclick="goBack()">
@@ -634,56 +634,6 @@
         <i class="fas fa-bars"></i>
       </div>
     </div>
-    
-    <div class="content">
-      <div class="option-list">
-        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar')">
-          <span class="modalidade-text">MILHAR</span>
-          <span class="modalidade-tag">4 números</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('centena')">
-          <span class="modalidade-text">CENTENA</span>
-          <span class="modalidade-tag">3 números</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('dezena')">
-          <span class="modalidade-text">DEZENA</span>
-          <span class="modalidade-tag">2 números</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('grupo')">
-          <span class="modalidade-text">GRUPO</span>
-          <span class="modalidade-tag">1 animal</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar-centena')">
-          <span class="modalidade-text">MILHAR E CENTENA</span>
-          <span class="modalidade-tag">4 e 3 números</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('centena-combinada')">
-          <span class="modalidade-text">CENTENA COMBINADA</span>
-          <span class="modalidade-tag">3 números</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar-combinada')">
-          <span class="modalidade-text">MILHAR COMBINADA</span>
-          <span class="modalidade-tag">4 números</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('dupla-grupo')">
-          <span class="modalidade-text">DUPLA DE GRUPO</span>
-          <span class="modalidade-tag">2 grupos</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('dupla-dezena')">
-          <span class="modalidade-text">DUPLA DE DEZENA</span>
-          <span class="modalidade-tag">2 dezenas</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('terno-grupo')">
-          <span class="modalidade-text">TERNO DE GRUPO</span>
-          <span class="modalidade-tag">3 grupos</span>
-        </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo('terno-dezena')">
-          <span class="modalidade-text">TERNO DE DEZENA</span>
-          <span class="modalidade-tag">3 dezenas</span>
-        </div>
-      </div>
-    </div>
- 
     
     <div class="content">
       <div class="option-list">
@@ -901,7 +851,6 @@
     
     <div class="content">
       <div class="option-list" id="horarios-list">
-        <!-- Horários serão inseridos dinamicamente -->
         <div class="horario-item" onclick="selectHorario('09:00')">
           <input type="radio" name="horario" class="horario-radio" value="09:00">
           <span class="horario-text">09:00</span>
@@ -1014,15 +963,6 @@
       </div>
       <button class="btn-fechar" onclick="resetApp()">NOVA APOSTA</button>
     </div>
-  </div>
-</div>
-
-<!-- Modal de Sucesso -->
-<div class="success-modal" id="success-modal">
-  <div class="success-content">
-    <div class="success-icon">✅</div>
-    <div class="success-text">Aposta realizada com sucesso!</div>
-    <button class="btn-fechar" onclick="closeSuccessModal()">FECHAR</button>
   </div>
 </div>
 
@@ -1236,11 +1176,6 @@
     });
     
     showScreen('screen-modalidades');
-  }
-
-  function closeSuccessModal() {
-    document.getElementById('success-modal').style.display = 'none';
-    resetApp();
   }
 
   // Event listeners para atualizar o resumo antes de mostrar a tela
