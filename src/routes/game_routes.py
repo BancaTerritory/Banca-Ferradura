@@ -45,7 +45,7 @@ def get_grupo_from_milhar(milhar_str):
 def jogo_do_bicho():
     if "user_phone" not in session:
         flash("Você precisa estar logado para jogar.", "error"); return redirect(url_for("auth.login"))
-    return render_template("jogo_do_bicho.html")
+    return render_template("jogo_do_bicho_v2.html")
 
 @game_bp.route("/jogo-do-bicho/apostar", methods=["POST"])
 def fazer_aposta_bicho():
