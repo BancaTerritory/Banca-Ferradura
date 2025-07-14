@@ -1,4 +1,4 @@
-{# Versão 2.0 - Final Limpa e Correta - SEM SAO-PAULO #}
+{# Versão 2.0 - Sem SAO-PAULO e CSS Otimizado #}
 {% extends "base.html" %}
 
 {% block title %}Jogo do Bicho - Banca Ferradura{% endblock %}
@@ -152,10 +152,10 @@
   align-items: center;
   justify-content: space-between;
   background: white;
-  padding: 8px 12px; 
+  padding: 10px 15px;
   border-radius: 8px;
   cursor: pointer;
-  width: 85%;  
+  width: 85%;
   max-width: 320px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s;
@@ -513,6 +513,7 @@
   font-weight: 500;
 }
 </style>
+
 <div class="lottery-container">
   <!-- Tela 1: Seleção de Modalidades -->
   <div class="screen active" id="screen-modalidades">
@@ -529,27 +530,27 @@
     
     <div class="content">
       <div class="option-list">
-        <div class="option-item" onclick="selectModalidade(\'tradicional\')">
+        <div class="option-item" onclick="selectModalidade('tradicional')">
           <div class="option-icon green">🍀</div>
           <span class="option-text">TRADICIONAL</span>
         </div>
-        <div class="option-item" onclick="selectModalidade(\'tradicional-1-10\')">
+        <div class="option-item" onclick="selectModalidade('tradicional-1-10')">
           <div class="option-icon green">🍀</div>
           <span class="option-text">TRADICIONAL 1/10</span>
         </div>
-        <div class="option-item" onclick="selectModalidade(\'uruguaia\')">
+        <div class="option-item" onclick="selectModalidade('uruguaia')">
           <div class="option-icon yellow">⭐</div>
           <span class="option-text">LOT. URUGUAIA</span>
         </div>
-        <div class="option-item" onclick="selectModalidade(\'quininha\')">
+        <div class="option-item" onclick="selectModalidade('quininha')">
           <div class="option-icon purple">💜</div>
           <span class="option-text">QUININHA</span>
         </div>
-        <div class="option-item" onclick="selectModalidade(\'seninha\')">
+        <div class="option-item" onclick="selectModalidade('seninha')">
           <div class="option-icon pink">💖</div>
           <span class="option-text">SENINHA</span>
         </div>
-        <div class="option-item" onclick="selectModalidade(\'super15\')">
+        <div class="option-item" onclick="selectModalidade('super15')">
           <div class="option-icon orange">🧡</div>
           <span class="option-text">SUPER15</span>
         </div>
@@ -572,49 +573,49 @@
     
     <div class="content">
       <div class="option-list">
-        <div class="date-item" onclick="selectData(\'04/07/2025\')">
+        <div class="date-item" onclick="selectData('04/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">04/07/2025</div>
             <div class="date-sub">Hoje</div>
           </div>
         </div>
-        <div class="date-item" onclick="selectData(\'05/07/2025\')">
+        <div class="date-item" onclick="selectData('05/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">05/07/2025</div>
             <div class="date-sub">Sábado</div>
           </div>
         </div>
-        <div class="date-item" onclick="selectData(\'06/07/2025\')">
+        <div class="date-item" onclick="selectData('06/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">06/07/2025</div>
             <div class="date-sub">Domingo</div>
           </div>
         </div>
-        <div class="date-item" onclick="selectData(\'07/07/2025\')">
+        <div class="date-item" onclick="selectData('07/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">07/07/2025</div>
             <div class="date-sub">Segunda</div>
           </div>
         </div>
-        <div class="date-item" onclick="selectData(\'08/07/2025\')">
+        <div class="date-item" onclick="selectData('08/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">08/07/2025</div>
             <div class="date-sub">Terça</div>
           </div>
         </div>
-        <div class="date-item" onclick="selectData(\'09/07/2025\')">
+        <div class="date-item" onclick="selectData('09/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">09/07/2025</div>
             <div class="date-sub">Quarta</div>
           </div>
         </div>
-        <div class="date-item" onclick="selectData(\'10/07/2025\')">
+        <div class="date-item" onclick="selectData('10/07/2025')">
           <div class="date-icon">📅</div>
           <div class="date-text">
             <div class="date-main">10/07/2025</div>
@@ -640,47 +641,47 @@
     
     <div class="content">
       <div class="option-list">
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar')">
           <span class="modalidade-text">MILHAR</span>
           <span class="modalidade-tag">4 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'centena\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('centena')">
           <span class="modalidade-text">CENTENA</span>
           <span class="modalidade-tag">3 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'dezena\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('dezena')">
           <span class="modalidade-text">DEZENA</span>
           <span class="modalidade-tag">2 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'grupo\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('grupo')">
           <span class="modalidade-text">GRUPO</span>
           <span class="modalidade-tag">1 animal</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar-centena\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar-centena')">
           <span class="modalidade-text">MILHAR E CENTENA</span>
           <span class="modalidade-tag">4 e 3 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'centena-combinada\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('centena-combinada')">
           <span class="modalidade-text">CENTENA COMBINADA</span>
           <span class="modalidade-tag">3 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'milhar-combinada\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('milhar-combinada')">
           <span class="modalidade-text">MILHAR COMBINADA</span>
           <span class="modalidade-tag">4 números</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'dupla-grupo\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('dupla-grupo')">
           <span class="modalidade-text">DUPLA DE GRUPO</span>
           <span class="modalidade-tag">2 grupos</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'dupla-dezena\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('dupla-dezena')">
           <span class="modalidade-text">DUPLA DE DEZENA</span>
           <span class="modalidade-tag">2 dezenas</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'terno-grupo\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('terno-grupo')">
           <span class="modalidade-text">TERNO DE GRUPO</span>
           <span class="modalidade-tag">3 grupos</span>
         </div>
-        <div class="modalidade-item" onclick="selectModalidadeJogo(\'terno-dezena\')">
+        <div class="modalidade-item" onclick="selectModalidadeJogo('terno-dezena')">
           <span class="modalidade-text">TERNO DE DEZENA</span>
           <span class="modalidade-tag">3 dezenas</span>
         </div>
@@ -703,27 +704,27 @@
     
     <div class="content">
       <div class="option-list">
-        <div class="colocacao-item" onclick="selectColocacao(\'1º\')">
+        <div class="colocacao-item" onclick="selectColocacao('1º')">
           <span class="colocacao-text">1º PRÊMIO</span>
           <span class="colocacao-tag">1º</span>
         </div>
-        <div class="colocacao-item" onclick="selectColocacao(\'2º\')">
+        <div class="colocacao-item" onclick="selectColocacao('2º')">
           <span class="colocacao-text">2º PRÊMIO</span>
           <span class="colocacao-tag">2º</span>
         </div>
-        <div class="colocacao-item" onclick="selectColocacao(\'3º\')">
+        <div class="colocacao-item" onclick="selectColocacao('3º')">
           <span class="colocacao-text">3º PRÊMIO</span>
           <span class="colocacao-tag">3º</span>
         </div>
-        <div class="colocacao-item" onclick="selectColocacao(\'4º\')">
+        <div class="colocacao-item" onclick="selectColocacao('4º')">
           <span class="colocacao-text">4º PRÊMIO</span>
           <span class="colocacao-tag">4º</span>
         </div>
-        <div class="colocacao-item" onclick="selectColocacao(\'5º\')">
+        <div class="colocacao-item" onclick="selectColocacao('5º')">
           <span class="colocacao-text">5º PRÊMIO</span>
           <span class="colocacao-tag">5º</span>
         </div>
-        <div class="colocacao-item" onclick="selectColocacao(\'cabeça\')">
+        <div class="colocacao-item" onclick="selectColocacao('cabeça')">
           <span class="colocacao-text">CABEÇA</span>
           <span class="colocacao-tag">1º ao 5º</span>
         </div>
@@ -773,7 +774,7 @@
           <button class="btn-cada">CADA</button>
         </div>
         
-        <button class="btn-continuar" onclick="goToScreen(\'screen-loterias\')">CONTINUAR</button>
+        <button class="btn-continuar" onclick="goToScreen('screen-loterias')">CONTINUAR</button>
       </div>
     </div>
   </div>
@@ -793,49 +794,37 @@
     
     <div class="content">
       <div class="option-list">
-        <div class="loteria-item" onclick="toggleLoteria(\'rio-federal\')">
+        <div class="loteria-item" onclick="toggleLoteria('rio-federal')">
           <span class="loteria-text">RIO FEDERAL</span>
           <span class="loteria-counter" id="counter-rio-federal">0</span>
         </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'maluquinha\')">
+        <div class="loteria-item" onclick="toggleLoteria('maluquinha')">
           <span class="loteria-text">MALUQUINHA</span>
           <span class="loteria-counter" id="counter-maluquinha">0</span>
         </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'lotece-lotep\')">
+        <div class="loteria-item" onclick="toggleLoteria('lotece-lotep')">
           <span class="loteria-text">LOTECE/LOTEP</span>
           <span class="loteria-counter" id="counter-lotece-lotep">0</span>
         </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'capital\')">
+        <div class="loteria-item" onclick="toggleLoteria('capital')">
           <span class="loteria-text">CAPITAL</span>
           <span class="loteria-counter" id="counter-capital">0</span>
         </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'look-goias\')">
-          <span class="loteria-text">LOOK/GOIAS</span>
-          <span class="loteria-counter" id="counter-look-goias">0</span>
-        </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'sorte\')">
-          <span class="loteria-text">SORTE</span>
-          <span class="loteria-counter" id="counter-sorte">0</span>
-        </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'bahia\')">
-          <span class="loteria-text">BAHIA</span>
-          <span class="loteria-counter" id="counter-bahia">0</span>
-        </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'minas-gerais\')">
-          <span class="loteria-text">MINAS GERAIS</span>
-          <span class="loteria-counter" id="counter-minas-gerais">0</span>
-        </div>
-        <div class="loteria-item" onclick="toggleLoteria(\'nacional\')">
+        <div class="loteria-item" onclick="toggleLoteria('nacional')">
           <span class="loteria-text">NACIONAL</span>
           <span class="loteria-counter" id="counter-nacional">0</span>
         </div>
+        <div class="loteria-item" onclick="toggleLoteria('lt-pt-rio')">
+          <span class="loteria-text">LT PT RIO</span>
+          <span class="loteria-counter" id="counter-lt-pt-rio">0</span>
+        </div>
       </div>
       
-      <button class="btn-avancar" onclick="goToScreen(\'screen-horarios\')">AVANÇAR</button>
+      <button class="btn-avancar" onclick="goToScreen('screen-horarios')">AVANÇAR</button>
     </div>
   </div>
 
-  <!-- Tela 7: Horários Específicos -->
+  <!-- Tela 7: Horários -->
   <div class="screen" id="screen-horarios">
     <div class="header">
       <button class="back-btn" onclick="goBack()">
@@ -850,39 +839,10 @@
     
     <div class="content">
       <div class="option-list" id="horarios-list">
-        <div class="horario-item" onclick="selectHorario(\'09:00\')">
-          <input type="radio" name="horario" class="horario-radio" value="09:00">
-          <span class="horario-text">09:00</span>
-          <span class="horario-time">LT PT RIO</span>
-        </div>
-        <div class="horario-item" onclick="selectHorario(\'11:00\')">
-          <input type="radio" name="horario" class="horario-radio" value="11:00">
-          <span class="horario-text">11:00</span>
-          <span class="horario-time">LT PT RIO</span>
-        </div>
-        <div class="horario-item" onclick="selectHorario(\'14:00\')">
-          <input type="radio" name="horario" class="horario-radio" value="14:00">
-          <span class="horario-text">14:00</span>
-          <span class="horario-time">LT PT RIO</span>
-        </div>
-        <div class="horario-item" onclick="selectHorario(\'16:00\')">
-          <input type="radio" name="horario" class="horario-radio" value="16:00">
-          <span class="horario-text">16:00</span>
-          <span class="horario-time">LT PT RIO</span>
-        </div>
-        <div class="horario-item" onclick="selectHorario(\'18:00\')">
-          <input type="radio" name="horario" class="horario-radio" value="18:00">
-          <span class="horario-text">18:00</span>
-          <span class="horario-time">LT PT RIO</span>
-        </div>
-        <div class="horario-item" onclick="selectHorario(\'21:00\')">
-          <input type="radio" name="horario" class="horario-radio" value="21:00">
-          <span class="horario-text">21:00</span>
-          <span class="horario-time">LT PT RIO</span>
-        </div>
+        <!-- Horários serão preenchidos dinamicamente -->
       </div>
       
-      <button class="btn-avancar" onclick="goToScreen(\'screen-resumo\')">AVANÇAR</button>
+      <button class="btn-avancar" onclick="goToScreen('screen-resumo')">AVANÇAR</button>
     </div>
   </div>
 
@@ -901,44 +861,48 @@
     
     <div class="resumo-container">
       <div class="resumo-header">
-        <h2>RESUMO DA APOSTA</h2>
+        <h2>Resumo da Aposta</h2>
       </div>
       
       <div class="resumo-content">
         <div class="resumo-section">
-          <div class="resumo-label">Vendedor:</div>
-          <div class="resumo-value" id="resumo-vendedor">620500</div>
+          <div class="resumo-label">Modalidade:</div>
+          <div class="resumo-value" id="resumo-modalidade">-</div>
         </div>
         
         <div class="resumo-section">
-          <div class="resumo-label">Data/Hora:</div>
-          <div class="resumo-value" id="resumo-data-hora">04/07/2025 - 14:30</div>
+          <div class="resumo-label">Data:</div>
+          <div class="resumo-value" id="resumo-data">-</div>
         </div>
         
         <div class="resumo-section">
-          <div class="resumo-label">Cotação:</div>
-          <div class="resumo-value" id="resumo-cotacao">8M/800C</div>
+          <div class="resumo-label">Tipo de Jogo:</div>
+          <div class="resumo-value" id="resumo-tipo">-</div>
         </div>
         
         <div class="resumo-section">
-          <div class="resumo-label">Loteria:</div>
-          <div class="resumo-value" id="resumo-loteria">RIO FEDERAL - 14:00</div>
-        </div>
-        
-        <div class="resumo-section">
-          <div class="resumo-label">Modalidade/Colocação:</div>
-          <div class="resumo-value" id="resumo-modalidade">MILHAR - 1º PRÊMIO</div>
+          <div class="resumo-label">Colocação:</div>
+          <div class="resumo-value" id="resumo-colocacao">-</div>
         </div>
         
         <div class="resumo-section">
           <div class="resumo-label">Palpites:</div>
-          <div class="resumo-value" id="resumo-palpites">1234</div>
+          <div class="resumo-value" id="resumo-palpites">-</div>
+        </div>
+        
+        <div class="resumo-section">
+          <div class="resumo-label">Loterias:</div>
+          <div class="resumo-value" id="resumo-loterias">-</div>
+        </div>
+        
+        <div class="resumo-section">
+          <div class="resumo-label">Horários:</div>
+          <div class="resumo-value" id="resumo-horarios">-</div>
         </div>
       </div>
       
       <div class="resumo-total">
-        <span>VALOR TOTAL:</span>
-        <span id="resumo-valor-total">R$ 5,00</span>
+        <strong>Total: <span id="resumo-total">R$ 0,00</span></strong>
       </div>
     </div>
     
@@ -949,395 +913,220 @@
   </div>
 
   <!-- Tela 9: Sucesso -->
-  <div class="screen" id="screen-sucesso">
-    <div class="header">
-      <h1>Aposta Realizada</h1>
-    </div>
-    
-    <div class="content" style="text-align: center; padding: 50px 20px;">
+  <div class="success-modal" id="success-modal">
+    <div class="success-content">
       <div class="success-icon">✅</div>
       <div class="success-text">Aposta realizada com sucesso!</div>
-      <div style="margin-bottom: 30px; color: #666;">
-        Sua aposta foi registrada e você receberá a confirmação em breve.
-      </div>
-      <button class="btn-fechar" onclick="resetApp()">NOVA APOSTA</button>
+      <button class="btn-fechar" onclick="fecharModal()">FECHAR</button>
     </div>
   </div>
 </div>
 
 <script>
-  const appState = {
-    screenHistory: ["screen-modalidades"],
-    currentScreen: "screen-modalidades",
-    selectedModalidade: null,
-    selectedDate: null,
-    selectedModalidadeJogo: null,
-    selectedColocacao: null,
-    palpites: "",
-    valor: 0,
-    loterias: [],
-    selectedHorarios: [],
-    resumo: {
-      vendedor: "620500",
-      dataHora: "",
-      cotacao: "8M/800C",
-      loteriaNome: "",
-      modalidadeColocacao: "",
-      palpitesResumo: "",
-      valorTotal: 0
-    }
-  };
+// Variáveis globais para armazenar seleções
+let currentScreen = 'screen-modalidades';
+let selectedModalidade = '';
+let selectedData = '';
+let selectedModalidadeJogo = '';
+let selectedColocacao = '';
+let selectedPalpites = '';
+let selectedValor = 0;
+let selectedLoterias = [];
+let selectedHorarios = [];
 
-  const loteriaHorarios = {
-    "rio-federal": [
-      { time: "09:00", name: "LT PT RIO" },
-      { time: "11:00", name: "LT PT RIO" },
-      { time: "14:00", name: "LT PT RIO" },
-      { time: "16:00", name: "LT PT RIO" },
-      { time: "18:00", name: "LT PT RIO" },
-      { time: "21:00", name: "LT PT RIO" }
-    ],
-    "maluquinha": [
-      { time: "10:00", name: "MALUQUINHA" },
-      { time: "15:00", name: "MALUQUINHA" }
-    ],
-    "lotece-lotep": [
-      { time: "13:00", name: "LOTECE/LOTEP" },
-      { time: "19:00", name: "LOTECE/LOTEP" }
-    ],
-    "capital": [
-      { time: "10:00", name: "CAPITAL" },
-      { time: "14:00", name: "CAPITAL" }
-    ],
-    "look-goias": [
-      { time: "11:00", name: "LOOK/GOIAS" },
-      { time: "16:00", name: "LOOK/GOIAS" }
-    ],
-    "sorte": [
-      { time: "12:00", name: "SORTE" },
-      { time: "18:00", name: "SORTE" }
-    ],
-    "bahia": [
-      { time: "13:00", name: "BAHIA" },
-      { time: "20:00", name: "BAHIA" }
-    ],
-    "minas-gerais": [
-      { time: "09:00", name: "MINAS GERAIS" },
-      { time: "17:00", name: "MINAS GERAIS" }
-    ],
-    "nacional": [
-      { time: "10:00", name: "NACIONAL" },
-      { time: "19:00", name: "NACIONAL" }
-    ]
-  };
+// Histórico de navegação
+let screenHistory = ['screen-modalidades'];
 
-  function showScreen(screenId) {
-    document.querySelectorAll(\'.screen\').forEach(screen => {
-      screen.classList.remove(\'active\');
-    });
-    document.getElementById(screenId).classList.add(\'active\');
-    appState.currentScreen = screenId;
-  }
+// Dados dos horários por loteria (SEM SAO-PAULO)
+const horariosData = {
+  "rio-federal": [
+    { time: "11:00", name: "RIO FEDERAL" },
+    { time: "14:00", name: "RIO FEDERAL" },
+    { time: "18:00", name: "RIO FEDERAL" },
+    { time: "21:00", name: "RIO FEDERAL" }
+  ],
+  "maluquinha": [
+    { time: "10:00", name: "MALUQUINHA" },
+    { time: "15:00", name: "MALUQUINHA" },
+    { time: "20:00", name: "MALUQUINHA" }
+  ],
+  "lotece-lotep": [
+    { time: "11:30", name: "LOTECE" },
+    { time: "18:30", name: "LOTEP" }
+  ],
+  "capital": [
+    { time: "10:00", name: "CAPITAL" },
+    { time: "14:00", name: "CAPITAL" },
+    { time: "18:00", name: "CAPITAL" }
+  ],
+  "nacional": [
+    { time: "12:00", name: "NACIONAL" },
+    { time: "19:00", name: "NACIONAL" }
+  ],
+  "lt-pt-rio": [
+    { time: "09:00", name: "LT PT RIO" },
+    { time: "11:00", name: "LT PT RIO" },
+    { time: "18:00", name: "LT PT RIO" }
+  ]
+};
 
-  function goToScreen(screenId) {
-    appState.screenHistory.push(screenId);
-    showScreen(screenId);
-  }
+// Função para navegar entre telas
+function goToScreen(screenId) {
+  // Esconder tela atual
+  document.querySelector('.screen.active').classList.remove('active');
+  
+  // Mostrar nova tela
+  document.getElementById(screenId).classList.add('active');
+  
+  // Atualizar histórico
+  screenHistory.push(screenId);
+  currentScreen = screenId;
+}
 
-  function goBack() {
-    if (appState.screenHistory.length > 1) {
-      appState.screenHistory.pop();
-      showScreen(appState.screenHistory[appState.screenHistory.length - 1]);
-    } else {
-      window.history.back(); 
-    }
-  }
-
-  function selectModalidade(modalidade) {
-    appState.selectedModalidade = modalidade;
-    goToScreen(\'screen-data\');
-  }
-
-  function selectData(date) {
-    appState.selectedDate = date;
-    goToScreen(\'screen-modalidade-jogo\');
-  }
-
-  function selectModalidadeJogo(modalidadeJogo) {
-    appState.selectedModalidadeJogo = modalidadeJogo;
-    document.getElementById(\'valor-title\').textContent = modalidadeJogo.toUpperCase().replace(/-/g, \' \');
-    goToScreen(\'screen-colocacao\');
-  }
-
-  function selectColocacao(colocacao) {
-    appState.selectedColocacao = colocacao;
-    document.getElementById(\'valor-date\').textContent = `${appState.selectedDate}`;
-    goToScreen(\'screen-valor\');
-  }
-
-  function addValor(value) {
-    let currentValor = parseFloat(document.getElementById(\'valor-input\').value.replace(\'R$\' , \'\').replace(\' , \' .\')) || 0;
-    currentValor += value;
-    document.getElementById(\'valor-input\').value = `R$ ${currentValor.toFixed(2).replace(\' .\', \' ,\')}`;
-    appState.valor = currentValor;
-  }
-
-  function toggleLoteria(loteriaId) {
-    const index = appState.loterias.indexOf(loteriaId);
-    const counter = document.getElementById(`counter-${loteriaId}`);
+// Função para voltar
+function goBack() {
+  if (screenHistory.length > 1) {
+    screenHistory.pop(); // Remove tela atual
+    const previousScreen = screenHistory[screenHistory.length - 1];
     
-    if (index === -1) {
-      appState.loterias.push(loteriaId);
-      counter.textContent = loteriaHorarios[loteriaId].length;
-      counter.style.background = \'#28a745\';
-    } else {
-      appState.loterias.splice(index, 1);
-      counter.textContent = \'0\';
-      counter.style.background = \'#6c757d\';
-    }
+    // Esconder tela atual
+    document.querySelector('.screen.active').classList.remove('active');
     
-    updateHorarios();
+    // Mostrar tela anterior
+    document.getElementById(previousScreen).classList.add('active');
+    
+    currentScreen = previousScreen;
   }
+}
 
-  function updateHorarios() {
-    const horariosList = document.getElementById(\'horarios-list\');
-    horariosList.innerHTML = \'\';
-    
-    appState.loterias.forEach(loteriaId => {
-      loteriaHorarios[loteriaId].forEach(horario => {
-        const horarioItem = document.createElement(\'div\');
-        horarioItem.className = \'horario-item\';
-        horarioItem.onclick = () => selectHorario(horario.time);
+// Funções de seleção
+function selectModalidade(modalidade) {
+  selectedModalidade = modalidade;
+  goToScreen('screen-data');
+}
+
+function selectData(data) {
+  selectedData = data;
+  goToScreen('screen-modalidade-jogo');
+}
+
+function selectModalidadeJogo(modalidade) {
+  selectedModalidadeJogo = modalidade;
+  document.getElementById('valor-title').textContent = modalidade.toUpperCase();
+  goToScreen('screen-colocacao');
+}
+
+function selectColocacao(colocacao) {
+  selectedColocacao = colocacao;
+  goToScreen('screen-valor');
+}
+
+// Função para adicionar valor
+function addValor(valor) {
+  selectedValor += valor;
+  document.getElementById('valor-input').value = `R$ ${selectedValor.toFixed(2).replace('.', ',')}`;
+}
+
+// Função para toggle de loterias
+function toggleLoteria(loteria) {
+  const counter = document.getElementById(`counter-${loteria}`);
+  const index = selectedLoterias.indexOf(loteria);
+  
+  if (index === -1) {
+    selectedLoterias.push(loteria);
+    counter.textContent = '1';
+    counter.style.backgroundColor = '#28a745';
+  } else {
+    selectedLoterias.splice(index, 1);
+    counter.textContent = '0';
+    counter.style.backgroundColor = '#6c757d';
+  }
+}
+
+// Função para carregar horários
+function loadHorarios() {
+  const horariosList = document.getElementById('horarios-list');
+  horariosList.innerHTML = '';
+  
+  selectedLoterias.forEach(loteria => {
+    if (horariosData[loteria]) {
+      horariosData[loteria].forEach(horario => {
+        const horarioItem = document.createElement('div');
+        horarioItem.className = 'horario-item';
+        horarioItem.onclick = () => toggleHorario(loteria, horario.time);
+        
         horarioItem.innerHTML = `
-          <input type="radio" name="horario" class="horario-radio" value="${horario.time}">
-          <span class="horario-text">${horario.time}</span>
-          <span class="horario-time">${horario.name}</span>
+          <input type="checkbox" class="horario-radio" id="horario-${loteria}-${horario.time}">
+          <span class="horario-text">${horario.name}</span>
+          <span class="horario-time">${horario.time}</span>
         `;
+        
         horariosList.appendChild(horarioItem);
       });
-    });
-  }
-
-  function selectHorario(horario) {
-    const radios = document.querySelectorAll(\'input[name="horario"]
-                                             radios.forEach(radio => {
-      if (radio.value === horario) {
-        radio.checked = true;
-      }
-    });
-    appState.selectedHorarios = [horario];
-  }
-
-  function updateResumo() {
-    const now = new Date();
-    appState.resumo.dataHora = `${appState.selectedDate} - ${now.getHours().toString().padStart(2, \'0\')}:${now.getMinutes().toString().padStart(2, \'0\')}`;
-    appState.resumo.loteriaNome = appState.loterias.map(l => l.toUpperCase().replace(/-\ /g, \' \')).join(\' , \');
-    appState.resumo.modalidadeColocacao = `${appState.selectedModalidadeJogo.toUpperCase().replace(/-\ /g, \' \')} - ${appState.selectedColocacao} PRÊMIO`;
-    appState.resumo.palpitesResumo = document.getElementById(\'palpites-input\').value;
-    appState.resumo.valorTotal = appState.valor;
-
-    document.getElementById(\'resumo-vendedor\').textContent = appState.resumo.vendedor;
-    document.getElementById(\'resumo-data-hora\').textContent = appState.resumo.dataHora;
-    document.getElementById(\'resumo-cotacao\').textContent = appState.resumo.cotacao;
-    document.getElementById(\'resumo-loteria\').textContent = appState.resumo.loteriaNome;
-    document.getElementById(\'resumo-modalidade\').textContent = appState.resumo.modalidadeColocacao;
-    document.getElementById(\'resumo-palpites\').textContent = appState.resumo.palpitesResumo;
-    document.getElementById(\'resumo-valor-total\').textContent = `R$ ${appState.resumo.valorTotal.toFixed(2).replace(\' .\', \' ,\')}`;
-  }
-
-  function finalizarAposta() {
-    updateResumo();
-    goToScreen(\'screen-sucesso\');
-  }
-
-  function resetApp() {
-    appState.screenHistory = ["screen-modalidades"];
-    appState.currentScreen = "screen-modalidades";
-    appState.selectedModalidade = null;
-    appState.selectedDate = null;
-    appState.selectedModalidadeJogo = null;
-    appState.selectedColocacao = null;
-    appState.palpites = "";
-    appState.valor = 0;
-    appState.loterias = [];
-    appState.selectedHorarios = [];
-    
-    document.getElementById(\'palpites-input\').value = \'\';
-    document.getElementById(\'valor-input\').value = \'R$ 0,00\';
-    
-    document.querySelectorAll(\".loteria-counter\").forEach(counter => {
-      counter.textContent = \'0\';
-      counter.style.background = \'#6c757d\';
-    });
-    
-    showScreen(\'screen-modalidades\');
-  }
-
-  // Event listeners para atualizar o resumo antes de mostrar a tela
-  document.addEventListener(\'DOMContentLoaded\', function() {
-    const originalGoToScreen = goToScreen;
-    goToScreen = function(screenId) {
-      if (screenId === \'screen-resumo\') {
-        updateResumo();
-      }
-      originalGoToScreen(screenId);
-    };
+    }
   });
+}
+
+// Função para toggle de horários
+function toggleHorario(loteria, time) {
+  const checkbox = document.getElementById(`horario-${loteria}-${time}`);
+  const horarioKey = `${loteria}-${time}`;
+  
+  if (checkbox.checked) {
+    selectedHorarios = selectedHorarios.filter(h => h !== horarioKey);
+    checkbox.checked = false;
+  } else {
+    selectedHorarios.push(horarioKey);
+    checkbox.checked = true;
+  }
+}
+
+// Função para atualizar resumo
+function updateResumo() {
+  document.getElementById('resumo-modalidade').textContent = selectedModalidade.toUpperCase();
+  document.getElementById('resumo-data').textContent = selectedData;
+  document.getElementById('resumo-tipo').textContent = selectedModalidadeJogo.toUpperCase();
+  document.getElementById('resumo-colocacao').textContent = selectedColocacao;
+  document.getElementById('resumo-palpites').textContent = selectedPalpites || 'Não informado';
+  document.getElementById('resumo-loterias').textContent = selectedLoterias.join(', ').toUpperCase();
+  document.getElementById('resumo-horarios').textContent = selectedHorarios.length + ' horários selecionados';
+  document.getElementById('resumo-total').textContent = `R$ ${selectedValor.toFixed(2).replace('.', ',')}`;
+}
+
+// Função para finalizar aposta
+function finalizarAposta() {
+  document.getElementById('success-modal').style.display = 'flex';
+}
+
+// Função para fechar modal
+function fecharModal() {
+  document.getElementById('success-modal').style.display = 'none';
+  // Reset do jogo
+  location.reload();
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  // Listener para mudança de tela de loterias para horários
+  const originalGoToScreen = goToScreen;
+  goToScreen = function(screenId) {
+    if (screenId === 'screen-horarios') {
+      loadHorarios();
+    } else if (screenId === 'screen-resumo') {
+      updateResumo();
+    }
+    originalGoToScreen(screenId);
+  };
+  
+  // Listener para input de palpites
+  const palpitesInput = document.getElementById('palpites-input');
+  if (palpitesInput) {
+    palpitesInput.addEventListener('input', function() {
+      selectedPalpites = this.value;
+    });
+  }
+});
 </script>
 
 {% endblock %}
-function showScreen(screenId) {
-    document.querySelectorAll(\".screen\").forEach(screen => {
-      screen.classList.remove(\"active\");
-    });
-    document.getElementById(screenId).classList.add(\"active\");
-    appState.currentScreen = screenId;
-  }
 
-  function goToScreen(screenId) {
-    appState.screenHistory.push(screenId);
-    showScreen(screenId);
-  }
-
-  function goBack() {
-    if (appState.screenHistory.length > 1) {
-      appState.screenHistory.pop();
-      showScreen(appState.screenHistory[appState.screenHistory.length - 1]);
-    } else {
-      window.history.back(); 
-    }
-  }
-
-  function selectModalidade(modalidade) {
-    appState.selectedModalidade = modalidade;
-    goToScreen(\"screen-data\");
-  }
-
-  function selectData(date) {
-    appState.selectedDate = date;
-    goToScreen(\"screen-modalidade-jogo\");
-  }
-
-  function selectModalidadeJogo(modalidadeJogo) {
-    appState.selectedModalidadeJogo = modalidadeJogo;
-    document.getElementById(\"valor-title\").textContent = modalidadeJogo.toUpperCase().replace(/-/g, \" \");
-    goToScreen(\"screen-colocacao\");
-  }
-
-  function selectColocacao(colocacao) {
-    appState.selectedColocacao = colocacao;
-    document.getElementById(\"valor-date\").textContent = `${appState.selectedDate}`;
-    goToScreen(\"screen-valor\");
-  }
-
-  function addValor(value) {
-    let currentValor = parseFloat(document.getElementById(\"valor-input\").value.replace(\"R$\", \"\").replace(\",\", \".\")) || 0;
-    currentValor += value;
-    document.getElementById(\"valor-input\").value = `R$ ${currentValor.toFixed(2).replace(\".\", \",\")}`;
-    appState.valor = currentValor;
-  }
-
-  function toggleLoteria(loteriaId) {
-    const index = appState.loterias.indexOf(loteriaId);
-    const counter = document.getElementById(`counter-${loteriaId}`);
-    
-    if (index === -1) {
-      appState.loterias.push(loteriaId);
-      counter.textContent = loteriaHorarios[loteriaId].length;
-      counter.style.background = \"#28a745\";
-    } else {
-      appState.loterias.splice(index, 1);
-      counter.textContent = \"0\";
-      counter.style.background = \"#6c757d\";
-    }
-    
-    updateHorarios();
-  }
-
-  function updateHorarios() {
-    const horariosList = document.getElementById(\"horarios-list\");
-    horariosList.innerHTML = \"\";
-    
-    appState.loterias.forEach(loteriaId => {
-      loteriaHorarios[loteriaId].forEach(horario => {
-        const horarioItem = document.createElement(\"div\");
-        horarioItem.className = \"horario-item\";
-        horarioItem.onclick = () => selectHorario(horario.time);
-        horarioItem.innerHTML = `
-          <input type="radio" name="horario" class="horario-radio" value="${horario.time}">
-          <span class="horario-text">${horario.time}</span>
-          <span class="horario-time">${horario.name}</span>
-        `;
-        horariosList.appendChild(horarioItem);
-      });
-    });
-  }
-
-  function selectHorario(horario) {
-    const radios = document.querySelectorAll(\"input[name="horario"]");
-    radios.forEach(radio => {
-      if (radio.value === horario) {
-        radio.checked = true;
-      }
-    });
-    appState.selectedHorarios = [horario];
-  }
-
-  function updateResumo() {
-    const now = new Date();
-    appState.resumo.dataHora = `${appState.selectedDate} - ${now.getHours().toString().padStart(2, \"0\")}:${now.getMinutes().toString().padStart(2, \"0\")}`;
-    appState.resumo.loteriaNome = appState.loterias.map(l => l.toUpperCase().replace(/-\ /g, \" \")).join(\" , \");
-    appState.resumo.modalidadeColocacao = `${appState.selectedModalidadeJogo.toUpperCase().replace(/-\ /g, \" \")} - ${appState.selectedColocacao} PRÊMIO`;
-    appState.resumo.palpitesResumo = document.getElementById(\"palpites-input\").value;
-    appState.resumo.valorTotal = appState.valor;
-
-    document.getElementById(\"resumo-vendedor\").textContent = appState.resumo.vendedor;
-    document.getElementById(\"resumo-data-hora\").textContent = appState.resumo.dataHora;
-    document.getElementById(\"resumo-cotacao\").textContent = appState.resumo.cotacao;
-    document.getElementById(\"resumo-loteria\").textContent = appState.resumo.loteriaNome;
-    document.getElementById(\"resumo-modalidade\").textContent = appState.resumo.modalidadeColocacao;
-    document.getElementById(\"resumo-palpites\").textContent = appState.resumo.palpitesResumo;
-    document.getElementById(\"resumo-valor-total\").textContent = `R$ ${appState.resumo.valorTotal.toFixed(2).replace(\".\", \",\")}`;
-  }
-
-  function finalizarAposta() {
-    updateResumo();
-    goToScreen(\"screen-sucesso\");
-  }
-
-  function resetApp() {
-    appState.screenHistory = ["screen-modalidades"];
-    appState.currentScreen = "screen-modalidades";
-    appState.selectedModalidade = null;
-    appState.selectedDate = null;
-    appState.selectedModalidadeJogo = null;
-    appState.selectedColocacao = null;
-    appState.palpites = "";
-    appState.valor = 0;
-    appState.loterias = [];
-    appState.selectedHorarios = [];
-    
-    document.getElementById(\"palpites-input\").value = \"\";
-    document.getElementById(\"valor-input\").value = \"R$ 0,00\";
-    
-    document.querySelectorAll(\".loteria-counter\").forEach(counter => {
-      counter.textContent = \"0\";
-      counter.style.background = \"#6c757d\";
-    });
-    
-    showScreen(\"screen-modalidades\");
-  }
-
-  // Event listeners para atualizar o resumo antes de mostrar a tela
-  document.addEventListener(\"DOMContentLoaded\", function() {
-    const originalGoToScreen = goToScreen;
-    goToScreen = function(screenId) {
-      if (screenId === \"screen-resumo\") {
-        updateResumo();
-      }
-      originalGoToScreen(screenId);
-    };
-  });
-</script>
-
-{% endblock %}
