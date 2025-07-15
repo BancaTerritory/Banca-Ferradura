@@ -1,4 +1,4 @@
-{# Versão 2.0 - Sem SAO-PAULO e CSS Otimizado #}
+{# Versão 2.0 - Sem SAO-PAULO e CSS Otimizado - Atualizado #}
 {% extends "base.html" %}
 
 {% block title %}Jogo do Bicho - Banca Ferradura{% endblock %}
@@ -798,9 +798,9 @@
           <span class="loteria-text">RIO FEDERAL</span>
           <span class="loteria-counter" id="counter-rio-federal">0</span>
         </div>
-        <div class="loteria-item" onclick="toggleLoteria('maluquinha')">
-          <span class="loteria-text">MALUQUINHA</span>
-          <span class="loteria-counter" id="counter-maluquinha">0</span>
+        <div class="loteria-item" onclick="toggleLoteria('lt-goias')">
+          <span class="loteria-text">LT GOIAS</span>
+          <span class="loteria-counter" id="counter-lt-goias">0</span>
         </div>
         <div class="loteria-item" onclick="toggleLoteria('lotece-lotep')">
           <span class="loteria-text">LOTECE/LOTEP</span>
@@ -817,6 +817,14 @@
         <div class="loteria-item" onclick="toggleLoteria('lt-pt-rio')">
           <span class="loteria-text">LT PT RIO</span>
           <span class="loteria-counter" id="counter-lt-pt-rio">0</span>
+        </div>
+        <div class="loteria-item" onclick="toggleLoteria('minas-gerais')">
+          <span class="loteria-text">MINAS GERAIS</span>
+          <span class="loteria-counter" id="counter-minas-gerais">0</span>
+        </div>
+        <div class="loteria-item" onclick="toggleLoteria('bahia')">
+          <span class="loteria-text">BAHIA</span>
+          <span class="loteria-counter" id="counter-bahia">0</span>
         </div>
       </div>
       
@@ -902,7 +910,8 @@
       </div>
       
       <div class="resumo-total">
-        <strong>Total: <span id="resumo-total">R$ 0,00</span></strong>
+        <span>VALOR TOTAL:</span>
+        <span id="resumo-total">R$ 0,00</span>
       </div>
     </div>
     
@@ -912,7 +921,7 @@
     </div>
   </div>
 
-  <!-- Tela 9: Sucesso -->
+  <!-- Modal de Sucesso -->
   <div class="success-modal" id="success-modal">
     <div class="success-content">
       <div class="success-icon">✅</div>
@@ -923,8 +932,7 @@
 </div>
 
 <script>
-// Variáveis globais para armazenar seleções
-let currentScreen = 'screen-modalidades';
+// Variáveis globais
 let selectedModalidade = '';
 let selectedData = '';
 let selectedModalidadeJogo = '';
@@ -934,10 +942,7 @@ let selectedValor = 0;
 let selectedLoterias = [];
 let selectedHorarios = [];
 
-// Histórico de navegação
-let screenHistory = ['screen-modalidades'];
-
-// Dados dos horários por loteria (SEM SAO-PAULO)
+// Dados dos horários por loteria (ATUALIZADO)
 const horariosData = {
   "rio-federal": [
     { time: "11:00", name: "RIO FEDERAL" },
@@ -945,10 +950,10 @@ const horariosData = {
     { time: "18:00", name: "RIO FEDERAL" },
     { time: "21:00", name: "RIO FEDERAL" }
   ],
-  "maluquinha": [
-    { time: "10:00", name: "MALUQUINHA" },
-    { time: "15:00", name: "MALUQUINHA" },
-    { time: "20:00", name: "MALUQUINHA" }
+  "lt-goias": [
+    { time: "10:00", name: "LT GOIAS" },
+    { time: "15:00", name: "LT GOIAS" },
+    { time: "20:00", name: "LT GOIAS" }
   ],
   "lotece-lotep": [
     { time: "11:30", name: "LOTECE" },
@@ -967,6 +972,14 @@ const horariosData = {
     { time: "09:00", name: "LT PT RIO" },
     { time: "11:00", name: "LT PT RIO" },
     { time: "18:00", name: "LT PT RIO" }
+  ],
+  "minas-gerais": [
+    { time: "09:00", name: "MINAS GERAIS" },
+    { time: "17:00", name: "MINAS GERAIS" }
+  ],
+  "bahia": [
+    { time: "13:00", name: "BAHIA" },
+    { time: "20:00", name: "BAHIA" }
   ]
 };
 
@@ -977,26 +990,12 @@ function goToScreen(screenId) {
   
   // Mostrar nova tela
   document.getElementById(screenId).classList.add('active');
-  
-  // Atualizar histórico
-  screenHistory.push(screenId);
-  currentScreen = screenId;
 }
 
 // Função para voltar
 function goBack() {
-  if (screenHistory.length > 1) {
-    screenHistory.pop(); // Remove tela atual
-    const previousScreen = screenHistory[screenHistory.length - 1];
-    
-    // Esconder tela atual
-    document.querySelector('.screen.active').classList.remove('active');
-    
-    // Mostrar tela anterior
-    document.getElementById(previousScreen).classList.add('active');
-    
-    currentScreen = previousScreen;
-  }
+  // Implementar lógica de voltar
+  window.history.back();
 }
 
 // Funções de seleção
@@ -1034,7 +1033,7 @@ function toggleLoteria(loteria) {
   
   if (index === -1) {
     selectedLoterias.push(loteria);
-    counter.textContent = '1';
+    counter.textContent = horariosData[loteria] ? horariosData[loteria].length : '1';
     counter.style.backgroundColor = '#28a745';
   } else {
     selectedLoterias.splice(index, 1);
