@@ -164,3 +164,6 @@ def fazer_aposta_futebol():
     except ValueError: flash("Valor da aposta inválido.", "error"); return redirect(url_for("games.bet_futebol"))
     except Exception as e: flash(f"Ocorreu um erro ao processar sua aposta de futebol: {str(e)}", "error"); return redirect(url_for("games.bet_futebol"))
 
+@game_blueprint.route("/jogo-do-tigrinho")
+def jogo_do_tigrinho():
+    return render_template("jogo_tigrinho.html")
