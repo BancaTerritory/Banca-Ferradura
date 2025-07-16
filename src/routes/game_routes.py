@@ -52,7 +52,7 @@ def jogo_do_bicho():
         flash("Você precisa estar logado para jogar.", "error"); return redirect(url_for("auth.login"))
     return render_template("jogo_do_bicho_v2.html")
 
-@game_bp.route("/jogo-do-bicho/apostar", methods=["POST"])
+@game_blueprint.route("/jogo-do-bicho/apostar", methods=["POST"])
 def fazer_aposta_bicho():
     if "user_phone" not in session:
         flash("Sessão expirada. Faça login novamente.", "error"); return redirect(url_for("auth.login"))
