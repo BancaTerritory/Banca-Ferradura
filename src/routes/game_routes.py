@@ -1,9 +1,11 @@
-
 from flask import Blueprint, render_template
-game_blueprint = Blueprint('games', __name__)
+
+game_blueprint = Blueprint("games", __name__)
 
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON\'T CHANGE THIS !!!
+import sys # ESTA LINHA DEVE VIR AQUI
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import random
