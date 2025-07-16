@@ -46,7 +46,7 @@ def get_grupo_from_milhar(milhar_str):
         if dezena_sorteada in detalhes["dezenas"]: return grupo_num
     return None
 
-@game_bp.route("/jogo-do-bicho", methods=["GET"])
+@game_blueprint.route("/jogo-do-bicho", methods=["GET"])
 def jogo_do_bicho():
     if "user_phone" not in session:
         flash("Você precisa estar logado para jogar.", "error"); return redirect(url_for("auth.login"))
@@ -110,13 +110,13 @@ def fazer_aposta_bicho():
     except ValueError: flash("Valor da aposta inválido.", "error"); return redirect(url_for("games.jogo_do_bicho"))
     except Exception as e: flash(f"Ocorreu um erro ao processar sua aposta: {str(e)}", "error"); return redirect(url_for("games.jogo_do_bicho"))
 
-@game_bp.route("/bet-futebol", methods=["GET"])
+@game_blueprint.route
 def bet_futebol():
     if "user_phone" not in session:
         flash("Você precisa estar logado para jogar.", "error"); return redirect(url_for("auth.login"))
     return render_template("bet_futebol.html", partidas=PARTIDAS_FUTEBOL)
 
-@game_bp.route("/bet-futebol/apostar", methods=["POST"])
+@game_blueprint.route
 def fazer_aposta_futebol():
     if "user_phone" not in session:
         flash("Sessão expirada. Faça login novamente.", "error"); return redirect(url_for("auth.login"))
