@@ -1,4 +1,7 @@
-import sys
+
+from flask import Blueprint, render_template
+game_blueprint = Blueprint('games', __name__)
+
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON\'T CHANGE THIS !!!
 
@@ -7,7 +10,7 @@ import random
 
 from src.routes.auth_routes import users_db # Using global for prototype simplicity
 
-game_bp = Blueprint("games", __name__)
+
 
 # Jogo do Bicho Configuration (Simplified)
 GRUPOS_BICHO = {
