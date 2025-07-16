@@ -32,7 +32,7 @@ from flask import Blueprint
 
 
 from src.routes.payment_routes import payment_bp
-from src.routes.game_routes import game_bp
+from src.routes.game_routes import game_blueprint
 from src.routes.casino_routes import casino_bp
 from src.routes.admin_routes import admin_bp # Importa o blueprint do admin
 from src.routes.lottery_routes import lottery_bp # Importa o blueprint de loteria
@@ -44,7 +44,7 @@ app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(lottery_bp, url_prefix="/lottery")
 
 app.register_blueprint(payment_bp, url_prefix="/payments")
-app.register_blueprint(game_bp, url_prefix="/games")
+app.register_blueprint(game_blueprint, url_prefix="/games")
 app.register_blueprint(casino_bp, url_prefix="/casino")
 app.register_blueprint(admin_bp, url_prefix="/admin") # Registra o blueprint do admin
 #app.register_blueprint(lottery_bp, url_prefix="/lottery") # Registra o blueprint de loteria
