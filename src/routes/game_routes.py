@@ -5,7 +5,7 @@ game_blueprint = Blueprint("games", __name__)
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON\\'T CHANGE THIS !!!
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
 
 from flask import request, redirect, url_for, flash, session
 import random
@@ -137,11 +137,18 @@ def fazer_aposta_futebol():
         partida_selecionada = next((p for p in PARTIDAS_FUTEBOL if p["id"] == partida_id), None)
         if not partida_selecionada: flash("Partida selecionada inválida.", "error"); return redirect(url_for("games.bet_futebol"))
         
-        partida_descricao = f"{partida_selecionada["casa"]} vs {partida_selecionada["fora"]}"
+        partida_descricao = f"{partida_selecionada['casa']} vs {partida_selecionada['fora']}"
 
         user_data["credits"] -= valor_aposta; session["user_credits"] = user_data["credits"]
         resultados_possiveis = ["casa", "empate", "fora"]; resultado_real_partida = random.choice(resultados_possiveis)
         odd_apostada = partida_selecionada["odds"][escolha_aposta]; premio = 0.0; mensagem_resultado_futebol = "Não premiado."
+        
+        if resultado_real_partida == "casa":
+            resultado_partida_texto = f"Resultado: {partida_selecionada['casa']} venceu."
+        elif resultado_real_partida == "fora":
+            resultado_partida_texto = f"Resultado: {partida_selecionada['fora']} venceu."
+        else: 
+            resultado_partida_texto = "Resultado: Empate."
         
         if escolha_aposta == resultado_real_partida:
             premio = valor_aposta * odd_apostada; mensagem_resultado_futebol = f"Parabéns! Você acertou o resultado!"
