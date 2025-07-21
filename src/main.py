@@ -51,4 +51,4 @@ app.register_blueprint(admin_bp, url_prefix="/admin") # Registra o blueprint do 
 
 if __name__ == "__main__":
     # For development, ensure it runs on 0.0.0.0 to be accessible if exposed
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=False)
