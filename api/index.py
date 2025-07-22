@@ -1,12 +1,8 @@
 from src.main import app
 
-# Para Vercel - exportar a aplicação Flask
-application = app
-
 # Handler para Vercel
-def handler(request):
-    return app(request.environ, start_response)
+def handler(request, response):
+    return app(request.environ, response)
 
-# Exportar para Vercel
-if __name__ == "__main__":
-    app.run()
+# Exportar app para Vercel
+app = app
