@@ -6,10 +6,10 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.environ.get('SECRET_KEY', 'sua-chave-secreta-super-segura-aqui-2024')
     
-    # Configurar CORS
+    # Configurar CORS para permitir requisições de qualquer origem
     CORS(app)
     
-    # Importar apenas as rotas que funcionavam antes
+    # Importar blueprints
     from routes.auth_routes import auth_blueprint
     from routes.game_routes import game_blueprint
     
@@ -44,4 +44,5 @@ app = create_app()
 
 # Para desenvolvimento local
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
