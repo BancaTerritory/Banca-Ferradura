@@ -9,30 +9,43 @@ def create_app():
     # Configurar CORS para permitir requisições de qualquer origem
     CORS(app)
     
-    # Importar blueprints
-    from routes.auth_routes import auth_blueprint
-    from routes.game_routes import game_blueprint
-    from routes.pix_routes import pix_blueprint
+    # Importar e registrar blueprints com tratamento de erro
+    try:
+        from routes.auth_routes import auth_blueprint
+        app.register_blueprint(auth_blueprint)
+    except ImportError as e:
+        print(f"Erro ao importar auth_routes: {e}")
     
-    # Registrar blueprints
-    app.register_blueprint(auth_blueprint)
-    app.register_blueprint(game_blueprint)
-    app.register_blueprint(pix_blueprint)
+    try:
+        from routes.game_routes import game_blueprint
+        app.register_blueprint(game_blueprint)
+    except ImportError as e:
+        print(f"Erro ao importar game_routes: {e}")
+    
+    try:
+        from routes.pix_routes import pix_blueprint
+        app.register_blueprint(pix_blueprint)
+    except ImportError as e:
+        print(f"Erro ao importar pix_routes: {e}")
     
     @app.route('/')
     def index():
         """Página principal - Dashboard"""
-        if not session.get("user_phone"):
-            return redirect(url_for("auth.login_page"))
-        
-        # Dados do usuário para o dashboard
-        user_data = {
-            'phone': session.get("user_phone"),
-            'credits': session.get("user_credits", 0.0),
-            'name': session.get("user_name", "Usuário")
-        }
-        
-        return render_template('index.html', user=user_data)
+        try:
+            if not session.get("user_phone"):
+                return redirect(url_for("auth.login_page"))
+            
+            # Dados do usuário para o dashboard
+            user_data = {
+                'phone': session.get("user_phone"),
+                'credits': session.get("user_credits", 0.0),
+                'name': session.get("user_name", "Usuário")
+            }
+            
+            return render_template('index.html', user=user_data)
+        except Exception as e:
+            print(f"Erro na rota index: {e}")
+            return f"Erro interno: {str(e)}", 500
     
     @app.route('/dashboard')
     def dashboard():
@@ -42,17 +55,26 @@ def create_app():
     @app.errorhandler(404)
     def page_not_found(e):
         """Página de erro 404"""
-        return render_template('404.html'), 404
+        return f"Página não encontrada: {str(e)}", 404
     
     @app.errorhandler(500)
     def internal_server_error(e):
         """Página de erro 500"""
-        return render_template('500.html'), 500
+        return f"Erro interno do servidor: {str(e)}", 500
+    
+    # Rota de teste para verificar se o app está funcionando
+    @app.route('/test')
+    def test():
+        return "App funcionando corretamente!"
     
     return app
 
 # Criar aplicação
 app = create_app()
+
+# Para Vercel (importante!)
+def handler(event, context):
+    return app
 
 # Para desenvolvimento local
 if __name__ == '__main__':
