@@ -12,10 +12,12 @@ def create_app():
     # Importar blueprints
     from routes.auth_routes import auth_blueprint
     from routes.game_routes import game_blueprint
+    from routes.payment_routes import payment_bp
     
     # Registrar blueprints
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(game_blueprint)
+    app.register_blueprint(payment_bp)
     
     @app.route('/')
     def index():
