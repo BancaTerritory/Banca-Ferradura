@@ -10,14 +10,26 @@ def create_app():
     CORS(app)
     
     # Importar blueprints
-    from routes.auth_routes import auth_blueprint
+    from routes.auth_routes import auth_bp
     from routes.game_routes import game_blueprint
     from routes.payment_routes import payment_bp
+    from routes.admin_routes import admin_bp
+    from routes.casino_routes import casino_bp
+    from routes.contapay_routes import contapay_bp
+    from routes.lottery_routes import lottery_bp
+    from routes.main_routes import main_bp
+    from routes.user import user_bp
     
     # Registrar blueprints
-    app.register_blueprint(auth_blueprint)
+    app.register_blueprint(auth_bp)
     app.register_blueprint(game_blueprint)
     app.register_blueprint(payment_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(casino_bp)
+    app.register_blueprint(contapay_bp)
+    app.register_blueprint(lottery_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(user_bp)
     
     @app.route('/')
     def index():
