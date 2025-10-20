@@ -1,1 +1,121 @@
+{% extends "base.html" %}
 
+{% block title %}Recarga PIX - Banca Ferradura{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container" style="max-width: 700px;">
+        <h2 style="text-align: center; color: var(--cor-texto-principal); margin-bottom: 20px;">
+            💳 Pagamento PIX
+        </h2>
+
+        <div class="card" style="background-color: #2c3e50; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <p style="font-size: 1.1em; color: #ecf0f1; margin-bottom: 10px;">Valor a pagar:</p>
+                <h1 style="color: var(--cor-destaque-verde); font-size: 2.5em; margin: 0;">
+                    R$ {{ "%.2f"|format(amount) }}
+                </h1>
+            </div>
+
+            {% if qr_code_base64 %}
+            <div style="text-align: center; margin-bottom: 25px;">
+                <p style="color: #ecf0f1; margin-bottom: 15px; font-weight: bold;">
+                    📱 Escaneie o QR Code com seu app bancário:
+                </p>
+                <div style="background-color: white; padding: 20px; border-radius: 12px; display: inline-block;">
+                    <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR Code PIX" style="max-width: 300px; width: 100%;">
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom: 20px;">
+                <p style="color: #ecf0f1; margin-bottom: 10px; font-weight: bold; text-align: center;">
+                    📋 Ou copie o código PIX Copia e Cola:
+                </p>
+                <div style="position: relative;">
+                    <textarea 
+                        id="pixCode" 
+                        readonly 
+                        style="width: 100%; 
+                               min-height: 120px; 
+                               background-color: #34495e; 
+                               color: var(--cor-destaque-verde); 
+                               border: 2px solid var(--cor-destaque-verde); 
+                               border-radius: 8px; 
+                               padding: 15px; 
+                               font-family: 'Courier New', monospace; 
+                               font-size: 0.9em; 
+                               resize: none; 
+                               word-wrap: break-word;"
+                    >{{ pix_code }}</textarea>
+                    <button 
+                        onclick="copyPixCode()" 
+                        class="btn btn-verde" 
+                        style="width: 100%; margin-top: 10px; font-size: 1.1em;"
+                    >
+                        <i data-lucide="copy" style="vertical-align: middle;"></i> Copiar Código PIX
+                    </button>
+                </div>
+            </div>
+
+            <div style="background-color: #34495e; padding: 20px; border-radius: 8px; margin-top: 25px;">
+                <h4 style="color: var(--cor-destaque-verde); margin-top: 0; text-align: center;">
+                    ⏱️ Instruções de Pagamento
+                </h4>
+                <ol style="color: #ecf0f1; line-height: 1.8; padding-left: 20px;">
+                    <li>Abra o aplicativo do seu banco</li>
+                    <li>Escolha a opção <strong>PIX</strong></li>
+                    <li>Selecione <strong>Pagar com QR Code</strong> ou <strong>PIX Copia e Cola</strong></li>
+                    <li>Escaneie o QR Code ou cole o código acima</li>
+                    <li>Confirme o pagamento no seu banco</li>
+                    <li>Aguarde alguns segundos - seus créditos serão adicionados automaticamente!</li>
+                </ol>
+            </div>
+
+            <div style="text-align: center; margin-top: 25px; padding: 15px; background-color: #27ae60; border-radius: 8px;">
+                <p style="margin: 0; color: white; font-weight: bold;">
+                    ✅ Após o pagamento, seu saldo será atualizado automaticamente em até 10 segundos!
+                </p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('main.index') }}" class="auth-link">
+                <i data-lucide="arrow-left-circle" style="vertical-align: middle;"></i> Voltar para o Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyPixCode() {
+        const pixCodeTextarea = document.getElementById('pixCode');
+        pixCodeTextarea.select();
+        pixCodeTextarea.setSelectionRange(0, 99999); // Para dispositivos móveis
+        
+        try {
+            document.execCommand('copy');
+            alert('✅ Código PIX copiado com sucesso!');
+        } catch (err) {
+            alert('❌ Erro ao copiar. Por favor, copie manualmente.');
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+        
+        // Verificar status do pagamento a cada 5 segundos
+        setInterval(function() {
+            fetch('{{ url_for("payment.check_payment_status") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'PAID') {
+                        alert('🎉 Pagamento confirmado! Seus créditos foram adicionados.');
+                        window.location.href = '{{ url_for("main.index") }}';
+                    }
+                })
+                .catch(error => console.log('Verificando pagamento...'));
+        }, 5000);
+    });
+</script>
+{% endblock %}
