@@ -15,7 +15,6 @@ def create_app():
     from src.routes.payment_routes import payment_bp
     from src.routes.admin_routes import admin_bp
     from src.routes.casino_routes import casino_bp
-    from src.routes.contapay_routes import contapay_bp
     from src.routes.lottery_routes import lottery_bp
     from src.routes.main_routes import main_bp
     from src.routes.user import user_bp
@@ -26,7 +25,6 @@ def create_app():
     app.register_blueprint(payment_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(casino_bp)
-    app.register_blueprint(contapay_bp)
     app.register_blueprint(lottery_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(user_bp)
