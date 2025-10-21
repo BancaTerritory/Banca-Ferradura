@@ -5,6 +5,8 @@ from api.contapay import ContaPayAPI
 import qrcode
 import io
 import base64
+from datetime import datetime
+import uuid
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -12,6 +14,10 @@ load_dotenv()
 # Inicializa a API da ContaPay com o token
 contapay_token = os.getenv("CONTAPAY_TOKEN")
 contapay_api = ContaPayAPI(token=contapay_token)
+
+# Banco de dados de transações em memória (para protótipo)
+# Em produção, usar banco de dados real
+transactions_db = []
 
 payment_bp = Blueprint('payment', __name__)
 
@@ -55,6 +61,19 @@ def process_payment():
             'payment_id': payment_data.get('id'),
             'amount': amount_float
         }
+        
+        # Registra a transação no banco de dados
+        transaction = {
+            'id': str(uuid.uuid4()),
+            'payment_id': payment_data.get('id'),
+            'user_phone': session.get('user_phone'),
+            'type': 'recharge',
+            'amount': amount_float,
+            'status': 'pending',
+            'timestamp': datetime.now().isoformat(),
+            'pix_code': payment_data.get('pix_code')
+        }
+        transactions_db.append(transaction)
         
         # Retorna para a página com o código PIX e QR Code
         return render_template('recarga_pix.html', 
@@ -111,9 +130,14 @@ def check_payment_status():
         if payment_status.get('status') == 'PAID':
             # Pagamento confirmado - adiciona créditos
             amount = session['pending_payment'].get('amount')
+            payment_id = session['pending_payment'].get('payment_id')
             
-            # Aqui você deve adicionar os créditos ao usuário no banco de dados
-            # Exemplo: update_user_credits(session['user_phone'], amount)
+            # Atualiza status da transação no banco de dados
+            for tx in transactions_db:
+                if tx.get('payment_id') == payment_id:
+                    tx['status'] = 'completed'
+                    tx['completed_at'] = datetime.now().isoformat()
+                    break
             
             # Atualiza sessão
             current_credits = session.get('user_credits', 0.0)
@@ -190,16 +214,22 @@ def process_withdrawal():
             flash('Saldo insuficiente.')
             return redirect(url_for('payment.request_withdrawal'))
         
-        # Solicita o saque via ContaPay
-        withdrawal_data = contapay_api.request_withdrawal(
-            amount=amount_float,
-            pix_key=pix_key
-        )
+        # Registra a transação de saque
+        transaction = {
+            'id': str(uuid.uuid4()),
+            'user_phone': session.get('user_phone'),
+            'type': 'withdrawal',
+            'amount': amount_float,
+            'pix_key': pix_key,
+            'status': 'pending_approval',
+            'timestamp': datetime.now().isoformat()
+        }
+        transactions_db.append(transaction)
         
-        # Desconta o valor do saldo do usuário
+        # Desconta o valor do saldo do usuário (reserva)
         session['user_credits'] = current_credits - amount_float
         
-        flash('Saque solicitado com sucesso! O valor será transferido para sua chave PIX em breve.')
+        flash('Saque solicitado com sucesso! Aguarde a aprovação do administrador.')
         return redirect(url_for('main.index'))
         
     except ValueError:
