@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Credenciais do Twilio a partir de variáveis de ambiente
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'ACb43a431fa025e2cc4ca995ae474a52c9')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '63817bea093d6f189aa5f4cac963a318')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '83e087452b61a843b6f43ba965087c2d')
 TWILIO_VERIFY_SERVICE_ID = os.getenv('TWILIO_VERIFY_SERVICE_ID', 'VAe357d2ce1d153201d31c423d830deb6e')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+12189750606')
 
