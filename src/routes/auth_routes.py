@@ -130,31 +130,18 @@ def verify_code_page():
             stored_code = users_db[registering_phone].get("verification_code")
             
             if stored_code and code_entered == stored_code:
-                # Código correto, ativar a conta e gerar senha
-                final_password = generate_short_code(6)  # Senha de 6 dígitos para maior segurança
-                users_db[registering_phone]["password"] = final_password
+                # Código correto, ativar a conta e usar o código de 4 dígitos como senha permanente
+                users_db[registering_phone]["password"] = stored_code  # Usar o código de 4 dígitos como senha
                 users_db[registering_phone]["verified"] = True
                 
-                try:
-                    # Enviar senha via SMS direto
-                    message = client.messages.create(
-                        body=f"Banca Ferradura: Sua senha de acesso é {final_password}. Guarde-a com segurança!",
-                        from_=TWILIO_PHONE_NUMBER,
-                        to=international_phone
-                    )
-                    
-                    session.pop("registering_phone", None)
-                    # Logar o usuário automaticamente após verificação bem-sucedida
-                    session["user_phone"] = registering_phone
-                    session["user_name"] = user_data_pending.get("name")
-                    session["user_credits"] = user_data_pending.get("credits", 0.0)
-                    session["is_admin"] = False # Garante que é um jogador
-                    flash(f"Cadastro de {user_data_pending.get('name')} confirmado! Sua senha de acesso foi enviada por SMS. Você já está logado.", "success")
-                    return redirect(url_for("main.index")) # Redireciona para o dashboard do jogador
-                except Exception as e:
-                    # Em caso de erro no envio da senha, informamos o usuário
-                    flash(f"Seu cadastro foi confirmado, mas não foi possível enviar a senha por SMS: {str(e)}. Por favor, entre em contato com o suporte.", "error")
-                    return redirect(url_for("main.index"))
+                session.pop("registering_phone", None)
+                # Logar o usuário automaticamente após verificação bem-sucedida
+                session["user_phone"] = registering_phone
+                session["user_name"] = user_data_pending.get("name")
+                session["user_credits"] = user_data_pending.get("credits", 0.0)
+                session["is_admin"] = False # Garante que é um jogador
+                flash(f"Cadastro de {user_data_pending.get('name')} confirmado! Use o código de 4 dígitos que você recebeu como sua senha de acesso. Você já está logado.", "success")
+                return redirect(url_for("main.index")) # Redireciona para o dashboard do jogador
             else:
                 flash("Código de verificação inválido. Tente novamente.", "error")
                 return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
