@@ -9,6 +9,7 @@ import string
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from dotenv import load_dotenv
+from src.database import users_db, admin_credentials
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -22,18 +23,6 @@ TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'ACb43a431fa025e2cc4ca995ae
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '83e087452b61a843b6f43ba965087c2d')
 TWILIO_VERIFY_SERVICE_ID = os.getenv('TWILIO_VERIFY_SERVICE_ID', 'VAe357d2ce1d153201d31c423d830deb6e')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+12189750606')
-
-# For a prototype, we'll use a simple in-memory dictionary to store users and their passwords.
-# In a real application, you would use a database.
-# { "phone_number_complete": { "name": "User Name", "password": "xxxx", "credits": 0.0, "verified": False, "verification_code": "yyyy" } }
-users_db = {}
-
-# Administrador - Login por e-mail
-admin_credentials = {
-    "email": "admin@bancaferradura.com",
-    "password": "admin123",
-    "name": "Administrador Principal"
-}
 
 auth_bp = Blueprint("auth", __name__)
 
