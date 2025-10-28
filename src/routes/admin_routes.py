@@ -6,8 +6,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 import datetime
 
 # Import shared data stores (NOT ideal for production, but used in this prototype)
-from src.routes.payment_routes import transactions_db # List of transaction dicts
-from src.routes.auth_routes import users_db # Dict of user dicts
+from src.database import transactions_db, users_db
 
 admin_bp = Blueprint("admin", __name__, template_folder="../templates/admin")
 
@@ -86,5 +85,3 @@ def reject_withdrawal(transaction_id):
         flash(f"Saque ID {transaction_id[:8]}... não encontrado ou já processado.", "error")
         
     return redirect(url_for("admin.dashboard"))
-
-
