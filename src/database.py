@@ -1,19 +1,14 @@
-"""
-Banco de dados em memória para protótipo.
-Em produção, substituir por banco de dados real (PostgreSQL, MySQL, etc.)
-"""
+# src/database.py
+# Centralized data storage to avoid circular imports
 
-# Banco de dados de usuários
-# Estrutura: { "phone_number": { "name": str, "password": str, "credits": float, "verified": bool, "is_admin": bool } }
+# User database: stores user information
 users_db = {}
 
-# Banco de dados de transações
-# Estrutura: [ { "id": str, "user_phone": str, "type": str, "amount": float, "status": str, "timestamp": str, ... } ]
+# Transaction database: stores all transactions (recharges and withdrawals)
 transactions_db = []
 
-# Credenciais de administrador
+# Admin credentials
 admin_credentials = {
-    "email": "admin@bancaferradura.com",
-    "password": "admin123",
-    "name": "Administrador"
+    "username": "admin",
+    "password": "admin123"
 }
