@@ -7,6 +7,7 @@ import io
 import base64
 from datetime import datetime
 import uuid
+from src.database import transactions_db
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -14,10 +15,6 @@ load_dotenv()
 # Inicializa a API da ContaPay com o token
 contapay_token = os.getenv("CONTAPAY_TOKEN")
 contapay_api = ContaPayAPI(token=contapay_token)
-
-# Banco de dados de transações em memória (para protótipo)
-# Em produção, usar banco de dados real
-transactions_db = []
 
 payment_bp = Blueprint('payment', __name__)
 
