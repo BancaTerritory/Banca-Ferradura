@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 # Credenciais do Twilio a partir de variáveis de ambiente
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'ACb43a431fa025e2cc4ca995ae474a52c9')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '83e087452b61a843b6f43ba965087c2d')
-TWILIO_VERIFY_SERVICE_ID = os.getenv('TWILIO_VERIFY_SERVICE_ID', 'VAe357d2ce1d153201d31c423d830deb6e')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+12189750606')
 
 auth_bp = Blueprint("auth", __name__)
@@ -55,13 +54,17 @@ def register():
             flash("Este número de celular (DDD + Número) já está cadastrado. Tente fazer login.", "error")
             return redirect(url_for("auth.register"))
 
+        # Gerar código de verificação de 4 dígitos (que será a senha permanente)
+        verification_code = generate_short_code(4)
+        
         # Armazenar dados do usuário temporariamente
         users_db[full_phone_number] = {
             "name": name,
-            "password": None, 
+            "password": verification_code,  # SENHA PERMANENTE = código de 4 dígitos
             "credits": 0.0,
             "verified": False,
-            "is_admin": False # Jogadores nunca são admin por este fluxo
+            "is_admin": False,
+            "verification_code": verification_code
         }
         
         session["registering_phone"] = full_phone_number
@@ -73,18 +76,14 @@ def register():
             # Inicializar cliente Twilio
             client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
             
-            # Gerar código de verificação
-            verification_code = generate_short_code(4)
-            users_db[full_phone_number]["verification_code"] = verification_code
-            
-            # Enviar código de verificação via SMS direto
+            # Enviar APENAS 1 SMS com o código de 4 dígitos
             message = client.messages.create(
-                body=f"Banca Ferradura: Seu código de verificação é {verification_code}",
+                body=f"Banca Ferradura: Seu código de acesso é {verification_code}. Use este código para fazer login.",
                 from_=TWILIO_PHONE_NUMBER,
                 to=international_phone
             )
             
-            flash(f"Um código de verificação foi enviado para o número {full_phone_number}. Por favor, insira o código recebido por SMS para ativar sua conta.", "info")
+            flash(f"Um código de acesso foi enviado para o número {full_phone_number}. Por favor, insira o código recebido por SMS.", "info")
             return redirect(url_for("auth.verify_code_page"))
         except Exception as e:
             # Em caso de erro, informamos o usuário e removemos o cadastro temporário
@@ -110,32 +109,22 @@ def verify_code_page():
             flash("Código de verificação é obrigatório.", "error")
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
-        # Formatando o número para o padrão internacional exigido pelo Twilio
-        international_phone = "+55" + registering_phone
+        stored_code = users_db[registering_phone].get("verification_code")
         
-        try:
-            # Verificar o código inserido pelo usuário comparando com o código armazenado
-            client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-            stored_code = users_db[registering_phone].get("verification_code")
+        if stored_code and code_entered == stored_code:
+            # Código correto, ativar a conta
+            users_db[registering_phone]["verified"] = True
             
-            if stored_code and code_entered == stored_code:
-                # Código correto, ativar a conta e usar o código de 4 dígitos como senha permanente
-                users_db[registering_phone]["password"] = stored_code  # Usar o código de 4 dígitos como senha
-                users_db[registering_phone]["verified"] = True
-                
-                session.pop("registering_phone", None)
-                # Logar o usuário automaticamente após verificação bem-sucedida
-                session["user_phone"] = registering_phone
-                session["user_name"] = user_data_pending.get("name")
-                session["user_credits"] = user_data_pending.get("credits", 0.0)
-                session["is_admin"] = False # Garante que é um jogador
-                flash(f"Cadastro de {user_data_pending.get('name')} confirmado! Use o código de 4 dígitos que você recebeu como sua senha de acesso. Você já está logado.", "success")
-                return redirect(url_for("main.index")) # Redireciona para o dashboard do jogador
-            else:
-                flash("Código de verificação inválido. Tente novamente.", "error")
-                return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
-        except Exception as e:
-            flash(f"Erro na verificação: {str(e)}. Por favor, tente novamente ou entre em contato com o suporte.", "error")
+            session.pop("registering_phone", None)
+            # Logar o usuário automaticamente após verificação bem-sucedida
+            session["user_phone"] = registering_phone
+            session["user_name"] = user_data_pending.get("name")
+            session["user_credits"] = user_data_pending.get("credits", 0.0)
+            session["is_admin"] = False
+            flash(f"Cadastro confirmado! Sua senha de acesso é o código de 4 dígitos que você recebeu: {stored_code}. Você já está logado.", "success")
+            return redirect(url_for("main.index"))
+        else:
+            flash("Código de verificação inválido. Tente novamente.", "error")
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
     return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
@@ -161,7 +150,7 @@ def login_page():
             session["user_credits"] = user.get("credits", 0.0)
             session["is_admin"] = False
             flash("Login realizado com sucesso!", "success")
-            return redirect(url_for("main.index")) # Dashboard do jogador
+            return redirect(url_for("main.index"))
         elif user and not user.get("verified"):
             flash("Sua conta ainda não foi verificada. Por favor, complete o processo de verificação.", "warning")
             session["registering_phone"] = full_phone_number 
@@ -181,17 +170,16 @@ def admin_login_page():
             flash("E-mail e senha são obrigatórios.", "error")
             return redirect(url_for("auth.admin_login_page"))
 
-        if email == admin_credentials["email"] and password == admin_credentials["password"]:
+        if email == admin_credentials.get("email", "admin@bancaferradura.com") and password == admin_credentials.get("password", "admin123"):
             session["admin_logged_in"] = True
-            session["admin_name"] = admin_credentials["name"]
-            session["is_admin"] = True # Definindo explicitamente que é um admin na sessão
+            session["admin_name"] = admin_credentials.get("name", "Administrador")
+            session["is_admin"] = True
             # Limpar qualquer sessão de jogador que possa existir
             session.pop("user_phone", None)
             session.pop("user_name", None)
             session.pop("user_credits", None)
             flash("Login de administrador realizado com sucesso!", "success")
-            # Futuramente redirecionar para url_for('admin.dashboard') ou similar
-            return redirect(url_for("main.index")) # Por enquanto, redireciona para o index principal
+            return redirect(url_for("main.index"))
         else:
             flash("E-mail ou senha de administrador inválidos.", "error")
             return redirect(url_for("auth.admin_login_page"))
@@ -205,7 +193,7 @@ def logout():
     session.pop("user_credits", None)
     session.pop("is_admin", None)
     session.pop("registering_phone", None)
-    session.pop("admin_logged_in", None) # Limpar sessão de admin
+    session.pop("admin_logged_in", None)
     session.pop("admin_name", None)
     flash("Você foi desconectado.", "success")
     return redirect(url_for("main.index"))
