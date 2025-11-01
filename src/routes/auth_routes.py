@@ -9,7 +9,6 @@ import string
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from dotenv import load_dotenv
-from src.database import users_db, admin_credentials
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -20,8 +19,20 @@ logger = logging.getLogger(__name__)
 
 # Credenciais do Twilio a partir de variáveis de ambiente
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'ACb43a431fa025e2cc4ca995ae474a52c9')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '83e087452b61a843b6f43ba965087c2d')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '961f5c65db7bd9e011c7d9906589de5c')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+12189750606')
+
+# For a prototype, we'll use a simple in-memory dictionary to store users and their passwords.
+# In a real application, you would use a database.
+# { "phone_number_complete": { "name": "User Name", "password": "xxxx", "credits": 0.0, "verified": False, "verification_code": "yyyy" } }
+users_db = {}
+
+# Administrador - Login por e-mail
+admin_credentials = {
+    "email": "admin@bancaferradura.com",
+    "password": "admin123",
+    "name": "Administrador Principal"
+}
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -83,12 +94,15 @@ def register():
                 to=international_phone
             )
             
+            logger.info(f"SMS enviado com sucesso para {international_phone}. SID: {message.sid}")
+            
             flash(f"Um código de acesso foi enviado para o número {full_phone_number}. Por favor, insira o código recebido por SMS.", "info")
             return redirect(url_for("auth.verify_code_page"))
         except Exception as e:
             # Em caso de erro, informamos o usuário e removemos o cadastro temporário
             users_db.pop(full_phone_number, None)
             session.pop("registering_phone", None)
+            logger.error(f"Erro ao enviar SMS: {str(e)}")
             flash(f"Não foi possível enviar o SMS: {str(e)}. Por favor, verifique se o número está correto e tente novamente.", "error")
             return redirect(url_for("auth.register"))
 
@@ -112,7 +126,7 @@ def verify_code_page():
         stored_code = users_db[registering_phone].get("verification_code")
         
         if stored_code and code_entered == stored_code:
-            # Código correto, ativar a conta
+            # Código correto, ativar a conta (a senha já foi definida no registro)
             users_db[registering_phone]["verified"] = True
             
             session.pop("registering_phone", None)
@@ -121,6 +135,9 @@ def verify_code_page():
             session["user_name"] = user_data_pending.get("name")
             session["user_credits"] = user_data_pending.get("credits", 0.0)
             session["is_admin"] = False
+            
+            logger.info(f"Usuário {registering_phone} verificado com sucesso. Senha: {stored_code}")
+            
             flash(f"Cadastro confirmado! Sua senha de acesso é o código de 4 dígitos que você recebeu: {stored_code}. Você já está logado.", "success")
             return redirect(url_for("main.index"))
         else:
@@ -149,6 +166,9 @@ def login_page():
             session["user_name"] = user.get("name")
             session["user_credits"] = user.get("credits", 0.0)
             session["is_admin"] = False
+            
+            logger.info(f"Login bem-sucedido para {full_phone_number}")
+            
             flash("Login realizado com sucesso!", "success")
             return redirect(url_for("main.index"))
         elif user and not user.get("verified"):
@@ -156,6 +176,7 @@ def login_page():
             session["registering_phone"] = full_phone_number 
             return redirect(url_for("auth.verify_code_page"))
         else:
+            logger.warning(f"Tentativa de login falhou para {full_phone_number}")
             flash("DDD/Número de celular ou senha inválidos.", "error")
             return redirect(url_for("auth.login_page"))
     return render_template("login.html")
@@ -170,9 +191,9 @@ def admin_login_page():
             flash("E-mail e senha são obrigatórios.", "error")
             return redirect(url_for("auth.admin_login_page"))
 
-        if email == admin_credentials.get("email", "admin@bancaferradura.com") and password == admin_credentials.get("password", "admin123"):
+        if email == admin_credentials["email"] and password == admin_credentials["password"]:
             session["admin_logged_in"] = True
-            session["admin_name"] = admin_credentials.get("name", "Administrador")
+            session["admin_name"] = admin_credentials["name"]
             session["is_admin"] = True
             # Limpar qualquer sessão de jogador que possa existir
             session.pop("user_phone", None)
