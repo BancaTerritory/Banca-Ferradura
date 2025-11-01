@@ -1,7 +1,7 @@
 import sys
 import os
 import logging
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))) # DON'T CHANGE THIS !!!
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import random
@@ -10,24 +10,20 @@ from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Configuração de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Credenciais do Twilio a partir de variáveis de ambiente
+# Credenciais do Twilio - ATUALIZADAS
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'ACb43a431fa025e2cc4ca995ae474a52c9')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '961f5c65db7bd9e011c7d9906589de5c')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+12189750606')
 
-# For a prototype, we'll use a simple in-memory dictionary to store users and their passwords.
-# In a real application, you would use a database.
-# { "phone_number_complete": { "name": "User Name", "password": "xxxx", "credits": 0.0, "verified": False, "verification_code": "yyyy" } }
+# Banco de dados em memória
 users_db = {}
 
-# Administrador - Login por e-mail
+# Administrador
 admin_credentials = {
     "email": "admin@bancaferradura.com",
     "password": "admin123",
@@ -35,7 +31,6 @@ admin_credentials = {
 }
 
 auth_bp = Blueprint("auth", __name__)
-
 
 def generate_short_code(length=4):
     return "".join(random.choices(string.digits, k=length))
@@ -62,16 +57,16 @@ def register():
         full_phone_number = ddd + phone_number_part
 
         if full_phone_number in users_db:
-            flash("Este número de celular (DDD + Número) já está cadastrado. Tente fazer login.", "error")
+            flash("Este número de celular já está cadastrado. Tente fazer login.", "error")
             return redirect(url_for("auth.register"))
 
-        # Gerar código de verificação de 4 dígitos (que será a senha permanente)
+        # Gerar código de 4 dígitos (senha permanente)
         verification_code = generate_short_code(4)
         
-        # Armazenar dados do usuário temporariamente
+        # Armazenar usuário
         users_db[full_phone_number] = {
             "name": name,
-            "password": verification_code,  # SENHA PERMANENTE = código de 4 dígitos
+            "password": verification_code,
             "credits": 0.0,
             "verified": False,
             "is_admin": False,
@@ -80,14 +75,13 @@ def register():
         
         session["registering_phone"] = full_phone_number
         
-        # Formatando o número para o padrão internacional exigido pelo Twilio
+        # Formatar número internacional
         international_phone = "+55" + full_phone_number
         
         try:
-            # Inicializar cliente Twilio
+            # Enviar APENAS 1 SMS
             client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
             
-            # Enviar APENAS 1 SMS com o código de 4 dígitos
             message = client.messages.create(
                 body=f"Banca Ferradura: Seu código de acesso é {verification_code}. Use este código para fazer login.",
                 from_=TWILIO_PHONE_NUMBER,
@@ -99,7 +93,6 @@ def register():
             flash(f"Um código de acesso foi enviado para o número {full_phone_number}. Por favor, insira o código recebido por SMS.", "info")
             return redirect(url_for("auth.verify_code_page"))
         except Exception as e:
-            # Em caso de erro, informamos o usuário e removemos o cadastro temporário
             users_db.pop(full_phone_number, None)
             session.pop("registering_phone", None)
             logger.error(f"Erro ao enviar SMS: {str(e)}")
@@ -126,11 +119,11 @@ def verify_code_page():
         stored_code = users_db[registering_phone].get("verification_code")
         
         if stored_code and code_entered == stored_code:
-            # Código correto, ativar a conta (a senha já foi definida no registro)
+            # Ativar conta
             users_db[registering_phone]["verified"] = True
             
             session.pop("registering_phone", None)
-            # Logar o usuário automaticamente após verificação bem-sucedida
+            # Login automático
             session["user_phone"] = registering_phone
             session["user_name"] = user_data_pending.get("name")
             session["user_credits"] = user_data_pending.get("credits", 0.0)
@@ -145,7 +138,6 @@ def verify_code_page():
             return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
 
     return render_template("verify_code.html", phone=registering_phone, name=user_data_pending.get("name"))
-
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login_page(): 
@@ -195,7 +187,6 @@ def admin_login_page():
             session["admin_logged_in"] = True
             session["admin_name"] = admin_credentials["name"]
             session["is_admin"] = True
-            # Limpar qualquer sessão de jogador que possa existir
             session.pop("user_phone", None)
             session.pop("user_name", None)
             session.pop("user_credits", None)
@@ -205,7 +196,6 @@ def admin_login_page():
             flash("E-mail ou senha de administrador inválidos.", "error")
             return redirect(url_for("auth.admin_login_page"))
     return render_template("admin_login.html")
-
 
 @auth_bp.route("/logout")
 def logout():
