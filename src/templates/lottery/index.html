@@ -1,136 +1,357 @@
 {% extends "base.html" %}
-{% set lottery_numbers = lottery_numbers|default([]) %}
-{% set draw_date = draw_date|default('') %}
-{% set draw_numbers = draw_numbers|default([]) %}
 
-{% block title %}Loterias - Banca Ferradura{% endblock %}
+{% block title %}Dashboard - Banca Ferradura{% endblock %}
 
 {% block content %}
-<div class="lottery-container">
-  <!-- Cabeçalho com saldo -->
-  <div class="lottery-header">
-    <h1>LOTERIAS</h1>
-    <div class="balance-container">
-      <i class="fas fa-coins"></i>
-      <span class="balance">{{ "%.2f"|format(balance|default(0)) }}</span>
-      <button class="balance-details"><i class="fas fa-bars"></i></button>
+<div class="auth-container">
+    <div class="logo-container">
+        <img src="https://raw.githubusercontent.com/BancaTerritory/Banca-Ferradura/main/src/static/img/ferradura.jpg" alt="ferradura" class="ferradura-logo">
+        <div class="logo-text">BANCA FERRADURA</div>
     </div>
-  </div>
+    <div class="auth-logo-subtitle">A SUA SORTE NO DESTINO CERTO</div>
 
-  <!-- Menu de navegação principal -->
-  <div class="lottery-nav">
-    <a href="#" class="nav-item active" data-target="apostar">
-      <i class="fas fa-ticket-alt"></i>
-      <span>APOSTAR</span>
-    </a>
-    <a href="#" class="nav-item" data-target="minhas-apostas">
-      <i class="fas fa-list-alt"></i>
-      <span>MINHAS APOSTAS</span>
-    </a>
-    <a href="#" class="nav-item" data-target="historico">
-      <i class="fas fa-history"></i>
-      <span>HISTÓRICO</span>
-    </a>
-    <a href="#" class="nav-item" data-target="como-jogar">
-      <i class="fas fa-question-circle"></i>
-      <span>COMO JOGAR</span>
-    </a>
-  </div>
+    {% with messages = get_flashed_messages(with_categories=true ) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-  <!-- Conteúdo das seções -->
-  <div class="content-section active" id="apostar">
-    <div class="options-grid">
-      <a href="{{ url_for('lottery_blueprint_v1.modalidade') }}" class="option-card">
-        <div class="option-icon"><i class="fas fa-paw"></i></div>
-        <div class="option-title">Jogo do Bicho</div>
-      </a>
-      <!-- Adicione mais opções de jogos aqui -->
+    <div class="header-balance">
+        <h2>Bem-vindo ao Jogo do Bicho!</h2>
+        <span class="balance-info">Saldo: R$ {{ "%.2f"|format(balance|default(0)) }}</span>
     </div>
-  </div>
 
-  <div class="content-section" id="minhas-apostas">
-    <h2>Minhas Apostas</h2>
-    <div class="bets-list">
-      <!-- Lista de apostas do usuário -->
-      {% if user_bets|default([]) %}
-        {% for bet in user_bets %}
-          <div class="bet-item">
-            <div class="bet-info">
-              <span class="bet-type">{{ bet.type }}</span>
-              <span class="bet-date">{{ bet.date }}</span>
+    <div class="user-actions">
+        <a href="{{ url_for('payments.recharge_page') }}" class="btn btn-primary">
+            <i data-lucide="credit-card" style="vertical-align: middle;"></i> Recarregar
+        </a>
+        <a href="{{ url_for('payments.withdraw_page') }}" class="btn btn-secondary">
+            <i data-lucide="dollar-sign" style="vertical-align: middle;"></i> Sacar
+        </a>
+        <a href="{{ url_for('main.index') }}" class="btn btn-back">
+            <i data-lucide="arrow-left" style="vertical-align: middle;"></i> Voltar ao Dashboard
+        </a>
+    </div>
+
+    <div class="lottery-nav">
+        <a href="#" class="nav-item active" data-target="apostar">
+            <i data-lucide="ticket" style="vertical-align: middle;"></i> APOSTAR
+        </a>
+        <a href="#" class="nav-item" data-target="minhas-apostas">
+            <i data-lucide="list" style="vertical-align: middle;"></i> MINHAS APOSTAS
+        </a>
+        <a href="#" class="nav-item" data-target="historico">
+            <i data-lucide="history" style="vertical-align: middle;"></i> HISTÓRICO
+        </a>
+        <a href="#" class="nav-item" data-target="como-jogar">
+            <i data-lucide="help-circle" style="vertical-align: middle;"></i> COMO JOGAR
+        </a>
+    </div>
+
+    <div class="content-section active" id="apostar">
+        <div class="options-grid">
+            <a href="{{ url_for('lottery_blueprint_v1.modalidade') }}" class="option-card">
+                <div class="option-icon"><i data-lucide="paw-print"></i></div>
+                <div class="option-title">Jogo do Bicho</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="content-section" id="minhas-apostas">
+        <h2>Minhas Apostas</h2>
+        <div class="bets-list">
+            {% if user_bets|default([]) %}
+                {% for bet in user_bets %}
+                    <div class="bet-item">
+                        <div class="bet-info">
+                            <span class="bet-type">{{ bet.type }}</span>
+                            <span class="bet-date">{{ bet.date }}</span>
+                        </div>
+                        <div class="bet-amount">R$ {{ "%.2f"|format(bet.amount) }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-message">Você ainda não fez nenhuma aposta.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="content-section" id="historico">
+        <h2>Histórico</h2>
+        <div class="history-list">
+            {% if lottery_history|default([]) %}
+                {% for item in lottery_history %}
+                    <div class="history-item">
+                        <div class="history-date">{{ item.date }}</div>
+                        <div class="history-result">{{ item.result }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-message">Nenhum histórico disponível.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="content-section" id="como-jogar">
+        <h2>Como Jogar</h2>
+        <div class="instructions">
+            <div class="instruction-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Escolha o jogo</h3>
+                    <p>Selecione entre as diversas modalidades disponíveis.</p>
+                </div>
             </div>
-            <div class="bet-amount">R$ {{ "%.2f"|format(bet.amount) }}</div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p class="empty-message">Você ainda não fez nenhuma aposta.</p>
-      {% endif %}
-    </div>
-  </div>
 
-  <div class="content-section" id="historico">
-    <h2>Histórico</h2>
-    <div class="history-list">
-      <!-- Histórico de resultados -->
-      {% if lottery_history|default([]) %}
-        {% for item in lottery_history %}
-          <div class="history-item">
-            <div class="history-date">{{ item.date }}</div>
-            <div class="history-result">{{ item.result }}</div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p class="empty-message">Nenhum histórico disponível.</p>
-      {% endif %}
-    </div>
-  </div>
+            <div class="instruction-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Faça sua aposta</h3>
+                    <p>Escolha os números, grupos ou combinações de sua preferência.</p>
+                </div>
+            </div>
 
-  <div class="content-section" id="como-jogar">
-    <h2>Como Jogar</h2>
-    <div class="instructions">
-      <div class="instruction-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h3>Escolha o jogo</h3>
-          <p>Selecione entre as diversas modalidades disponíveis.</p>
-        </div>
-      </div>
-      <div class="instruction-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h3>Faça sua aposta</h3>
-          <p>Escolha os números, grupos ou combinações de sua preferência.</p>
-        </div>
-      </div>
-      <div class="instruction-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h3>Confirme o pagamento</h3>
-          <p>Revise sua aposta e confirme o pagamento.</p>
-        </div>
-      </div>
-      <div class="instruction-step">
-        <div class="step-number">4</div>
-        <div class="step-content">
-          <h3>Acompanhe o resultado</h3>
-          <p>Verifique os resultados na seção de histórico.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div class="instruction-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Confirme o pagamento</h3>
+                    <p>Revise sua aposta e confirme o pagamento.</p>
+                </div>
+            </div>
 
-  <!-- Menu lateral (opcional) -->
-  <div class="side-menu">
-    <div class="menu-header">
-      <h2>Menu</h2>
-      <button class="close-menu"><i class="fas fa-times"></i></button>
+            <div class="instruction-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Acompanhe o resultado</h3>
+                    <p>Verifique os resultados na seção de histórico.</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <ul class="menu-list">
-      <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.modalidade') }}">Apostar</a></li>
-      <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}">Minhas Apostas</a></li>
-      <li class="menu-item"><a href="{{ url_for('lottery_blueprint_v1.api_grupos') }}">Histórico</a></li>
-      <li class="menu-item"><a href="{{ url_for('main.index') }}">Voltar ao Dashboard</a></li>
-    </ul>
-  </div>
 </div>
+
+<style>
+.lottery-nav {
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    border-radius: 12px;
+    padding: 10px;
+    margin: 20px 0;
+    gap: 10px;
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    color: #e0e0e0;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: rgba(255, 215, 0, 0.1);
+    color: #FFD700;
+    text-decoration: none;
+}
+
+.nav-item.active {
+    background: #FFD700;
+    color: #1a1a1a;
+}
+
+.content-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.content-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.option-card {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.option-card:hover {
+    border-color: #FFD700;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+    text-decoration: none;
+    color: #e0e0e0;
+}
+
+.option-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #FFD700;
+}
+
+.option-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.bets-list, .history-list {
+    margin-top: 20px;
+}
+
+.bet-item, .history-item {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bet-info, .history-date {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.bet-type, .history-result {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.bet-date {
+    color: #999;
+    font-size: 12px;
+}
+
+.bet-amount {
+    color: #4CAF50;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-style: italic;
+}
+
+.instructions {
+    margin-top: 20px;
+}
+
+.instruction-step {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    align-items: flex-start;
+}
+
+.step-number {
+    background: #FFD700;
+    color: #1a1a1a;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    margin: 0 0 8px 0;
+    color: #FFD700;
+    font-size: 16px;
+}
+
+.step-content p {
+    margin: 0;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.btn-back {
+    background: #666;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-back:hover {
+    background: #777;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .lottery-nav {
+        flex-wrap: wrap;
+    }
+
+    .nav-item {
+        font-size: 12px;
+        padding: 10px 5px;
+    }
+
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            navItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+
+            const target = this.getAttribute('data-target');
+            
+            contentSections.forEach(section => section.classList.remove('active'));
+            document.getElementById(target).classList.add('active');
+        });
+    });
+});
+</script>
 {% endblock %}
