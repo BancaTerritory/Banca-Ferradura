@@ -25,12 +25,29 @@ def create_app():
     app.register_blueprint(payment_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(casino_bp)
-    app.register_blueprint(lottery_bp, url_prefix='/lottery')
+    app.register_blueprint(lottery_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(user_bp)
     
-    # Rotas principais agora estão em main_routes.py
-    # Removido para evitar conflito com main_bp
+    @app.route('/')
+    def index():
+        """Página principal - Dashboard"""
+        if not session.get("user_phone"):
+            return redirect(url_for("auth.login_page"))
+        
+        # Dados do usuário para o dashboard
+        user_data = {
+            'phone': session.get("user_phone"),
+            'credits': session.get("user_credits", 0.0),
+            'name': session.get("user_name", "Usuário")
+        }
+        
+        return render_template('index.html', user=user_data)
+    
+    @app.route('/dashboard')
+    def dashboard():
+        """Redirecionar para página principal"""
+        return redirect(url_for("index"))
     
     return app
 
@@ -41,4 +58,3 @@ app = create_app()
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
