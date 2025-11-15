@@ -31,11 +31,12 @@ def create_app():
     
     @app.route('/')
     def index():
-        """Página principal - Dashboard"""
+        """Página principal - Dashboard ou Cadastro"""
         if not session.get("user_phone"):
-            return redirect(url_for("auth.login_page"))
+            # Se não estiver logado, mostrar tela de CADASTRO
+            return render_template('register.html')
         
-        # Dados do usuário para o dashboard
+        # Se estiver logado, mostrar dashboard
         user_data = {
             'phone': session.get("user_phone"),
             'credits': session.get("user_credits", 0.0),
@@ -58,3 +59,4 @@ app = create_app()
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
