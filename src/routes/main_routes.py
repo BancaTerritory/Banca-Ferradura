@@ -13,7 +13,7 @@ def index():
         # Se estiver autenticado, mostrar a dashboard
         return render_template("index.html")
     else:
-        # Se não estiver autenticado, redirecionar para a página de cadastro/login
-        return redirect(url_for("auth.register"))
+        # Se não estiver autenticado, mostrar a página de cadastro diretamente
+        return render_template("register.html")
 
 
