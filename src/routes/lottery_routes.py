@@ -40,8 +40,8 @@ COLOCACOES = ['1º PRÊMIO', '2º PRÊMIO', '3º PRÊMIO', '4º PRÊMIO', '5º P
 # from src.main import lottery_bp
 
 
-# Rota principal da loteria
-@lottery_bp.route('/')
+# Rota principal da loteria (mudada de / para /jogo-do-bicho para evitar conflito)
+@lottery_bp.route('/jogo-do-bicho')
 def index():
     # Adiciona a variável balance que está faltando no template
     balance = 0
